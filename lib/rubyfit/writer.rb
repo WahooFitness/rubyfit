@@ -44,6 +44,7 @@ class RubyFit::Writer
       end_x: opts[:end_x],
       end_y: opts[:end_y],
       total_distance: opts[:total_distance],
+      total_ascent: opts[:total_ascent],
       sport: opts[:sport],
       subsport: opts[:subsport]
     })
