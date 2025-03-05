@@ -27,8 +27,8 @@ class RubyFit::Writer
     write_message(:file_id, {
       time_created: opts[:time_created],
       type: 6, # Course file
-      manufacturer: 1, # Garmin
-      product: PRODUCT_ID,
+      manufacturer: opts[:manufacturer],
+      product: opts[:product],
       serial_number: 0,
     })
 
@@ -43,7 +43,9 @@ class RubyFit::Writer
       start_y: opts[:start_y],
       end_x: opts[:end_x],
       end_y: opts[:end_y],
-      total_distance: opts[:total_distance]
+      total_distance: opts[:total_distance],
+      sport: opts[:sport],
+      subsport: opts[:subsport]
     })
 
     write_message(:event, {

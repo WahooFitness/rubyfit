@@ -37,6 +37,8 @@ class RubyFit::MessageWriter
         end_y: { id: 5, type: RubyFit::Type.semicircles },
         end_x: { id: 6, type: RubyFit::Type.semicircles },
         total_distance: { id: 9, type: RubyFit::Type.centimeters },
+        sport: { id: 25, type: RubyFit::Type.enum(RubyFit::MessageConstants::SPORT), required: false },
+        subsport: { id: 24, type: RubyFit::Type.enum(RubyFit::MessageConstants::SUBSPORT), required: false }
       },
     },
     course_point: {
