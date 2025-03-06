@@ -88,7 +88,7 @@ module RubyFit::Helpers
 
 
   def deg2semicircles(degrees)
-    (degrees * DEGREES_TO_SEMICIRCLES).truncate
+    (degrees * DEGREES_TO_SEMICIRCLES)
   end
 
   def semicircles2deg(degrees)
