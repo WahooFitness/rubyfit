@@ -140,21 +140,21 @@ class RubyFit::Type
 
     def centimeters
       uint32({
-        rb2fit: ->(val, type) { (val * 100).truncate },
+        rb2fit: ->(val, type) { (val * 100) },
         fit2rb: ->(val, type) { val / 100.0 }
       })
     end
 
     def altitude
       uint16({
-        rb2fit: ->(val, type) { ((val + 500) * 5).truncate },
+        rb2fit: ->(val, type) { ((val + 500) * 5) },
         fit2rb: ->(val, type) { val / 5.0 - 500 }
       })
     end
 
     def duration
       uint32({
-        rb2fit: ->(val, type) { (val * 1000).truncate },
+        rb2fit: ->(val, type) { (val * 1000) },
         fit2rb: ->(val, type) { val / 1000.0 }
       })
     end
