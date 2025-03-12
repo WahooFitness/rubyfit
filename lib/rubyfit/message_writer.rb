@@ -49,7 +49,7 @@ class RubyFit::MessageWriter
         y: { id: 2, type: RubyFit::Type.semicircles, required: true },
         x: { id: 3, type: RubyFit::Type.semicircles, required: true },
         distance: { id: 4, type: RubyFit::Type.centimeters },
-        name: { id: 6, type: RubyFit::Type.string(32) },
+        name: { id: 6, type: RubyFit::Type.string(48) },
         message_index: { id: 254, type: RubyFit::Type.uint16 },
         type: { id: 5, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::COURSE_POINT_TYPE, required: true }
       },
