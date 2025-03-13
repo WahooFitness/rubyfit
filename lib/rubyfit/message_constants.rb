@@ -26,6 +26,8 @@ module RubyFit::MessageConstants
     sharp_right: 22,
     u_turn: 23,
     segment_start: 24,
+    checkpoint: 35,
+    toilet: 39,
     segment_end: 25
   }.freeze
 
