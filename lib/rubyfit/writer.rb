@@ -238,13 +238,16 @@ class RubyFit::Writer
       @last_local_num += 1
       local_num = @last_local_num
       @local_nums[type] = local_num
+      puts("local_num1", local_num)
       write_data(RubyFit::MessageWriter.definition_message(type, local_num))
     end
 
+    puts("local_num", local_num)
     write_data(RubyFit::MessageWriter.data_message(type, local_num, values))
   end
 
   def write_data(data)
+    puts("writing data", data)
     @stream.write(data)
     prev = @data_crc
     @data_crc = RubyFit::CRC.update_crc(@data_crc, data)
