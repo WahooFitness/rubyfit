@@ -149,6 +149,16 @@ class RubyFit::Writer
       local_timestamp: opts[:local_timestamp]
     })
 
+    write_message(:workout, {
+      sport: opts[:sport],
+      # capabilities: opts[:capabilities],
+      num_valid_steps: opts[:num_valid_steps],
+      wkt_name: opts[:name],
+      sub_sport: opts[:subsport],
+      # pool_length: opts[:pool_length],
+      # pool_length_unit: opts[:pool_length_unit]
+    })
+
     # yield for sessions, laps (within a session), and records
     yield
 
@@ -232,22 +242,18 @@ class RubyFit::Writer
   protected
 
   def write_message(type, values)
-    puts("writing message", type, values)
     local_num = @local_nums[type]
     unless local_num
       @last_local_num += 1
       local_num = @last_local_num
       @local_nums[type] = local_num
-      puts("local_num1", local_num)
       write_data(RubyFit::MessageWriter.definition_message(type, local_num))
     end
 
-    puts("local_num", type, local_num, values)
     write_data(RubyFit::MessageWriter.data_message(type, local_num, values))
   end
 
   def write_data(data)
-    puts("writing data", data)
     @stream.write(data)
     prev = @data_crc
     @data_crc = RubyFit::CRC.update_crc(@data_crc, data)
