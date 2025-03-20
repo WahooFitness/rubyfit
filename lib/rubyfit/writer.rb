@@ -144,9 +144,9 @@ class RubyFit::Writer
       total_timer_time: opts[:total_timer_time],
       num_sessions: opts[:num_sessions],
       type: opts[:type],
-      event: opts[:event],
-      event_type: opts[:event_type],
-      local_timestamp: opts[:local_timestamp]
+      # event: opts[:event],
+      # event_type: opts[:event_type],
+      # local_timestamp: opts[:local_timestamp]
     })
 
     # yield for sessions, laps (within a session), and records
