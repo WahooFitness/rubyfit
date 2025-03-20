@@ -127,7 +127,7 @@ class RubyFit::Writer
 
     @data_crc = 0
 
-    data_size = calculate_workout_data_size( 0, opts[lap_count], opts[session_count], opts[event_count],0, 0)
+    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, 0)
     write_data(RubyFit::MessageWriter.file_header(data_size))
 
     write_message(:file_id, {
