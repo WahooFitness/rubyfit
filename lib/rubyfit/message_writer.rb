@@ -51,7 +51,7 @@ class RubyFit::MessageWriter
         max_power: { id: 20, type: RubyFit::Type.uint16 },
         total_work: { id: 41, type: RubyFit::Type.uint32 },
         total_calories: { id: 11, type: RubyFit::Type.uint16 },
-        lap_trigger: { id: 24, type: RubyFit::Type.enum(RubyFit::MessageConstants::LAP_TRIGGER) },
+        # lap_trigger: { id: 24, type: RubyFit::Type.enum(RubyFit::MessageConstants::LAP_TRIGGER) },
         normalized_power: { id: 33, type: RubyFit::Type.uint16 },
         total_moving_time: { id: 52, type: RubyFit::Type.duration },
         # time_in_hr_zone: { id: 57, type: RubyFit::Type.uint32 }, # should be array of hr_zone type
@@ -134,7 +134,7 @@ class RubyFit::MessageWriter
         software_version: { id: 5, type: RubyFit::Type.uint16 },
         hardware_version: { id: 6, type: RubyFit::Type.uint8 },
         battery_voltage: { id: 10, type: RubyFit::Type.uint16 },
-        battery_status: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::BATTERY_STATUS },
+        # battery_status: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::BATTERY_STATUS },
         ant_device_number: { id: 21, type: RubyFit::Type.uint16 },
         device_index: { id: 0, type: RubyFit::Type.uint8 }
       }
