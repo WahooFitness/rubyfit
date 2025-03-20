@@ -132,21 +132,21 @@ class RubyFit::Writer
 
     write_message(:file_id, {
       time_created: opts[:time_created],
-      type: 5, # workout file
+      type: 4, # activity file
       manufacturer: opts[:manufacturer],
       product: opts[:product],
       serial_number: 0,
     })
 
-    # Every FIT activity file MUST contain an activity message as the second message
+    # Every FIT activity file MUST contain an activity message
     write_message(:activity, {
       timestamp: opts[:timestamp],
       total_timer_time: opts[:total_timer_time],
-      num_sessions: opts[:num_sessions],
+      num_sessions: opts[:session_count],
       type: opts[:type],
-      # event: opts[:event],
-      # event_type: opts[:event_type],
-      # local_timestamp: opts[:local_timestamp]
+      event: opts[:event],
+      event_type: opts[:event_type],
+      local_timestamp: opts[:local_timestamp]
     })
 
     # yield for sessions, laps (within a session), and records
@@ -232,6 +232,7 @@ class RubyFit::Writer
   protected
 
   def write_message(type, values)
+    puts("writing message", type, values)
     local_num = @local_nums[type]
     unless local_num
       @last_local_num += 1
