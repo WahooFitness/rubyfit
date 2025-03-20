@@ -242,7 +242,7 @@ class RubyFit::Writer
       write_data(RubyFit::MessageWriter.definition_message(type, local_num))
     end
 
-    puts("local_num", local_num)
+    puts("local_num", type, local_num, values)
     write_data(RubyFit::MessageWriter.data_message(type, local_num, values))
   end
 

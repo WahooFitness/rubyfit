@@ -238,8 +238,9 @@ class RubyFit::MessageWriter
             raise ArgumentError.new("Invalid value for '#{field}' in #{type} data message values")
           end
         end
-
+        puts("value", value)
         value_bytes = value ? field_type.val2bytes(value) : field_type.default_bytes
+        puts("value_bytes", value_bytes)
         bytes.push(*value_bytes)
       end
     end
