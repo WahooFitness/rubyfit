@@ -106,8 +106,8 @@ class RubyFit::MessageWriter
         num_valid_steps: { id: 6, type: RubyFit::Type.uint16 },
         wkt_name: { id: 8, type: RubyFit::Type.string(16) },
         sub_sport: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT },
-        pool_length: { id: 14, type: RubyFit::Type.uint16 },
-        pool_length_unit: { id: 15, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::DISPLAY_MEASURE }
+        # pool_length: { id: 14, type: RubyFit::Type.uint16 },
+        # pool_length_unit: { id: 15, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::DISPLAY_MEASURE }
       }
     },
     hr_zone: {
