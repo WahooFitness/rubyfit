@@ -164,4 +164,92 @@ module RubyFit::MessageConstants
     all: 254
   }.freeze
 
+  DISPLAY_MEASURE = {
+    metric: 0,
+    stature: 1,
+    nautical: 2
+  }.freeze
+
+  DURATION_TYPE = {
+    time: 0,
+    distance: 1,
+    hr_less_than: 2,
+    hr_greater_than: 3,
+    calories: 4,
+    open: 5,
+    repeat_until_steps_cmplt: 6,
+    repeat_until_time: 7,
+    repeat_until_distance: 8,
+    repeat_until_calories: 9,
+    repeat_until_hr_less_than: 10,
+    repeat_until_hr_greater_than: 11,
+    repeat_until_power_less_than: 12,
+    repeat_until_power_greater_than: 13,
+    power_less_than: 14,
+    power_greater_than: 15,
+    training_peaks_tss: 16,
+    repeat_until_power_last_lap_less_than: 17,
+    repeat_until_max_power_last_lap_less_than: 18,
+    power_3s_less_than: 19,
+    power_10s_less_than: 20,
+    power_30s_less_than: 21,
+    power_3s_greater_than: 22,
+    power_10s_greater_than: 23,
+    power_30s_greater_than: 24,
+    power_lap_less_than: 25,
+    power_lap_greater_than: 26,
+    repeat_until_training_peaks_tss: 27,
+    repetition_time: 28,
+    reps: 29,
+    time_only: 31
+  }.freeze
+
+  TARGET_TYPE = {
+    speed: 0,
+    heart_rate: 1,
+    open: 2,
+    cadence: 3,
+    power: 4,
+    grade: 5,
+    resistance: 6,
+    power_3s: 7,
+    power_10s: 8,
+    power_30s: 9,
+    power_lap: 10,
+    swim_stroke: 11,
+    speed_lap: 12,
+    heart_rate_lap: 13
+  }.freeze
+
+  INTENSITY = {
+    active: 0,
+    rest: 1,
+    warmup: 2,
+    cooldown: 3,
+    recovery: 4,
+    interval: 5,
+    other: 6
+  }.freeze
+
+  WORKOUT_EQUIPMENT = {
+    none: 0,
+    swim_fins: 1,
+    swim_kickboard: 2,
+    swim_paddles: 3,
+    swim_pull_buoy: 4,
+    swim_snorkel: 5
+  }.freeze
+
+  ACTIVITY_TYPE = {
+    generic: 0,
+    running: 1,
+    cycling: 2,
+    transition: 3,
+    fitness_equipment: 4,
+    swimming: 5,
+    walking: 6,
+    sedentary: 8,
+    all: 254
+  }.freeze
+
 end
