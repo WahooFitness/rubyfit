@@ -41,8 +41,8 @@ class RubyFit::MessageWriter
         sport: { id: 25, type: RubyFit::Type.enum(RubyFit::MessageConstants::SPORT), required: false },
         subsport: { id: 39, type: RubyFit::Type.enum(RubyFit::MessageConstants::SUBSPORT), required: false },
 
-        event: { id: 0, type: RubyFit::Type.enum(RubyFit::MessageConstants::EVENT), required: false },
-        event_type: { id: 1, type: RubyFit::Type.enum(RubyFit::MessageConstants::EVENT_TYPE), required: false },
+        event: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: false },
+        event_type: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: false },
         avg_heart_rate: { id: 15, type: RubyFit::Type.uint8 },
         max_heart_rate: { id: 16, type: RubyFit::Type.uint8 },
         avg_cadence: { id: 17, type: RubyFit::Type.uint8 },
@@ -128,7 +128,7 @@ class RubyFit::MessageWriter
       id: 23,
       fields: {
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
-        serial_number: { id: 3, type: RubyFit::Type.uint32z, required: true },
+        serial_number: { id: 3, type: RubyFit::Type.uint32z },
         manufacturer: { id: 2, type: RubyFit::Type.uint16 },
         product: { id: 4, type: RubyFit::Type.uint16 },
         software_version: { id: 5, type: RubyFit::Type.uint16 },
@@ -199,6 +199,32 @@ class RubyFit::MessageWriter
         event: { id: 3, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT },
         event_type: { id: 4, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE },
         local_timestamp: { id: 5, type: RubyFit::Type.timestamp },
+      }
+    },
+
+    length: {
+      id: 101,
+      fields: {
+        timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
+        event: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: true },
+        event_type: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: true },
+        start_time: { id: 2, type: RubyFit::Type.timestamp, required: true },
+        total_elapsed_time: { id: 3, type: RubyFit::Type.duration },
+        total_timer_time: { id: 4, type: RubyFit::Type.duration },
+        total_strokes: { id: 5, type: RubyFit::Type.uint16 },
+        avg_speed: { id: 6, type: RubyFit::Type.uint16 },
+        swim_stroke: { id: 7, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SWIM_STROKE },
+        avg_swimming_cadence: { id: 9, type: RubyFit::Type.uint8 },
+        total_calories: { id: 11, type: RubyFit::Type.uint16 },
+        length_type: { id: 12, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::LENGTH_TYPE },
+        player_score: { id: 18, type: RubyFit::Type.uint16 },
+        opponent_score: { id: 19, type: RubyFit::Type.uint16 },
+        stroke_count: { id: 20, type: RubyFit::Type.uint16 },
+        zone_count: { id: 21, type: RubyFit::Type.uint16 },
+        enhanced_avg_respiration_rate: { id: 22, type: RubyFit::Type.uint16 },
+        enhanced_max_respiration_rate: { id: 23, type: RubyFit::Type.uint16 },
+        avg_respiration_rate: { id: 24, type: RubyFit::Type.uint8 },
+        max_respiration_rate: { id: 25, type: RubyFit::Type.uint8 }
       }
     }
   }

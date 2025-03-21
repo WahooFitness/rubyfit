@@ -252,4 +252,19 @@ module RubyFit::MessageConstants
     all: 254
   }.freeze
 
+  LENGTH_TYPE = {
+    idle: 0,
+    active: 1
+  }.freeze
+
+  SWIM_STROKE = {
+    freestyle: 0,
+    backstroke: 1,
+    breaststroke: 2,
+    butterfly: 3,
+    drill: 4,
+    mixed: 5,
+    im: 6
+  }.freeze
+
 end

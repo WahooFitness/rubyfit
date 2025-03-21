@@ -121,13 +121,16 @@ class RubyFit::Writer
 
     @stream = stream
 
-    %i(start_time workout_step_count lap_count session_count event_count).each do |key|
+    %i(start_time duration workout_step_count lap_count session_count event_count).each do |key|
       raise ArgumentError.new("Missing required option #{key}") unless opts[key]
     end
 
+    start_time = opts[:start_time].to_i
+    duration = opts[:duration].to_i
+
     @data_crc = 0
 
-    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, 0)
+    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, 0, opts[:device_info_count], opts[:length_count])
     write_data(RubyFit::MessageWriter.file_header(data_size))
 
     write_message(:file_id, {
@@ -159,8 +162,22 @@ class RubyFit::Writer
       # pool_length_unit: opts[:pool_length_unit]
     })
 
-    # yield for sessions, laps (within a session), and records
+    write_message(:event, {
+      timestamp: start_time,
+      event: :timer,
+      event_type: :start,
+      event_group: 0
+    })
+
+    # yield for sessions, laps, lengths, device_infos and records
     yield
+
+    write_message(:event, {
+      timestamp: start_time + duration,
+      event: :timer,
+      event_type: :stop_disable_all,
+      event_group: 0
+    })
 
     # Update the data size in the header and calculate the CRC
     write_data(RubyFit::MessageWriter.crc(@data_crc))
@@ -209,6 +226,20 @@ class RubyFit::Writer
     @state = :write
   end
 
+  def device_infos
+    raise "Can only write device infos inside 'write' block" if @state != :write
+    @state = :device_infos
+    yield
+    @state = :write
+  end
+
+  def lengths
+    raise "Can only write lengths inside 'write' block" if @state != :write
+    @state = :lengths
+    yield
+    @state = :write
+  end
+
   def course_point(values)
     raise "Can only write course points inside 'course_points' block" if @state != :course_points
     write_message(:course_point, values)
@@ -237,6 +268,16 @@ class RubyFit::Writer
   def session(values)
     raise "Can only write sessions inside 'sessions' block" if @state != :sessions
     write_message(:session, values)
+  end
+
+  def device_info(values)
+    raise "Can only write device infos inside 'device_infos' block" if @state != :device_infos
+    write_message(:device_info, values)
+  end
+
+  def length(values)
+    raise "Can only write lengths inside 'lengths' block" if @state != :lengths
+    write_message(:length, values)
   end
 
   protected
@@ -280,16 +321,19 @@ class RubyFit::Writer
   end
 
 
-  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, track_point_count)
+  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, track_point_count, device_info_count, length_count)
     record_counts = {
       file_id: 1,
       workout: 1,
+      activity: 1,
       lap: lap_count,
-      event: event_count,
+      length: length_count,
+      event: event_count + 2,
       workout_step: workout_step_count,
       course_point: course_point_count,
       record: track_point_count,
-      session: session_count
+      session: session_count,
+      device_info: device_info_count
     }
 
     data_sizes = record_counts.map do |type, count|
