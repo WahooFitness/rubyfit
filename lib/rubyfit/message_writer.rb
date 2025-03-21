@@ -38,9 +38,8 @@ class RubyFit::MessageWriter
         end_x: { id: 6, type: RubyFit::Type.semicircles },
         total_distance: { id: 9, type: RubyFit::Type.centimeters },
         total_ascent: { id: 21, type: RubyFit::Type.altitude },
-        sport: { id: 25, type: RubyFit::Type.enum(RubyFit::MessageConstants::SPORT), required: false },
-        subsport: { id: 39, type: RubyFit::Type.enum(RubyFit::MessageConstants::SUBSPORT), required: false },
-
+        sport: { id: 25, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: false },
+        subsport: { id: 39, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT, required: false },
         event: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: false },
         event_type: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: false },
         avg_heart_rate: { id: 15, type: RubyFit::Type.uint8 },
@@ -51,7 +50,7 @@ class RubyFit::MessageWriter
         max_power: { id: 20, type: RubyFit::Type.uint16 },
         total_work: { id: 41, type: RubyFit::Type.uint32 },
         total_calories: { id: 11, type: RubyFit::Type.uint16 },
-        # lap_trigger: { id: 24, type: RubyFit::Type.enum(RubyFit::MessageConstants::LAP_TRIGGER) },
+        lap_trigger: { id: 24, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::LAP_TRIGGER },
         normalized_power: { id: 33, type: RubyFit::Type.uint16 },
         total_moving_time: { id: 52, type: RubyFit::Type.duration },
         # time_in_hr_zone: { id: 57, type: RubyFit::Type.uint32 }, # should be array of hr_zone type
@@ -87,6 +86,7 @@ class RubyFit::MessageWriter
         calories: { id: 33, type: RubyFit::Type.uint16 },
         enhanced_speed: { id: 73, type: RubyFit::Type.uint32 },
         battery_soc: { id: 78, type: RubyFit::Type.uint8 },
+        grade: { id: 9, type: RubyFit::Type.sint16 },
       }
     },
     event: {
@@ -104,7 +104,7 @@ class RubyFit::MessageWriter
         sport: { id: 4, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: true },
         # capabilities: { id: 5, type: RubyFit::Type.uint32z, required: true },  # should be workout_capabilities type
         num_valid_steps: { id: 6, type: RubyFit::Type.uint16 },
-        wkt_name: { id: 8, type: RubyFit::Type.string(16) },
+        wkt_name: { id: 8, type: RubyFit::Type.string(64) },
         sub_sport: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT },
         # pool_length: { id: 14, type: RubyFit::Type.uint16 },
         # pool_length_unit: { id: 15, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::DISPLAY_MEASURE }
@@ -135,8 +135,9 @@ class RubyFit::MessageWriter
         hardware_version: { id: 6, type: RubyFit::Type.uint8 },
         battery_voltage: { id: 10, type: RubyFit::Type.uint16 },
         # battery_status: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::BATTERY_STATUS },
-        ant_device_number: { id: 21, type: RubyFit::Type.uint16 },
-        device_index: { id: 0, type: RubyFit::Type.uint8 }
+        # ant_device_number: { id: 21, type: RubyFit::Type.uint16 },
+        device_index: { id: 0, type: RubyFit::Type.uint8 },
+        product_name: { id: 27, type: RubyFit::Type.string(20) }
       }
     },
     workout_step: {

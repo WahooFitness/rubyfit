@@ -267,4 +267,15 @@ module RubyFit::MessageConstants
     im: 6
   }.freeze
 
+  LAP_TRIGGER = {
+    manual: 0,
+    time: 1,
+    distance: 2,
+    position_start: 3,
+    position_lap: 4,
+    position_waypoint: 5,
+    position_marked: 6,
+    session_end: 7,
+    fitness_equipment: 8
+  }.freeze
 end

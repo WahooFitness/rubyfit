@@ -121,7 +121,7 @@ class RubyFit::Writer
 
     @stream = stream
 
-    %i(start_time duration workout_step_count lap_count session_count event_count).each do |key|
+    %i(start_time duration workout_step_count lap_count session_count event_count record_count).each do |key|
       raise ArgumentError.new("Missing required option #{key}") unless opts[key]
     end
 
@@ -130,7 +130,7 @@ class RubyFit::Writer
 
     @data_crc = 0
 
-    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, 0, opts[:device_info_count], opts[:length_count])
+    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, opts[:record_count], opts[:device_info_count], opts[:length_count])
     write_data(RubyFit::MessageWriter.file_header(data_size))
 
     write_message(:file_id, {
@@ -321,7 +321,7 @@ class RubyFit::Writer
   end
 
 
-  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, track_point_count, device_info_count, length_count)
+  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, record_count, device_info_count, length_count)
     record_counts = {
       file_id: 1,
       workout: 1,
@@ -331,7 +331,7 @@ class RubyFit::Writer
       event: event_count + 2,
       workout_step: workout_step_count,
       course_point: course_point_count,
-      record: track_point_count,
+      record: record_count,
       session: session_count,
       device_info: device_info_count
     }
