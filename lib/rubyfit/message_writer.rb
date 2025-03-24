@@ -114,8 +114,7 @@ class RubyFit::MessageWriter
       id: 12,
       fields: {
         sport: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: true },
-        sub_sport: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT },
-        name: { id: 3, type: RubyFit::Type.string(16) }
+        sub_sport: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT }
       }
     },
 

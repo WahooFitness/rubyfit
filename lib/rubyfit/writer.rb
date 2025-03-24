@@ -371,7 +371,7 @@ class RubyFit::Writer
     data_sizes = record_counts.map do |type, count|
       def_size = RubyFit::MessageWriter.definition_message_size(type)
       data_size = RubyFit::MessageWriter.data_message_size(type) * count
-      result = def_size + data_size if count > 0
+      result = def_size + data_size
       result
     end
 
