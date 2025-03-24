@@ -110,6 +110,15 @@ class RubyFit::MessageWriter
         # pool_length_unit: { id: 15, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::DISPLAY_MEASURE }
       }
     },
+    sport: {
+      id: 12,
+      fields: {
+        sport: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: true },
+        sub_sport: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT },
+        name: { id: 3, type: RubyFit::Type.string(16) }
+      }
+    },
+
     hr_zone: {
       id: 8,
       fields: {
