@@ -275,7 +275,7 @@ class RubyFit::Writer
 
   def lap(values)
     raise "Can only write laps inside 'laps' block" if @state != :laps
-    write_message(:lap, values)
+    write_message(:wkt_lap, values)
   end
 
   def record(values)
@@ -355,7 +355,7 @@ class RubyFit::Writer
       sport: 1,
       workout: 1,
       activity: 1,
-      lap: lap_count,
+      wkt_lap: lap_count,
       length: length_count,
       event: event_count + 2,
       workout_step: workout_step_count,
