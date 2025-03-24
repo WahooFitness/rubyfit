@@ -141,6 +141,16 @@ class RubyFit::Writer
       serial_number: 0,
     })
 
+    write_message(:activity, {
+      timestamp: opts[:timestamp],
+      total_timer_time: opts[:total_timer_time],
+      num_sessions: opts[:session_count],
+      type: opts[:type],
+      event: opts[:event],
+      event_type: opts[:event_type],
+      local_timestamp: opts[:local_timestamp]
+    })
+
     write_message(:sport, {
       sport: opts[:sport],
       sub_sport: opts[:subsport]
@@ -171,16 +181,6 @@ class RubyFit::Writer
       event: :timer,
       event_type: :stop_disable_all,
       event_group: 0
-    })
-
-    write_message(:activity, {
-      timestamp: opts[:timestamp],
-      total_timer_time: opts[:total_timer_time],
-      num_sessions: opts[:session_count],
-      type: opts[:type],
-      event: opts[:event],
-      event_type: opts[:event_type],
-      local_timestamp: opts[:local_timestamp]
     })
 
     # Update the data size in the header and calculate the CRC
