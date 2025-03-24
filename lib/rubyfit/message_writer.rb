@@ -38,8 +38,8 @@ class RubyFit::MessageWriter
         end_x: { id: 6, type: RubyFit::Type.semicircles },
         total_distance: { id: 9, type: RubyFit::Type.centimeters },
         total_ascent: { id: 21, type: RubyFit::Type.altitude },
-        sport: { id: 25, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: false },
-        subsport: { id: 39, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT, required: false },
+        sport: { id: 25, type: RubyFit::Type.enum(RubyFit::MessageConstants::SPORT), required: false },
+        subsport: { id: 39, type: RubyFit::Type.enum(RubyFit::MessageConstants::SUBSPORT), required: false },
         event: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: false },
         event_type: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: false },
         avg_heart_rate: { id: 15, type: RubyFit::Type.uint8 },
@@ -121,6 +121,7 @@ class RubyFit::MessageWriter
     hr_zone: {
       id: 8,
       fields: {
+        message_index: { id: 254, type: RubyFit::Type.uint16 },
         high_bpm: { id: 1, type: RubyFit::Type.uint8, required: true },
         name: { id: 2, type: RubyFit::Type.string(16), required: true }
       }
@@ -128,6 +129,7 @@ class RubyFit::MessageWriter
     power_zone: {
       id: 9,
       fields: {
+        message_index: { id: 254, type: RubyFit::Type.uint16 },
         high_value: { id: 1, type: RubyFit::Type.uint16, required: true },
         name: { id: 2, type: RubyFit::Type.string(16), required: true }
       }
