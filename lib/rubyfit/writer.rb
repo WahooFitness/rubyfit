@@ -121,7 +121,7 @@ class RubyFit::Writer
 
     @stream = stream
 
-    %i(start_time duration workout_step_count lap_count session_count event_count record_count).each do |key|
+    %i(start_time duration workout_step_count lap_count session_count event_count record_count power_zone_count hr_zone_count).each do |key|
       raise ArgumentError.new("Missing required option #{key}") unless opts[key]
     end
 
@@ -130,7 +130,7 @@ class RubyFit::Writer
 
     @data_crc = 0
 
-    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, opts[:record_count], opts[:device_info_count], opts[:length_count])
+    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, opts[:record_count], opts[:device_info_count], opts[:length_count], opts[:power_zone_count], opts[:hr_zone_count])
     write_data(RubyFit::MessageWriter.file_header(data_size))
 
     write_message(:file_id, {
@@ -139,6 +139,11 @@ class RubyFit::Writer
       manufacturer: opts[:manufacturer],
       product: opts[:product],
       serial_number: 0,
+    })
+
+    write_message(:sport, {
+      sport: opts[:sport],
+      sub_sport: opts[:subsport]
     })
 
     # Every FIT activity file MUST contain an activity message
@@ -240,6 +245,20 @@ class RubyFit::Writer
     @state = :write
   end
 
+  def hr_zones
+    raise "Can only write lengths inside 'write' block" if @state != :write
+    @state = :hr_zones
+    yield
+    @state = :write
+  end
+
+  def power_zones
+    raise "Can only write lengths inside 'write' block" if @state != :write
+    @state = :power_zones
+    yield
+    @state = :write
+  end
+
   def course_point(values)
     raise "Can only write course points inside 'course_points' block" if @state != :course_points
     write_message(:course_point, values)
@@ -278,6 +297,16 @@ class RubyFit::Writer
   def length(values)
     raise "Can only write lengths inside 'lengths' block" if @state != :lengths
     write_message(:length, values)
+  end
+
+  def hr_zone(values)
+    raise "Can only write hr zones inside 'hr_zones' block" if @state != :hr_zones
+    write_message(:hr_zone, values)
+  end
+
+  def power_zone(values)
+    raise "Can only write power zones inside 'power_zones' block" if @state != :power_zones
+    write_message(:power_zone, values)
   end
 
   protected
@@ -321,9 +350,10 @@ class RubyFit::Writer
   end
 
 
-  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, record_count, device_info_count, length_count)
+  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, record_count, device_info_count, length_count, power_zone_count, hr_zone_count)
     record_counts = {
       file_id: 1,
+      sport: 1,
       workout: 1,
       activity: 1,
       lap: lap_count,
@@ -333,13 +363,15 @@ class RubyFit::Writer
       course_point: course_point_count,
       record: record_count,
       session: session_count,
-      device_info: device_info_count
+      device_info: device_info_count,
+      hr_zone: hr_zone_count,
+      power_zone: power_zone_count
     }
 
     data_sizes = record_counts.map do |type, count|
       def_size = RubyFit::MessageWriter.definition_message_size(type)
       data_size = RubyFit::MessageWriter.data_message_size(type) * count
-      result = def_size + data_size
+      result = def_size + data_size if count > 0
       result
     end
 
