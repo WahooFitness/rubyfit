@@ -372,9 +372,11 @@ class RubyFit::Writer
       def_size = RubyFit::MessageWriter.definition_message_size(type)
       data_size = RubyFit::MessageWriter.data_message_size(type) * count
       result = def_size + data_size
+      puts "#{type}: #{result}"
       result
     end
 
+    puts("data sizes", data_sizes.reduce(&:+))
     data_sizes.reduce(&:+)
   end
 end
