@@ -322,11 +322,13 @@ class RubyFit::Writer
   protected
 
   def write_message(type, values)
+    puts("writing message", type, values)
     local_num = @local_nums[type]
     unless local_num
       @last_local_num += 1
       local_num = @last_local_num
       @local_nums[type] = local_num
+      puts("writing definition message", type, local_num)
       write_data(RubyFit::MessageWriter.definition_message(type, local_num))
     end
 
