@@ -121,7 +121,7 @@ class RubyFit::Writer
 
     @stream = stream
 
-    %i(start_time duration workout_step_count lap_count session_count event_count record_count power_zone_count hr_zone_count).each do |key|
+    %i(start_time duration workout_step_count lap_count session_count event_count record_count power_zone_count hr_zone_count wahoo_custom_num_count).each do |key|
       raise ArgumentError.new("Missing required option #{key}") unless opts[key]
     end
 
@@ -130,7 +130,7 @@ class RubyFit::Writer
 
     @data_crc = 0
 
-    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, opts[:record_count], opts[:device_info_count], opts[:length_count], opts[:power_zone_count], opts[:hr_zone_count])
+    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, opts[:record_count], opts[:device_info_count], opts[:length_count], opts[:power_zone_count], opts[:hr_zone_count], opts[:wahoo_custom_num_count])
     write_data(RubyFit::MessageWriter.file_header(data_size))
 
     write_message(:file_id, {
@@ -360,7 +360,7 @@ class RubyFit::Writer
   end
 
 
-  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, record_count, device_info_count, length_count, power_zone_count, hr_zone_count)
+  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, record_count, device_info_count, length_count, power_zone_count, hr_zone_count, wahoo_custom_num_count)
     record_counts = {
       file_id: 1,
       sport: 1,
@@ -375,7 +375,8 @@ class RubyFit::Writer
       session: session_count,
       device_info: device_info_count,
       hr_zone: hr_zone_count,
-      power_zone: power_zone_count
+      power_zone: power_zone_count,
+      wahoo_custom_nums: wahoo_custom_num_count
     }
 
     data_sizes = record_counts.map do |type, count|
