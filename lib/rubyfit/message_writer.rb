@@ -269,7 +269,7 @@ class RubyFit::MessageWriter
       }
     },
 
-    wahoo_custom_nums: {
+    wahoo_custom_num: {
       id: 0xFF04, # Custom message ID, ensure it does not conflict with existing IDs
       fields: {
         value: { id: 0, type: RubyFit::Type.uint16, required: true },
