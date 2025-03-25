@@ -272,7 +272,7 @@ class RubyFit::MessageWriter
     wahoo_custom_num: {
       id: 0xFF04,
       fields: {
-        value: { id: 0, type: RubyFit::Type.uint16, required: true },
+        value: { id: 0, type: RubyFit::Type.float64, required: true },
         timestamp: { id: 1, type: RubyFit::Type.timestamp, required: false },
         sub_type: { id: 2, type: RubyFit::Type.uint16, required: true },
         type: { id: 3, type: RubyFit::Type.uint8, required: true }

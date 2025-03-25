@@ -158,5 +158,15 @@ class RubyFit::Type
         fit2rb: ->(val, type) { val / 1000.0 }
       })
     end
+
+    def float64(opts = {})
+      new({
+            fit_id: 0x88,
+            byte_count: 8,
+            default_bytes: [0xFF] * 8,
+            val2bytes: ->(val, type) { [val].pack("G").bytes },
+            bytes2val: ->(bytes, type) { bytes.pack("C*").unpack1("G") },
+          }.merge(opts))
+    end
   end
 end
