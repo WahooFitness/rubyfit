@@ -161,7 +161,7 @@ class RubyFit::Type
 
     def float64(opts = {})
       new({
-            fit_id: 0x88,
+            fit_id: 0x89,
             byte_count: 8,
             default_bytes: [0xFF] * 8,
             val2bytes: ->(val, type) { [val].pack("G").bytes },
