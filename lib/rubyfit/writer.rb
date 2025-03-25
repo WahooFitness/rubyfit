@@ -378,7 +378,7 @@ class RubyFit::Writer
       device_info: device_info_count,
       hr_zone: hr_zone_count,
       power_zone: power_zone_count,
-      wahoo_custom_nums: wahoo_custom_num_count
+      wahoo_custom_num: wahoo_custom_num_count
     }
 
     data_sizes = record_counts.map do |type, count|
