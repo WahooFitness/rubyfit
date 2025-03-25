@@ -168,5 +168,15 @@ class RubyFit::Type
             bytes2val: ->(bytes, type) { bytes.pack("C*").unpack1("G") },
           }.merge(opts))
     end
+
+    def byte_array(length, opts = {})
+      new({
+            fit_id: 0x0D,
+            byte_count: length,
+            default_bytes: [0xFF] * length,
+            val2bytes: ->(val, type) { val },
+            bytes2val: ->(bytes, type) { bytes },
+          }.merge(opts))
+    end
   end
 end

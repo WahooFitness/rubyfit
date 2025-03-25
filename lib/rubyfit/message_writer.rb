@@ -279,6 +279,16 @@ class RubyFit::MessageWriter
       }
     },
 
+    wahoo_clm: {
+      id: 0xFF05,
+      fields: {
+        timestamp: { id: 0, type: RubyFit::Type.timestamp, required: false },
+        device_index: { id: 1, type: RubyFit::Type.uint8, required: false },
+        data_len: { id: 2, type: RubyFit::Type.uint8, required: true },
+        data: { id: 3, type: RubyFit::Type.byte_array(50), required: true }
+      }
+    },
+
     field_description: {
       # Must be logged before developer field is used
       id: 206,

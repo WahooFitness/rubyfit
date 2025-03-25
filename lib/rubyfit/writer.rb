@@ -121,7 +121,7 @@ class RubyFit::Writer
 
     @stream = stream
 
-    %i(start_time duration workout_step_count lap_count session_count event_count record_count power_zone_count hr_zone_count wahoo_custom_num_count).each do |key|
+    %i(start_time duration workout_step_count lap_count session_count event_count record_count power_zone_count hr_zone_count wahoo_custom_num_count wahoo_clm_count).each do |key|
       raise ArgumentError.new("Missing required option #{key}") unless opts[key]
     end
 
@@ -130,7 +130,7 @@ class RubyFit::Writer
 
     @data_crc = 0
 
-    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, opts[:record_count], opts[:device_info_count], opts[:length_count], opts[:power_zone_count], opts[:hr_zone_count], opts[:wahoo_custom_num_count])
+    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, opts[:record_count], opts[:device_info_count], opts[:length_count], opts[:power_zone_count], opts[:hr_zone_count], opts[:wahoo_custom_num_count], opts[:wahoo_clm_count])
     write_data(RubyFit::MessageWriter.file_header(data_size))
 
     write_message(:file_id, {
@@ -258,8 +258,15 @@ class RubyFit::Writer
   end
 
   def wahoo_custom_nums
-    raise "Can only write lengths inside 'write' block" if @state != :write
+    raise "Can only write custom nums inside 'write' block" if @state != :write
     @state = :wahoo_custom_nums
+    yield
+    @state = :write
+  end
+
+  def wahoo_clms
+    raise "Can only write clms inside 'write' block" if @state != :write
+    @state = :wahoo_clms
     yield
     @state = :write
   end
@@ -319,6 +326,11 @@ class RubyFit::Writer
     write_message(:wahoo_custom_num, values)
   end
 
+  def wahoo_clm(values)
+    raise "Can only write wahoo clms inside 'wahoo_clms' block" if @state != :wahoo_clms
+    write_message(:wahoo_clm, values)
+  end
+
   protected
 
   def write_message(type, values)
@@ -360,7 +372,7 @@ class RubyFit::Writer
   end
 
 
-  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, record_count, device_info_count, length_count, power_zone_count, hr_zone_count, wahoo_custom_num_count)
+  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, record_count, device_info_count, length_count, power_zone_count, hr_zone_count, wahoo_custom_num_count, wahoo_clm_count)
     record_counts = {
       file_id: 1,
       sport: 1,
@@ -376,7 +388,8 @@ class RubyFit::Writer
       device_info: device_info_count,
       hr_zone: hr_zone_count,
       power_zone: power_zone_count,
-      wahoo_custom_num: wahoo_custom_num_count
+      wahoo_custom_num: wahoo_custom_num_count,
+      wahoo_clm: wahoo_clm_count
     }
 
     data_sizes = record_counts.map do |type, count|
