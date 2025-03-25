@@ -173,7 +173,6 @@ class RubyFit::Writer
       event_group: 0
     })
 
-    # yield for sessions, laps, lengths, device_infos and records
     yield
 
     write_message(:event, {
@@ -258,6 +257,13 @@ class RubyFit::Writer
     @state = :write
   end
 
+  def wahoo_custom_nums
+    raise "Can only write lengths inside 'write' block" if @state != :write
+    @state = :wahoo_custom_nums
+    yield
+    @state = :write
+  end
+
   def course_point(values)
     raise "Can only write course points inside 'course_points' block" if @state != :course_points
     write_message(:course_point, values)
@@ -306,6 +312,11 @@ class RubyFit::Writer
   def power_zone(values)
     raise "Can only write power zones inside 'power_zones' block" if @state != :power_zones
     write_message(:power_zone, values)
+  end
+
+  def wahoo_custom_num(values)
+    raise "Can only write wahoo custom nums inside 'wahoo_custom_nums' block" if @state != :wahoo_custom_nums
+    write_message(:wahoo_custom_num, values)
   end
 
   protected

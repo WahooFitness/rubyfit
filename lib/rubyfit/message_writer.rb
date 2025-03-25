@@ -19,6 +19,7 @@ class RubyFit::MessageWriter
         type: { id: 0, type: RubyFit::Type.enum, required: true }, # See FIT_FILE_*
       }
     },
+
     course: {
       id: 31,
       fields: {
@@ -79,6 +80,7 @@ class RubyFit::MessageWriter
         enhanced_max_speed: { id: 66, type: RubyFit::Type.uint32 }
       },
     },
+
     course_point: {
       id: 32,
       fields: {
@@ -91,6 +93,7 @@ class RubyFit::MessageWriter
         type: { id: 5, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::COURSE_POINT_TYPE, required: true }
       },
     },
+
     record: {
       id: 20,
       fields: {
@@ -108,6 +111,7 @@ class RubyFit::MessageWriter
         grade: { id: 9, type: RubyFit::Type.sint16 },
       }
     },
+
     event: {
       id: 21,
       fields: {
@@ -117,6 +121,7 @@ class RubyFit::MessageWriter
         event_group: { id: 4, type: RubyFit::Type.uint8 },
       }
     },
+
     workout: {
       id: 26,
       fields: {
@@ -129,6 +134,7 @@ class RubyFit::MessageWriter
         # pool_length_unit: { id: 15, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::DISPLAY_MEASURE }
       }
     },
+
     sport: {
       id: 12,
       fields: {
@@ -145,6 +151,7 @@ class RubyFit::MessageWriter
         name: { id: 2, type: RubyFit::Type.string(16), required: true }
       }
     },
+
     power_zone: {
       id: 9,
       fields: {
@@ -153,6 +160,7 @@ class RubyFit::MessageWriter
         name: { id: 2, type: RubyFit::Type.string(16), required: true }
       }
     },
+
     device_info: {
       id: 23,
       fields: {
@@ -169,6 +177,7 @@ class RubyFit::MessageWriter
         product_name: { id: 27, type: RubyFit::Type.string(20) }
       }
     },
+
     workout_step: {
       id: 27,
       fields: {
@@ -185,6 +194,7 @@ class RubyFit::MessageWriter
         equipment: { id: 9, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::WORKOUT_EQUIPMENT }
       }
     },
+
     session: {
       id: 18,
       fields: {
@@ -219,6 +229,7 @@ class RubyFit::MessageWriter
         # workout_type: { id: 78, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::WORKOUT_TYPE }
         }
     },
+
     activity: {
       id: 34,
       fields: {
@@ -255,6 +266,38 @@ class RubyFit::MessageWriter
         enhanced_max_respiration_rate: { id: 23, type: RubyFit::Type.uint16 },
         avg_respiration_rate: { id: 24, type: RubyFit::Type.uint8 },
         max_respiration_rate: { id: 25, type: RubyFit::Type.uint8 }
+      }
+    },
+
+    wahoo_custom_nums: {
+      id: 0xFF04, # Custom message ID, ensure it does not conflict with existing IDs
+      fields: {
+        value: { id: 0, type: RubyFit::Type.float64, required: true },
+        timestamp: { id: 1, type: RubyFit::Type.timestamp, required: false },
+        sub_type: { id: 2, type: RubyFit::Type.uint16, required: true },
+        type: { id: 3, type: RubyFit::Type.uint8, required: true }
+      }
+    },
+
+    field_description: {
+      # Must be logged before developer field is used
+      id: 206,
+      fields: {
+        developer_data_index: { id: 0, type: RubyFit::Type.uint8 },
+        field_definition_number: { id: 1, type: RubyFit::Type.uint8 },
+        fit_base_type_id: { id: 2, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::FIT_BASE_TYPE },
+        field_name: { id: 3, type: RubyFit::Type.string(16) },
+        units: { id: 8, type: RubyFit::Type.string(16) },
+      }
+    },
+
+    developer_data_id: {
+      # Must be logged before field description
+      id: 207,
+      fields: {
+        developer_id: { id: 0, type: RubyFit::Type.uint8 },
+        manufacturer_id: { id: 2, type: RubyFit::Type.uint16 },
+        developer_data_index: { id: 3, type: RubyFit::Type.uint8 }
       }
     }
   }

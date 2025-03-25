@@ -278,4 +278,24 @@ module RubyFit::MessageConstants
     session_end: 7,
     fitness_equipment: 8
   }.freeze
+
+  FIT_BASE_TYPE = {
+    enum: 0,
+    sint8: 1,
+    uint8: 2,
+    sint16: 131,
+    uint16: 132,
+    sint32: 133,
+    uint32: 134,
+    string: 7,
+    float32: 136,
+    float64: 137,
+    uint8z: 10,
+    uint16z: 139,
+    uint32z: 140,
+    byte: 13,
+    sint64: 142,
+    uint64: 143,
+    uint64z: 144
+  }.freeze
 end
