@@ -270,12 +270,12 @@ class RubyFit::MessageWriter
     },
 
     wahoo_custom_num: {
-      id: 0xFF04, # Custom message ID, ensure it does not conflict with existing IDs
+      id: 0xFF04,
       fields: {
-        value: { id: 3, type: RubyFit::Type.uint16, required: true },
-        timestamp: { id: 0, type: RubyFit::Type.timestamp, required: false },
-        sub_type: { id: 1, type: RubyFit::Type.uint16, required: true },
-        type: { id: 2, type: RubyFit::Type.uint8, required: true }
+        value: { id: 0, type: RubyFit::Type.uint16, required: true },
+        timestamp: { id: 1, type: RubyFit::Type.timestamp, required: false },
+        sub_type: { id: 2, type: RubyFit::Type.uint16, required: true },
+        type: { id: 3, type: RubyFit::Type.uint8, required: true }
       }
     },
 
