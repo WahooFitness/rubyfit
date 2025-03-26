@@ -174,8 +174,12 @@ class RubyFit::Type
             fit_id: 0x0D,
             byte_count: length,
             default_bytes: [0xFF] * length,
-            val2bytes: ->(val, type) { val },
-            bytes2val: ->(bytes, type) { bytes },
+            val2bytes: ->(val, type) {
+              val[0, length] + ([0xFF] * (length - val.length))
+            },
+            bytes2val: ->(bytes, type) {
+              bytes[0, length]
+            },
           }.merge(opts))
     end
   end
