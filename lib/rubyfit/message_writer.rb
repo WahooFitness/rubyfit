@@ -31,24 +31,6 @@ class RubyFit::MessageWriter
       }
     },
 
-    # lap: {
-    #   id: 19,
-    #   fields: {
-    #     timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true},
-    #     start_time: { id: 2, type: RubyFit::Type.timestamp, required: true},
-    #     total_elapsed_time: { id: 7, type: RubyFit::Type.duration, required: true },
-    #     total_timer_time: { id: 8, type: RubyFit::Type.duration, required: true },
-    #     start_y: { id: 3, type: RubyFit::Type.semicircles },
-    #     start_x: { id: 4, type: RubyFit::Type.semicircles },
-    #     end_y: { id: 5, type: RubyFit::Type.semicircles },
-    #     end_x: { id: 6, type: RubyFit::Type.semicircles },
-    #     total_distance: { id: 9, type: RubyFit::Type.centimeters },
-    #     total_ascent: { id: 21, type: RubyFit::Type.altitude },
-    #     sport: { id: 25, type: RubyFit::Type.enum(RubyFit::MessageConstants::SPORT), required: false },
-    #     subsport: { id: 39, type: RubyFit::Type.enum(RubyFit::MessageConstants::SUBSPORT), required: false }
-    #   }
-    # },
-
     lap: {
       id: 19,
       fields: {

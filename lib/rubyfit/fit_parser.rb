@@ -1,5 +1,5 @@
 module RubyFit
-  class FitParser
+  class FitFileParser
     REQUIRED_CALLBACKS = [:definition_message, :get_definition, :data_message, :end_of_file]
 
     def initialize(callbacks)
@@ -20,7 +20,7 @@ module RubyFit
       # Convert each field in the raw FIT data to a readable format
       readable_data = {}
       raw_values = fit_data.values.first
-      puts("raw_values", raw_values)
+
       # Iterate through the message definition fields
       message_definition[:fields].each do |field_name, field_definition|
         field_id = field_definition[:id] # This is the key we're looking for in the raw data
@@ -58,7 +58,6 @@ module RubyFit
       data_type = io.read(4)
       raise "Invalid FIT file: invalid data type" unless data_type == ".FIT"
 
-      puts("current position", io.pos)
       if io.pos < header_size
         io.seek(header_size)
       end
@@ -67,7 +66,6 @@ module RubyFit
       while io.pos < header_size + data_size
         record_header = io.read(1)&.unpack1('C')
         raise "Invalid FIT file: unable to read record header" unless record_header
-        puts "Record header: #{record_header.to_s(2).rjust(8, '0')}"
 
         if record_header & 0x80 == 0x80
           # Handle compressed timestamp header
@@ -120,8 +118,6 @@ module RubyFit
             global_message_number = io.read(2)&.unpack(unpack_directive)&.first
             field_count = io.read(1)&.unpack1('C')
 
-            puts("arch", architecture, "global", global_message_number, "field_count", field_count)
-
             raise "Invalid FIT file: unable to read definition message" unless architecture && global_message_number && field_count
 
             fields = []
@@ -171,12 +167,9 @@ module RubyFit
 
             @callbacks[:data_message].call(local_num, values)
             data = self.convert_to_json({ definition[:global_message_number] => values }, unpack_directive)
-            puts("data message decoded", data)
 
             data&.each do |key, value|
-              puts("key", key)
               if all_data.key?(key)
-                puts("key exists", key)
                 all_data[key] = [all_data[key]] unless all_data[key].is_a?(Array)
                 all_data[key] << value
               else

@@ -159,7 +159,6 @@ class RubyFitIntegrationTest < Minitest::Test
           assert_equal json_output['wahoo_id']['workout_num'], json_input['wahoo_id']['workout_num']
           assert_equal json_output['wahoo_id']['workout_type'], json_input['wahoo_id']['workout_type']
           if json_input['records'].size > 1
-            puts(json_output['record'])
             assert_equal json_output['record'].size, json_input['records'].size
             assert_equal json_output['record'].last['timestamp'], json_input['records'].last['timestamp']
             assert_equal json_output['record'].last['y'].round(2), json_input['records'].last['y'].round(2)
@@ -254,7 +253,7 @@ class RubyFitIntegrationTest < Minitest::Test
       }
     }
 
-    parser = RubyFit::FitParser.new(callbacks)
+    parser = RubyFit::FitFileParser.new(callbacks)
     parser.parse(raw)
   end
 end

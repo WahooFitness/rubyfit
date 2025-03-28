@@ -292,7 +292,6 @@ class RubyFit::Writer
 
   def track_point(values)
     raise "Can only write track points inside 'track_points' block" if @state != :track_points
-    puts("track_point: #{values}")
     write_message(:record, values)
   end
 
@@ -430,7 +429,6 @@ class RubyFit::Writer
                else
                  0
                end
-      puts "#{type}: #{result}"
       result
     end
 

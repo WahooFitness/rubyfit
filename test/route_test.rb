@@ -12,8 +12,6 @@ class RubyFitIntegrationTest < Minitest::Test
 
     sport = RubyFit::MessageConstants::SPORT.key(json['sport_code'])
     subsport = RubyFit::MessageConstants::SUBSPORT.key(json['subsport_code']) || :generic
-    puts("subby", subsport, sport)
-
 
     writer = RubyFit::Writer.new
     File.open(fit_file_path, 'wb') do |file|
@@ -87,11 +85,10 @@ class RubyFitIntegrationTest < Minitest::Test
 
           assert_equal(json_input['track_points'].size, json_output['record'].size)
           assert_equal(json_input['course_points'].size, json_output['course_point'].size)
-          puts(json_output)
         end
       }
     }
-    parser = RubyFit::FitParser.new(callbacks)
+    parser = RubyFit::FitFileParser.new(callbacks)
     parser.parse(raw)
   end
 end

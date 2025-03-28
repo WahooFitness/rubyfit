@@ -150,12 +150,10 @@ class RubyFit::Type
       uint16({
         rb2fit: ->(val, type) {
           result = ((val + 500) * 5.0).truncate
-          puts "rb2fit: input=#{val}, output=#{result}"
           result
         },
         fit2rb: ->(val, type) {
           result = val / 5.0 - 500
-          puts "fit2rb: input=#{val}, output=#{result}"
           result
         }
       })
