@@ -1,5 +1,4 @@
-module RubyFit
-  class FitFileParser
+class RubyFit::FitFileParser
     REQUIRED_CALLBACKS = [:definition_message, :get_definition, :data_message, :end_of_file]
 
     def initialize(callbacks)
@@ -184,5 +183,4 @@ module RubyFit
       end
       @callbacks[:end_of_file].call
     end
-  end
 end
