@@ -1,4 +1,5 @@
-require "rubyfit/helpers"
+# require "rubyfit/helpers"
+require_relative 'helpers'
 
 class RubyFit::Type
   attr_reader *%i(fit_id byte_count default_bytes)
@@ -147,8 +148,16 @@ class RubyFit::Type
 
     def altitude
       uint16({
-        rb2fit: ->(val, type) { ((val + 500) * 5.0).truncate },
-        fit2rb: ->(val, type) { val / 5.0 - 500 }
+        rb2fit: ->(val, type) {
+          result = ((val + 500) * 5.0).truncate
+          puts "rb2fit: input=#{val}, output=#{result}"
+          result
+        },
+        fit2rb: ->(val, type) {
+          result = val / 5.0 - 500
+          puts "fit2rb: input=#{val}, output=#{result}"
+          result
+        }
       })
     end
 
@@ -157,6 +166,20 @@ class RubyFit::Type
         rb2fit: ->(val, type) { (val * 1000) },
         fit2rb: ->(val, type) { val / 1000.0 }
       })
+    end
+
+    def speed
+      uint32({
+               rb2fit: ->(val, type) { (val * 1000) },
+               fit2rb: ->(val, type) { val / 1000.0 }
+             })
+    end
+
+    def grade
+      sint16({
+                rb2fit: ->(val, type) { (val * 100) },
+                fit2rb: ->(val, type) { val / 100.0 }
+              })
     end
 
     def float64(opts = {})
@@ -175,7 +198,7 @@ class RubyFit::Type
             byte_count: length,
             default_bytes: [0xFF] * length,
             val2bytes: ->(val, type) {
-              val[0, length] + ([0xFF] * (length - val.length))
+              val[0, length] + ([0xFF] * [length - val.length, 0].max)
             },
             bytes2val: ->(bytes, type) {
               bytes[0, length]

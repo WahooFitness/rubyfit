@@ -298,4 +298,26 @@ module RubyFit::MessageConstants
     uint64: 143,
     uint64z: 144
   }.freeze
+
+
+  MESSAGE_TYPE = {
+    file_id: 0,
+    event: 21,
+    record: 20,
+    lap: 19,
+    course: 31,
+    course_point: 32,
+    session: 18,
+    workout: 26,
+    hr_zone: 8,
+    power_zone: 9,
+    activity: 34,
+    device_info: 23,
+    sport: 12,
+    wahoo_custom_num: 65284,
+    wahoo_clm: 65285,
+    wahoo_id: 65281,
+    developer_data_id: 207,
+    field_description: 206
+  }.freeze
 end

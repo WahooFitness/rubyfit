@@ -1,5 +1,5 @@
-require "rubyfit/message_writer"
-
+# require "rubyfit/message_writer"
+require_relative "message_writer"
 class RubyFit::Writer
   PRODUCT_ID = 65534 # Garmin Connect
 
@@ -46,7 +46,7 @@ class RubyFit::Writer
       total_distance: opts[:total_distance],
       total_ascent: opts[:total_ascent],
       sport: opts[:sport],
-      subsport: opts[:subsport]
+      sub_sport: opts[:subsport]
     })
 
     write_message(:event, {
@@ -121,8 +121,14 @@ class RubyFit::Writer
 
     @stream = stream
 
-    %i(start_time duration workout_step_count lap_count session_count event_count record_count power_zone_count hr_zone_count wahoo_custom_num_count wahoo_clm_count).each do |key|
+    %i(start_time duration workout_step_count lap_count session_count event_count record_count power_zone_count hr_zone_count wahoo_custom_num_count wahoo_clm_count include_wahoo_id).each do |key|
       raise ArgumentError.new("Missing required option #{key}") unless opts[key]
+    end
+
+    if opts[:include_wahoo_id]
+      %i(app_token workout_num workout_type).each do |key|
+        raise ArgumentError.new("Missing required option #{key}") unless opts[key]
+      end
     end
 
     start_time = opts[:start_time].to_i
@@ -130,7 +136,7 @@ class RubyFit::Writer
 
     @data_crc = 0
 
-    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, opts[:record_count], opts[:device_info_count], opts[:length_count], opts[:power_zone_count], opts[:hr_zone_count], opts[:wahoo_custom_num_count], opts[:wahoo_clm_count])
+    data_size = calculate_workout_data_size( opts[:workout_step_count], opts[:lap_count], opts[:session_count], opts[:event_count],0, opts[:record_count], opts[:device_info_count], opts[:length_count], opts[:power_zone_count], opts[:hr_zone_count], opts[:wahoo_custom_num_count], opts[:wahoo_clm_count], opts[:include_wahoo_id])
     write_data(RubyFit::MessageWriter.file_header(data_size))
 
     write_message(:file_id, {
@@ -165,6 +171,14 @@ class RubyFit::Writer
       # pool_length: opts[:pool_length],
       # pool_length_unit: opts[:pool_length_unit]
     })
+
+    if opts[:include_wahoo_id] == 1
+      write_message(:wahoo_id, {
+        app_token: opts[:app_token],
+        workout_num: opts[:workout_num],
+        workout_type: opts[:workout_type]
+      })
+    end
 
     write_message(:event, {
       timestamp: start_time,
@@ -278,6 +292,7 @@ class RubyFit::Writer
 
   def track_point(values)
     raise "Can only write track points inside 'track_points' block" if @state != :track_points
+    puts("track_point: #{values}")
     write_message(:record, values)
   end
 
@@ -288,7 +303,7 @@ class RubyFit::Writer
 
   def lap(values)
     raise "Can only write laps inside 'laps' block" if @state != :laps
-    write_message(:wkt_lap, values)
+    write_message(:lap, values)
   end
 
   def record(values)
@@ -347,8 +362,23 @@ class RubyFit::Writer
 
   def write_data(data)
     @stream.write(data)
-    prev = @data_crc
-    @data_crc = RubyFit::CRC.update_crc(@data_crc, data)
+    @data_crc = update_crc(@data_crc, data)
+  end
+
+  def update_crc(crc, data)
+    crc_table = [0x0000, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00, 0x2800, 0xE401,
+                 0xA001, 0x6C00, 0x7800, 0xB401, 0x5000, 0x9C01, 0x8801, 0x4400]
+    data.each_byte do |byte|
+      # compute checksum of lower four bits of byte
+      tmp = crc_table[crc & 0xF]
+      crc  = (crc >> 4) & 0x0FFF
+      crc  = crc ^ tmp ^ crc_table[byte & 0xF]
+      # now compute checksum of upper four bits of byte
+      tmp = crc_table[crc & 0xF]
+      crc  = (crc >> 4) & 0x0FFF
+      crc  = crc ^ tmp ^ crc_table[(byte >> 4) & 0xF]
+    end
+    crc
   end
 
   def calculate_data_size(course_point_count, track_point_count)
@@ -367,18 +397,18 @@ class RubyFit::Writer
       result = def_size + data_size
       result
     end
-
     data_sizes.reduce(&:+)
   end
 
 
-  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, record_count, device_info_count, length_count, power_zone_count, hr_zone_count, wahoo_custom_num_count, wahoo_clm_count)
+  def calculate_workout_data_size(workout_step_count, lap_count, session_count, event_count, course_point_count, record_count, device_info_count, length_count, power_zone_count, hr_zone_count, wahoo_custom_num_count, wahoo_clm_count, include_wahoo_id)
     record_counts = {
       file_id: 1,
       sport: 1,
       workout: 1,
       activity: 1,
-      wkt_lap: lap_count,
+      wahoo_id: include_wahoo_id,
+      lap: lap_count,
       length: length_count,
       event: event_count + 2,
       workout_step: workout_step_count,
@@ -404,7 +434,6 @@ class RubyFit::Writer
       result
     end
 
-    puts("data sizes", data_sizes.reduce(&:+))
     data_sizes.reduce(&:+)
   end
 end

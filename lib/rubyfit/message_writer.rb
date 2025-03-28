@@ -1,6 +1,10 @@
-require "rubyfit/type"
-require "rubyfit/helpers"
-require "rubyfit/message_constants"
+# require "rubyfit/type"
+# require "rubyfit/helpers"
+# require "rubyfit/message_constants"
+
+require_relative 'type'
+require_relative 'helpers'
+require_relative 'message_constants'
 
 class RubyFit::MessageWriter
   extend RubyFit::Helpers
@@ -12,7 +16,7 @@ class RubyFit::MessageWriter
     file_id: {
       id: 0,
       fields: {
-        serial_number: { id: 3, type: RubyFit::Type.uint32z, required: true },
+        serial_number: { id: 3, type: RubyFit::Type.uint32z, required: false },
         time_created: { id: 4, type: RubyFit::Type.timestamp, required: true },
         manufacturer: { id: 1, type: RubyFit::Type.uint16 }, # See FIT_MANUFACTURER_*
         product: { id: 2, type: RubyFit::Type.uint16 },
@@ -27,25 +31,25 @@ class RubyFit::MessageWriter
       }
     },
 
-    lap: {
-      id: 19,
-      fields: {
-        timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true},
-        start_time: { id: 2, type: RubyFit::Type.timestamp, required: true},
-        total_elapsed_time: { id: 7, type: RubyFit::Type.duration, required: true },
-        total_timer_time: { id: 8, type: RubyFit::Type.duration, required: true },
-        start_y: { id: 3, type: RubyFit::Type.semicircles },
-        start_x: { id: 4, type: RubyFit::Type.semicircles },
-        end_y: { id: 5, type: RubyFit::Type.semicircles },
-        end_x: { id: 6, type: RubyFit::Type.semicircles },
-        total_distance: { id: 9, type: RubyFit::Type.centimeters },
-        total_ascent: { id: 21, type: RubyFit::Type.altitude },
-        sport: { id: 25, type: RubyFit::Type.enum(RubyFit::MessageConstants::SPORT), required: false },
-        subsport: { id: 39, type: RubyFit::Type.enum(RubyFit::MessageConstants::SUBSPORT), required: false }
-      }
-    },
+    # lap: {
+    #   id: 19,
+    #   fields: {
+    #     timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true},
+    #     start_time: { id: 2, type: RubyFit::Type.timestamp, required: true},
+    #     total_elapsed_time: { id: 7, type: RubyFit::Type.duration, required: true },
+    #     total_timer_time: { id: 8, type: RubyFit::Type.duration, required: true },
+    #     start_y: { id: 3, type: RubyFit::Type.semicircles },
+    #     start_x: { id: 4, type: RubyFit::Type.semicircles },
+    #     end_y: { id: 5, type: RubyFit::Type.semicircles },
+    #     end_x: { id: 6, type: RubyFit::Type.semicircles },
+    #     total_distance: { id: 9, type: RubyFit::Type.centimeters },
+    #     total_ascent: { id: 21, type: RubyFit::Type.altitude },
+    #     sport: { id: 25, type: RubyFit::Type.enum(RubyFit::MessageConstants::SPORT), required: false },
+    #     subsport: { id: 39, type: RubyFit::Type.enum(RubyFit::MessageConstants::SUBSPORT), required: false }
+    #   }
+    # },
 
-    wkt_lap: {
+    lap: {
       id: 19,
       fields: {
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true},
@@ -58,10 +62,10 @@ class RubyFit::MessageWriter
         end_x: { id: 6, type: RubyFit::Type.semicircles },
         total_distance: { id: 9, type: RubyFit::Type.centimeters },
         total_ascent: { id: 21, type: RubyFit::Type.altitude },
-        sport: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: false },
-        sub_sport: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT, required: false},
-        event: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: false },
-        event_type: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: false },
+        sport: { id: 25, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: false },
+        sub_sport: { id: 39, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT, required: false},
+        event: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT },
+        event_type: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE },
         avg_heart_rate: { id: 15, type: RubyFit::Type.uint8 },
         max_heart_rate: { id: 16, type: RubyFit::Type.uint8 },
         avg_cadence: { id: 17, type: RubyFit::Type.uint8 },
@@ -106,9 +110,9 @@ class RubyFit::MessageWriter
         cadence: { id: 4, type: RubyFit::Type.uint8 },
         power: { id: 7, type: RubyFit::Type.uint16 },
         calories: { id: 33, type: RubyFit::Type.uint16 },
-        enhanced_speed: { id: 73, type: RubyFit::Type.uint32 },
+        enhanced_speed: { id: 73, type: RubyFit::Type.speed},
         battery_soc: { id: 78, type: RubyFit::Type.uint8 },
-        grade: { id: 9, type: RubyFit::Type.sint16 },
+        grade: { id: 9, type: RubyFit::Type.grade},
       }
     },
 
@@ -207,6 +211,7 @@ class RubyFit::MessageWriter
         total_elapsed_time: { id: 7, type: RubyFit::Type.duration },
         total_timer_time: { id: 8, type: RubyFit::Type.duration },
         total_distance: { id: 9, type: RubyFit::Type.centimeters },
+        total_ascent: { id: 22, type: RubyFit::Type.altitude },
         total_calories: { id: 11, type: RubyFit::Type.uint16 },
         avg_heart_rate: { id: 16, type: RubyFit::Type.uint8 },
         max_heart_rate: { id: 17, type: RubyFit::Type.uint8 },
@@ -269,6 +274,16 @@ class RubyFit::MessageWriter
       }
     },
 
+    wahoo_id: {
+      id: 0xFF01,
+      fields: {
+        app_token: { id: 0, type: RubyFit::Type.string(32), required: false },
+        workout_num: { id: 1, type: RubyFit::Type.uint32, required: false },
+        workout_type: { id: 2, type: RubyFit::Type.uint16, required: true },
+        # workout_token: { id: 3, type: RubyFit::Type.string(32), required: true },
+      }
+    },
+
     wahoo_custom_num: {
       id: 0xFF04,
       fields: {
@@ -285,7 +300,7 @@ class RubyFit::MessageWriter
         timestamp: { id: 0, type: RubyFit::Type.timestamp, required: false },
         device_index: { id: 1, type: RubyFit::Type.uint8, required: false },
         data_len: { id: 2, type: RubyFit::Type.uint8, required: true },
-        data: { id: 3, type: RubyFit::Type.byte_array(240), required: true }
+        data: { id: 3, type: RubyFit::Type.byte_array(26), required: true }
       }
     },
 
@@ -343,7 +358,7 @@ class RubyFit::MessageWriter
 
         if info[:values]
           value = info[:values][value]
-          if value.nil?
+          if info[:required] && value.nil?
             raise ArgumentError.new("Invalid value for '#{field}' in #{type} data message values")
           end
         end
