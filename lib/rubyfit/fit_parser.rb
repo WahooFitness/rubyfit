@@ -1,5 +1,5 @@
 class RubyFit::FitFileParser
-    REQUIRED_CALLBACKS = [:definition_message, :get_definition, :data_message, :end_of_file]
+    REQUIRED_CALLBACKS = [:definition_message, :get_definition, :data_message]
 
     def initialize(callbacks)
       @callbacks = callbacks
@@ -178,8 +178,9 @@ class RubyFit::FitFileParser
           end
         end
       end
-      @callbacks[:output_file].call(all_data)
-      @callbacks[:end_of_file].call
-      @callbacks[:delete_file].call
+      yield all_data
+      # @callbacks[:output_file].call(all_data)
+      # @callbacks[:end_of_file].call
+      # @callbacks[:delete_file].call
     end
 end

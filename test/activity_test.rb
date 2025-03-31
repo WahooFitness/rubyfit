@@ -141,127 +141,234 @@ class RubyFitIntegrationTest < Minitest::Test
 
         fit_data[local_num] = formatted_values.join(', ')
       },
-      output_file: -> (all_data) {
-        File.open('fit_data.json', 'w') do |json_file|
-          json_file.write(all_data.to_json)
-        end
-      },
-      end_of_file: -> {
-        File.open('fit_data.json', 'r') do |file|
-          json_output = JSON.parse(file.read)
-          json_input = JSON.parse(json_input)
-          assert_equal json_output['file_id']['manufacturer'], json_input['manufacturer']
-          assert_equal json_output['activity']['timestamp'], json_input['timestamp']
-          assert_equal json_output['activity']['total_timer_time'], json_input['total_timer_time']
-          assert_equal json_output['activity']['total_timer_time'], json_input['total_timer_time']
-          assert_equal json_output['activity']['local_timestamp'], json_input['local_timestamp']
-          assert_equal json_output['workout']['sport'], RubyFit::MessageConstants::SPORT[json_input['sport'].to_sym]
-          assert_equal json_output['workout']['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sub_sport'].to_sym]
-          assert_equal json_output['workout']['wkt_name'], json_input['name']
-          assert_equal json_output['sport']['sport'], RubyFit::MessageConstants::SPORT[json_input['sport'].to_sym]
-          assert_equal json_output['sport']['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sub_sport'].to_sym]
-          assert_equal json_output['wahoo_id']['app_token'], json_input['wahoo_id']['app_token']
-          assert_equal json_output['wahoo_id']['workout_num'], json_input['wahoo_id']['workout_num']
-          assert_equal json_output['wahoo_id']['workout_type'], json_input['wahoo_id']['workout_type']
-          if json_input['records'].size > 1
-            assert_equal json_output['record'].size, json_input['records'].size
-            assert_equal json_output['record'].last['timestamp'], json_input['records'].last['timestamp']
-            assert_equal json_output['record'].last['y'].round(2), json_input['records'].last['y'].round(2)
-            assert_equal json_output['record'].last['x'].round(2), json_input['records'].last['x'].round(2)
-            assert_equal json_output['record'].last['distance'].round(2), json_input['records'].last['distance'].round(2)
-            assert_equal json_output['record'].last['elevation'].round(2), json_input['records'].last['elevation'].round(2)
-            assert_equal json_output['record'].last['heart_rate'], json_input['records'].last['heart_rate']
-            assert_equal json_output['record'].last['cadence'], json_input['records'].last['cadence']
-            assert_equal json_output['record'].last['power'], json_input['records'].last['power']
-            assert_equal json_output['record'].last['enhanced_speed'], json_input['records'].last['enhanced_speed']
-            assert_equal json_output['record'].last['battery_soc'], json_input['records'].last['battery_soc']
-            assert_equal json_output['record'].last['grade'], json_input['records'].last['grade']
-          elsif json_input['records'].size > 0
-            assert_equal json_output['record']['timestamp'], json_input['records'].last['timestamp']
-            assert_equal json_output['record']['y'].round(2), json_input['records'].last['y'].round(2)
-            assert_equal json_output['record']['x'].round(2), json_input['records'].last['x'].round(2)
-            assert_equal json_output['record'].last['distance'].round(2), json_input['records'].last['distance'].round(2)
-            assert_equal json_output['record'].last['elevation'].round(2), json_input['records'].last['elevation'].round(2)
-            assert_equal json_output['record']['heart_rate'], json_input['records'].last['heart_rate']
-            assert_equal json_output['record']['cadence'], json_input['records'].last['cadence']
-            assert_equal json_output['record']['power'], json_input['records'].last['power']
-            assert_equal json_output['record']['enhanced_speed'], json_input['records'].last['enhanced_speed']
-            assert_equal json_output['record']['battery_soc'], json_input['records'].last['battery_soc']
-            assert_equal json_output['record']['grade'], json_input['records'].last['grade']
-
-          end
-          if json_input['laps'].size > 1
-            assert_equal json_output['lap'].size, json_input['laps'].size
-            assert_equal json_output['lap'].last['start_time'], json_input['laps'].last['start_time']
-            assert_equal json_output['lap'].last['total_timer_time'], json_input['laps'].last['total_timer_time']
-            assert_equal json_output['lap'].last['total_distance'], json_input['laps'].last['total_distance']
-            assert_equal json_output['lap'].last['total_ascent'], json_input['laps'].last['total_ascent']
-            assert_equal json_output['lap'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['laps'].last['sport'].to_sym]
-            assert_equal json_output['lap'].last['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['laps'].last['sub_sport'].to_sym]
-            assert_equal json_output['lap'].last['total_calories'], json_input['laps'].last['total_calories']
-            assert_equal json_output['lap'].last['event'], RubyFit::MessageConstants::EVENT[json_input['laps'].last['event'].to_sym]
-            assert_equal json_output['lap'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
-            assert_equal json_output['lap'].last['lap_trigger'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
-          elsif json_input['laps'].size > 0
-            assert_equal json_output['wkt_lap']['start_time'], json_input['laps'].last['start_time']
-            assert_equal json_output['wkt_lap']['total_timer_time'], json_input['laps'].last['total_timer_time']
-            assert_equal json_output['wkt_lap']['total_distance'], json_input['laps'].last['total_distance']
-            assert_equal json_output['wkt_lap']['total_ascent'], json_input['laps'].last['total_ascent']
-            assert_equal json_output['wkt_lap'].last['total_calories'], json_input['laps'].last['total_calories']
-            assert_equal json_output['wkt_lap'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['laps'].last['sport'].to_sym]
-            assert_equal json_output['wkt_lap'].last['sub_sport'],  RubyFit::MessageConstants::SUBSPORT[json_input['laps'].last['sub_sport'].to_sym]
-            assert_equal json_output['wkt_lap'].last['event'], RubyFit::MessageConstants::EVENT[json_input['laps'].last['event'].to_sym]
-            assert_equal json_output['wkt_lap'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
-            assert_equal json_output['wkt_lap'].last['lap_trigger'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
-          end
-          if json_input['sessions'].size > 1
-            assert_equal json_output['session'].size, json_input['sessions'].size
-            assert_equal json_output['session'].last['start_time'], json_input['sessions'].last['start_time']
-            assert_equal json_output['session'].last['total_timer_time'], json_input['sessions'].last['total_timer_time']
-            assert_equal json_output['session'].last['total_distance'], json_input['sessions'].last['total_distance']
-            assert_equal json_output['session'].last['total_ascent'], json_input['sessions'].last['total_ascent']
-            assert_equal json_output['session'].last['total_calories'], json_input['sessions'].last['total_calories']
-            assert_equal json_output['session'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['sessions'].last['sport'].to_sym]
-            assert_equal json_output['session'].last['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sessions'].last['sub_sport'].to_sym]
-            assert_equal json_output['session'].last['event'], RubyFit::MessageConstants::EVENT[json_input['sessions'].last['event'].to_sym]
-            assert_equal json_output['session'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['sessions'].last['event_type'].to_sym]
-          elsif json_input['sessions'].size > 0
-            assert_equal json_output['session']['start_time'], json_input['sessions'].last['start_time']
-            assert_equal json_output['session']['total_timer_time'], json_input['sessions'].last['total_timer_time']
-            assert_equal json_output['session']['total_distance'], json_input['sessions'].last['total_distance']
-            assert_equal json_output['session']['sport'], RubyFit::MessageConstants::SPORT[json_input['sessions'].last['sport'].to_sym]
-            assert_equal json_output['session']['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sessions'].last['sub_sport'].to_sym]
-            assert_equal json_output['session']['total_ascent'], json_input['sessions'].last['total_ascent']
-            assert_equal json_output['session']['total_calories'], json_input['sessions'].last['total_calories']
-            assert_equal json_output['session']['event'], RubyFit::MessageConstants::EVENT[json_input['sessions'].last['event'].to_sym]
-            assert_equal json_output['session']['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['sessions'].last['event_type'].to_sym]
-          end
-          if json_input['device_infos'].size > 1
-            assert_equal json_output['device_info'].size, json_input['device_infos'].size
-            assert_equal json_output['device_info'].last['timestamp'], json_input['device_infos'].last['timestamp']
-            assert_equal json_output['device_info'].last['serial_number'], json_input['device_infos'].last['serial_number']
-            assert_equal json_output['device_info'].last['manufacturer'], json_input['device_infos'].last['manufacturer']
-            assert_equal json_output['device_info'].last['product'], json_input['device_infos'].last['product']
-            assert_equal json_output['device_info'].last['software_version'], json_input['device_infos'].last['software_version']
-            assert_equal json_output['device_info'].last['battery_voltage'], json_input['device_infos'].last['battery_voltage']
-            assert_equal json_output['device_info'].last['device_index'], json_input['device_infos'].last['device_index']
-          elsif json_input['device_infos'].size > 0
-            assert_equal json_output['device_info']['timestamp'], json_input['device_infos'].last['timestamp']
-            assert_equal json_output['device_info']['serial_number'], json_input['device_infos'].last['serial_number']
-            assert_equal json_output['device_info']['manufacturer'], json_input['device_infos'].last['manufacturer']
-            assert_equal json_output['device_info']['product'], json_input['device_infos'].last['product']
-            assert_equal json_output['device_info']['software_version'], json_input['device_infos'].last['software_version']
-            assert_equal json_output['device_info']['battery_voltage'], json_input['device_infos'].last['battery_voltage']
-            assert_equal json_output['device_info']['device_index'], json_input['device_infos'].last['device_index']
-          end
-        end
-      },
-      delete_file: -> {
-        FileUtils.rm_rf('fit_data.json')
-      }
+    #   output_file: -> (all_data) {
+    #     File.open('fit_data.json', 'w') do |json_file|
+    #       json_file.write(all_data.to_json)
+    #     end
+    #   },
+    #   end_of_file: -> {
+    #     File.open('fit_data.json', 'r') do |file|
+    #       json_output = JSON.parse(file.read)
+    #       json_input = JSON.parse(json_input)
+    #       assert_equal json_output['file_id']['manufacturer'], json_input['manufacturer']
+    #       assert_equal json_output['activity']['timestamp'], json_input['timestamp']
+    #       assert_equal json_output['activity']['total_timer_time'], json_input['total_timer_time']
+    #       assert_equal json_output['activity']['total_timer_time'], json_input['total_timer_time']
+    #       assert_equal json_output['activity']['local_timestamp'], json_input['local_timestamp']
+    #       assert_equal json_output['workout']['sport'], RubyFit::MessageConstants::SPORT[json_input['sport'].to_sym]
+    #       assert_equal json_output['workout']['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sub_sport'].to_sym]
+    #       assert_equal json_output['workout']['wkt_name'], json_input['name']
+    #       assert_equal json_output['sport']['sport'], RubyFit::MessageConstants::SPORT[json_input['sport'].to_sym]
+    #       assert_equal json_output['sport']['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sub_sport'].to_sym]
+    #       assert_equal json_output['wahoo_id']['app_token'], json_input['wahoo_id']['app_token']
+    #       assert_equal json_output['wahoo_id']['workout_num'], json_input['wahoo_id']['workout_num']
+    #       assert_equal json_output['wahoo_id']['workout_type'], json_input['wahoo_id']['workout_type']
+    #       if json_input['records'].size > 1
+    #         assert_equal json_output['record'].size, json_input['records'].size
+    #         assert_equal json_output['record'].last['timestamp'], json_input['records'].last['timestamp']
+    #         assert_equal json_output['record'].last['y'].round(2), json_input['records'].last['y'].round(2)
+    #         assert_equal json_output['record'].last['x'].round(2), json_input['records'].last['x'].round(2)
+    #         assert_equal json_output['record'].last['distance'].round(2), json_input['records'].last['distance'].round(2)
+    #         assert_equal json_output['record'].last['elevation'].round(2), json_input['records'].last['elevation'].round(2)
+    #         assert_equal json_output['record'].last['heart_rate'], json_input['records'].last['heart_rate']
+    #         assert_equal json_output['record'].last['cadence'], json_input['records'].last['cadence']
+    #         assert_equal json_output['record'].last['power'], json_input['records'].last['power']
+    #         assert_equal json_output['record'].last['enhanced_speed'], json_input['records'].last['enhanced_speed']
+    #         assert_equal json_output['record'].last['battery_soc'], json_input['records'].last['battery_soc']
+    #         assert_equal json_output['record'].last['grade'], json_input['records'].last['grade']
+    #       elsif json_input['records'].size > 0
+    #         assert_equal json_output['record']['timestamp'], json_input['records'].last['timestamp']
+    #         assert_equal json_output['record']['y'].round(2), json_input['records'].last['y'].round(2)
+    #         assert_equal json_output['record']['x'].round(2), json_input['records'].last['x'].round(2)
+    #         assert_equal json_output['record'].last['distance'].round(2), json_input['records'].last['distance'].round(2)
+    #         assert_equal json_output['record'].last['elevation'].round(2), json_input['records'].last['elevation'].round(2)
+    #         assert_equal json_output['record']['heart_rate'], json_input['records'].last['heart_rate']
+    #         assert_equal json_output['record']['cadence'], json_input['records'].last['cadence']
+    #         assert_equal json_output['record']['power'], json_input['records'].last['power']
+    #         assert_equal json_output['record']['enhanced_speed'], json_input['records'].last['enhanced_speed']
+    #         assert_equal json_output['record']['battery_soc'], json_input['records'].last['battery_soc']
+    #         assert_equal json_output['record']['grade'], json_input['records'].last['grade']
+    #
+    #       end
+    #       if json_input['laps'].size > 1
+    #         assert_equal json_output['lap'].size, json_input['laps'].size
+    #         assert_equal json_output['lap'].last['start_time'], json_input['laps'].last['start_time']
+    #         assert_equal json_output['lap'].last['total_timer_time'], json_input['laps'].last['total_timer_time']
+    #         assert_equal json_output['lap'].last['total_distance'], json_input['laps'].last['total_distance']
+    #         assert_equal json_output['lap'].last['total_ascent'], json_input['laps'].last['total_ascent']
+    #         assert_equal json_output['lap'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['laps'].last['sport'].to_sym]
+    #         assert_equal json_output['lap'].last['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['laps'].last['sub_sport'].to_sym]
+    #         assert_equal json_output['lap'].last['total_calories'], json_input['laps'].last['total_calories']
+    #         assert_equal json_output['lap'].last['event'], RubyFit::MessageConstants::EVENT[json_input['laps'].last['event'].to_sym]
+    #         assert_equal json_output['lap'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
+    #         assert_equal json_output['lap'].last['lap_trigger'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
+    #       elsif json_input['laps'].size > 0
+    #         assert_equal json_output['wkt_lap']['start_time'], json_input['laps'].last['start_time']
+    #         assert_equal json_output['wkt_lap']['total_timer_time'], json_input['laps'].last['total_timer_time']
+    #         assert_equal json_output['wkt_lap']['total_distance'], json_input['laps'].last['total_distance']
+    #         assert_equal json_output['wkt_lap']['total_ascent'], json_input['laps'].last['total_ascent']
+    #         assert_equal json_output['wkt_lap'].last['total_calories'], json_input['laps'].last['total_calories']
+    #         assert_equal json_output['wkt_lap'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['laps'].last['sport'].to_sym]
+    #         assert_equal json_output['wkt_lap'].last['sub_sport'],  RubyFit::MessageConstants::SUBSPORT[json_input['laps'].last['sub_sport'].to_sym]
+    #         assert_equal json_output['wkt_lap'].last['event'], RubyFit::MessageConstants::EVENT[json_input['laps'].last['event'].to_sym]
+    #         assert_equal json_output['wkt_lap'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
+    #         assert_equal json_output['wkt_lap'].last['lap_trigger'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
+    #       end
+    #       if json_input['sessions'].size > 1
+    #         assert_equal json_output['session'].size, json_input['sessions'].size
+    #         assert_equal json_output['session'].last['start_time'], json_input['sessions'].last['start_time']
+    #         assert_equal json_output['session'].last['total_timer_time'], json_input['sessions'].last['total_timer_time']
+    #         assert_equal json_output['session'].last['total_distance'], json_input['sessions'].last['total_distance']
+    #         assert_equal json_output['session'].last['total_ascent'], json_input['sessions'].last['total_ascent']
+    #         assert_equal json_output['session'].last['total_calories'], json_input['sessions'].last['total_calories']
+    #         assert_equal json_output['session'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['sessions'].last['sport'].to_sym]
+    #         assert_equal json_output['session'].last['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sessions'].last['sub_sport'].to_sym]
+    #         assert_equal json_output['session'].last['event'], RubyFit::MessageConstants::EVENT[json_input['sessions'].last['event'].to_sym]
+    #         assert_equal json_output['session'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['sessions'].last['event_type'].to_sym]
+    #       elsif json_input['sessions'].size > 0
+    #         assert_equal json_output['session']['start_time'], json_input['sessions'].last['start_time']
+    #         assert_equal json_output['session']['total_timer_time'], json_input['sessions'].last['total_timer_time']
+    #         assert_equal json_output['session']['total_distance'], json_input['sessions'].last['total_distance']
+    #         assert_equal json_output['session']['sport'], RubyFit::MessageConstants::SPORT[json_input['sessions'].last['sport'].to_sym]
+    #         assert_equal json_output['session']['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sessions'].last['sub_sport'].to_sym]
+    #         assert_equal json_output['session']['total_ascent'], json_input['sessions'].last['total_ascent']
+    #         assert_equal json_output['session']['total_calories'], json_input['sessions'].last['total_calories']
+    #         assert_equal json_output['session']['event'], RubyFit::MessageConstants::EVENT[json_input['sessions'].last['event'].to_sym]
+    #         assert_equal json_output['session']['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['sessions'].last['event_type'].to_sym]
+    #       end
+    #       if json_input['device_infos'].size > 1
+    #         assert_equal json_output['device_info'].size, json_input['device_infos'].size
+    #         assert_equal json_output['device_info'].last['timestamp'], json_input['device_infos'].last['timestamp']
+    #         assert_equal json_output['device_info'].last['serial_number'], json_input['device_infos'].last['serial_number']
+    #         assert_equal json_output['device_info'].last['manufacturer'], json_input['device_infos'].last['manufacturer']
+    #         assert_equal json_output['device_info'].last['product'], json_input['device_infos'].last['product']
+    #         assert_equal json_output['device_info'].last['software_version'], json_input['device_infos'].last['software_version']
+    #         assert_equal json_output['device_info'].last['battery_voltage'], json_input['device_infos'].last['battery_voltage']
+    #         assert_equal json_output['device_info'].last['device_index'], json_input['device_infos'].last['device_index']
+    #       elsif json_input['device_infos'].size > 0
+    #         assert_equal json_output['device_info']['timestamp'], json_input['device_infos'].last['timestamp']
+    #         assert_equal json_output['device_info']['serial_number'], json_input['device_infos'].last['serial_number']
+    #         assert_equal json_output['device_info']['manufacturer'], json_input['device_infos'].last['manufacturer']
+    #         assert_equal json_output['device_info']['product'], json_input['device_infos'].last['product']
+    #         assert_equal json_output['device_info']['software_version'], json_input['device_infos'].last['software_version']
+    #         assert_equal json_output['device_info']['battery_voltage'], json_input['device_infos'].last['battery_voltage']
+    #         assert_equal json_output['device_info']['device_index'], json_input['device_infos'].last['device_index']
+    #       end
+    #     end
+    #   },
+    #   delete_file: -> {
+    #     FileUtils.rm_rf('fit_data.json')
+    #   }
     }
 
     parser = RubyFit::FitFileParser.new(callbacks)
-    parser.parse(raw)
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      json_input = JSON.parse(json_input)
+      assert_equal json_output['file_id']['manufacturer'], json_input['manufacturer']
+      assert_equal json_output['activity']['timestamp'], json_input['timestamp']
+      assert_equal json_output['activity']['total_timer_time'], json_input['total_timer_time']
+      assert_equal json_output['activity']['total_timer_time'], json_input['total_timer_time']
+      assert_equal json_output['activity']['local_timestamp'], json_input['local_timestamp']
+      assert_equal json_output['workout']['sport'], RubyFit::MessageConstants::SPORT[json_input['sport'].to_sym]
+      assert_equal json_output['workout']['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sub_sport'].to_sym]
+      assert_equal json_output['workout']['wkt_name'], json_input['name']
+      assert_equal json_output['sport']['sport'], RubyFit::MessageConstants::SPORT[json_input['sport'].to_sym]
+      assert_equal json_output['sport']['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sub_sport'].to_sym]
+      assert_equal json_output['wahoo_id']['app_token'], json_input['wahoo_id']['app_token']
+      assert_equal json_output['wahoo_id']['workout_num'], json_input['wahoo_id']['workout_num']
+      assert_equal json_output['wahoo_id']['workout_type'], json_input['wahoo_id']['workout_type']
+      if json_input['records'].size > 1
+        assert_equal json_output['record'].size, json_input['records'].size
+        assert_equal json_output['record'].last['timestamp'], json_input['records'].last['timestamp']
+        assert_equal json_output['record'].last['y'].round(2), json_input['records'].last['y'].round(2)
+        assert_equal json_output['record'].last['x'].round(2), json_input['records'].last['x'].round(2)
+        assert_equal json_output['record'].last['distance'].round(2), json_input['records'].last['distance'].round(2)
+        assert_equal json_output['record'].last['elevation'].round(2), json_input['records'].last['elevation'].round(2)
+        assert_equal json_output['record'].last['heart_rate'], json_input['records'].last['heart_rate']
+        assert_equal json_output['record'].last['cadence'], json_input['records'].last['cadence']
+        assert_equal json_output['record'].last['power'], json_input['records'].last['power']
+        assert_equal json_output['record'].last['enhanced_speed'], json_input['records'].last['enhanced_speed']
+        assert_equal json_output['record'].last['battery_soc'], json_input['records'].last['battery_soc']
+        assert_equal json_output['record'].last['grade'], json_input['records'].last['grade']
+      elsif json_input['records'].size > 0
+        assert_equal json_output['record']['timestamp'], json_input['records'].last['timestamp']
+        assert_equal json_output['record']['y'].round(2), json_input['records'].last['y'].round(2)
+        assert_equal json_output['record']['x'].round(2), json_input['records'].last['x'].round(2)
+        assert_equal json_output['record'].last['distance'].round(2), json_input['records'].last['distance'].round(2)
+        assert_equal json_output['record'].last['elevation'].round(2), json_input['records'].last['elevation'].round(2)
+        assert_equal json_output['record']['heart_rate'], json_input['records'].last['heart_rate']
+        assert_equal json_output['record']['cadence'], json_input['records'].last['cadence']
+        assert_equal json_output['record']['power'], json_input['records'].last['power']
+        assert_equal json_output['record']['enhanced_speed'], json_input['records'].last['enhanced_speed']
+        assert_equal json_output['record']['battery_soc'], json_input['records'].last['battery_soc']
+        assert_equal json_output['record']['grade'], json_input['records'].last['grade']
+
+      end
+      if json_input['laps'].size > 1
+        assert_equal json_output['lap'].size, json_input['laps'].size
+        assert_equal json_output['lap'].last['start_time'], json_input['laps'].last['start_time']
+        assert_equal json_output['lap'].last['total_timer_time'], json_input['laps'].last['total_timer_time']
+        assert_equal json_output['lap'].last['total_distance'], json_input['laps'].last['total_distance']
+        assert_equal json_output['lap'].last['total_ascent'], json_input['laps'].last['total_ascent']
+        assert_equal json_output['lap'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['laps'].last['sport'].to_sym]
+        assert_equal json_output['lap'].last['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['laps'].last['sub_sport'].to_sym]
+        assert_equal json_output['lap'].last['total_calories'], json_input['laps'].last['total_calories']
+        assert_equal json_output['lap'].last['event'], RubyFit::MessageConstants::EVENT[json_input['laps'].last['event'].to_sym]
+        assert_equal json_output['lap'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
+        assert_equal json_output['lap'].last['lap_trigger'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
+      elsif json_input['laps'].size > 0
+        assert_equal json_output['wkt_lap']['start_time'], json_input['laps'].last['start_time']
+        assert_equal json_output['wkt_lap']['total_timer_time'], json_input['laps'].last['total_timer_time']
+        assert_equal json_output['wkt_lap']['total_distance'], json_input['laps'].last['total_distance']
+        assert_equal json_output['wkt_lap']['total_ascent'], json_input['laps'].last['total_ascent']
+        assert_equal json_output['wkt_lap'].last['total_calories'], json_input['laps'].last['total_calories']
+        assert_equal json_output['wkt_lap'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['laps'].last['sport'].to_sym]
+        assert_equal json_output['wkt_lap'].last['sub_sport'],  RubyFit::MessageConstants::SUBSPORT[json_input['laps'].last['sub_sport'].to_sym]
+        assert_equal json_output['wkt_lap'].last['event'], RubyFit::MessageConstants::EVENT[json_input['laps'].last['event'].to_sym]
+        assert_equal json_output['wkt_lap'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
+        assert_equal json_output['wkt_lap'].last['lap_trigger'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
+      end
+      if json_input['sessions'].size > 1
+        assert_equal json_output['session'].size, json_input['sessions'].size
+        assert_equal json_output['session'].last['start_time'], json_input['sessions'].last['start_time']
+        assert_equal json_output['session'].last['total_timer_time'], json_input['sessions'].last['total_timer_time']
+        assert_equal json_output['session'].last['total_distance'], json_input['sessions'].last['total_distance']
+        assert_equal json_output['session'].last['total_ascent'], json_input['sessions'].last['total_ascent']
+        assert_equal json_output['session'].last['total_calories'], json_input['sessions'].last['total_calories']
+        assert_equal json_output['session'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['sessions'].last['sport'].to_sym]
+        assert_equal json_output['session'].last['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sessions'].last['sub_sport'].to_sym]
+        assert_equal json_output['session'].last['event'], RubyFit::MessageConstants::EVENT[json_input['sessions'].last['event'].to_sym]
+        assert_equal json_output['session'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['sessions'].last['event_type'].to_sym]
+      elsif json_input['sessions'].size > 0
+        assert_equal json_output['session']['start_time'], json_input['sessions'].last['start_time']
+        assert_equal json_output['session']['total_timer_time'], json_input['sessions'].last['total_timer_time']
+        assert_equal json_output['session']['total_distance'], json_input['sessions'].last['total_distance']
+        assert_equal json_output['session']['sport'], RubyFit::MessageConstants::SPORT[json_input['sessions'].last['sport'].to_sym]
+        assert_equal json_output['session']['sub_sport'], RubyFit::MessageConstants::SUBSPORT[json_input['sessions'].last['sub_sport'].to_sym]
+        assert_equal json_output['session']['total_ascent'], json_input['sessions'].last['total_ascent']
+        assert_equal json_output['session']['total_calories'], json_input['sessions'].last['total_calories']
+        assert_equal json_output['session']['event'], RubyFit::MessageConstants::EVENT[json_input['sessions'].last['event'].to_sym]
+        assert_equal json_output['session']['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['sessions'].last['event_type'].to_sym]
+      end
+      if json_input['device_infos'].size > 1
+        assert_equal json_output['device_info'].size, json_input['device_infos'].size
+        assert_equal json_output['device_info'].last['timestamp'], json_input['device_infos'].last['timestamp']
+        assert_equal json_output['device_info'].last['serial_number'], json_input['device_infos'].last['serial_number']
+        assert_equal json_output['device_info'].last['manufacturer'], json_input['device_infos'].last['manufacturer']
+        assert_equal json_output['device_info'].last['product'], json_input['device_infos'].last['product']
+        assert_equal json_output['device_info'].last['software_version'], json_input['device_infos'].last['software_version']
+        assert_equal json_output['device_info'].last['battery_voltage'], json_input['device_infos'].last['battery_voltage']
+        assert_equal json_output['device_info'].last['device_index'], json_input['device_infos'].last['device_index']
+      elsif json_input['device_infos'].size > 0
+        assert_equal json_output['device_info']['timestamp'], json_input['device_infos'].last['timestamp']
+        assert_equal json_output['device_info']['serial_number'], json_input['device_infos'].last['serial_number']
+        assert_equal json_output['device_info']['manufacturer'], json_input['device_infos'].last['manufacturer']
+        assert_equal json_output['device_info']['product'], json_input['device_infos'].last['product']
+        assert_equal json_output['device_info']['software_version'], json_input['device_infos'].last['software_version']
+        assert_equal json_output['device_info']['battery_voltage'], json_input['device_infos'].last['battery_voltage']
+        assert_equal json_output['device_info']['device_index'], json_input['device_infos'].last['device_index']
+      end
+    end
   end
 end

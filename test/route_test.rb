@@ -78,25 +78,29 @@ class RubyFitIntegrationTest < Minitest::Test
 
         fit_data[local_num] = formatted_values.join(', ')
       },
-      output_file: -> (all_data) {
-        File.open('fit_data.json', 'w') do |json_file|
-          json_file.write(all_data.to_json)
-        end
-      },
-      end_of_file: -> {
-        File.open('fit_data.json', 'r') do |file|
-          json_output = JSON.parse(file.read)
-          json_input = JSON.parse(json_input)
-
-          assert_equal(json_input['track_points'].size, json_output['record'].size)
-          assert_equal(json_input['course_points'].size, json_output['course_point'].size)
-        end
-      },
-      delete_file: -> {
-        FileUtils.rm_rf('fit_data.json')
-      }
+      # output_file: -> (all_data) {
+      #   File.open('fit_data.json', 'w') do |json_file|
+      #     json_file.write(all_data.to_json)
+      #   end
+      # },
+      # end_of_file: -> {
+      #   File.open('fit_data.json', 'r') do |file|
+      #     json_output = JSON.parse(file.read)
+      #     json_input = JSON.parse(json_input)
+      #
+      #     assert_equal(json_input['track_points'].size, json_output['record'].size)
+      #     assert_equal(json_input['course_points'].size, json_output['course_point'].size)
+      #   end
+      # },
+      # delete_file: -> {
+      #   FileUtils.rm_rf('fit_data.json')
+      # }
     }
     parser = RubyFit::FitFileParser.new(callbacks)
-    parser.parse(raw)
+    parser.parse(raw) do |data|
+      json_input = JSON.parse(json_input)
+      assert_equal(json_input['track_points'].size, data[:record].size)
+      assert_equal(json_input['course_points'].size, data[:course_point].size)
+    end
   end
 end
