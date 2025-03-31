@@ -1,12 +1,32 @@
 class RubyFit::FitFileParser
     REQUIRED_CALLBACKS = [:definition_message, :get_definition, :data_message]
 
-    def initialize(callbacks)
-      @callbacks = callbacks
-      REQUIRED_CALLBACKS.each do |callback|
-        raise ArgumentError, "Missing required callback: #{callback}" unless @callbacks[callback]
-      end
+    def initialize
+      @definitions = {}
+      @fit_data = {}
     end
+
+    def definition_message(local_num, global_message_number, fields, developer_fields)
+      global_message_number = global_message_number.to_i
+      @definitions[local_num] = { global_message_number: global_message_number, fields: fields, developer_fields: developer_fields }
+    end
+
+    def get_definition(local_num)
+      @definitions[local_num] || { fields: [] }
+    end
+
+    def data_message(local_num, values)
+      formatted_values = values.map do |key, value|
+        formatted_value = if value.is_a?(String)
+                            value.bytes.map { |byte| sprintf('%02X', byte) }.join(' ')
+                          else
+                            value.inspect
+                          end
+        "#{key}: #{formatted_value}"
+      end
+      @fit_data[local_num] = formatted_values.join(', ')
+    end
+
 
     def convert_to_json(fit_data, unpack_directive)
       # Define the message type to look up
@@ -84,7 +104,7 @@ class RubyFit::FitFileParser
 
           @previous_timestamp = timestamp
 
-          definition = @callbacks[:get_definition].call(local_num)
+          definition = get_definition(local_num)
           raise "Unknown definition for local number #{local_num}" unless definition
 
           values = {}
@@ -103,7 +123,7 @@ class RubyFit::FitFileParser
             @previous_timestamp = values[253].unpack1('V')
           end
 
-          @callbacks[:data_message].call(local_num, values)
+          data_message(local_num, values)
         else
           # Check if the record is a definition message by looking at the seventh bit (1 for definition, 0 for data)
           if record_header & 0x40 == 0x40
@@ -137,11 +157,12 @@ class RubyFit::FitFileParser
               end
             end
 
-            @callbacks[:definition_message].call(local_num, global_message_number, fields, developer_fields)
+
+            definition_message(local_num, global_message_number, fields, developer_fields)
           else
             # Data Message
             local_num = record_header & 0x0F
-            definition = @callbacks[:get_definition].call(local_num)
+            definition = get_definition(local_num)
             raise "Unknown definition for local number #{local_num}" unless definition
 
             values = {}
@@ -164,7 +185,7 @@ class RubyFit::FitFileParser
               developer_values[field[:id]] = value
             end
 
-            @callbacks[:data_message].call(local_num, values)
+            data_message(local_num, values)
             data = self.convert_to_json({ definition[:global_message_number] => values }, unpack_directive)
 
             data&.each do |key, value|
@@ -179,8 +200,5 @@ class RubyFit::FitFileParser
         end
       end
       yield all_data
-      # @callbacks[:output_file].call(all_data)
-      # @callbacks[:end_of_file].call
-      # @callbacks[:delete_file].call
     end
 end
