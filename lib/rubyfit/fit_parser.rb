@@ -178,9 +178,8 @@ class RubyFit::FitFileParser
           end
         end
       end
-      File.open('fit_data.json', 'w') do |json_file|
-        json_file.write(all_data.to_json)
-      end
+      @callbacks[:output_file].call(all_data)
       @callbacks[:end_of_file].call
+      @callbacks[:delete_file].call
     end
 end
