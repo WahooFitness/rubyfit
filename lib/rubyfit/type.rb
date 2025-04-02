@@ -47,7 +47,9 @@ class RubyFit::Type
         default_bytes: num2bytes(default, opts[:byte_count]),
         val2bytes: ->(val, type) { num2bytes(val, type.byte_count) },
         bytes2val: ->(bytes, type, opts = {}) {
-          bytes2num(bytes, type.byte_count, unsigned, opts[:big_endian]) },
+          value = bytes2num(bytes, type.byte_count, unsigned, opts[:big_endian])
+          value == default ? nil : value
+        },
       }.merge(opts))
     end
 
@@ -129,7 +131,7 @@ class RubyFit::Type
     def timestamp
       uint32({
         rb2fit: ->(val, type) { unix2fit_timestamp(val) },
-        fit2rb: ->(val, type) { fit2unix_timestamp(val) }
+        fit2rb: ->(val, type) { val.nil? ? nil :  fit2unix_timestamp(val) }
       })
     end
 
@@ -143,7 +145,7 @@ class RubyFit::Type
     def centimeters
       uint32({
         rb2fit: ->(val, type) { (val * 100).truncate },
-        fit2rb: ->(val, type) { val / 100.0 }
+        fit2rb: ->(val, type) { val.nil? ? nil : val / 100.0 }
       })
     end
 
@@ -154,7 +156,7 @@ class RubyFit::Type
           result
         },
         fit2rb: ->(val, type) {
-          result = val / 5.0 - 500
+          result = val.nil? ? nil : val / 5.0 - 500
           result
         }
       })
@@ -163,7 +165,7 @@ class RubyFit::Type
     def duration
       uint32({
         rb2fit: ->(val, type) { (val * 1000) },
-        fit2rb: ->(val, type) { val / 1000.0 }
+        fit2rb: ->(val, type) { val.nil? ? nil :  val / 1000.0 }
       })
     end
 
@@ -177,7 +179,7 @@ class RubyFit::Type
     def speed
       uint8({
                rb2fit: ->(val, type) { (val * 1000) },
-               fit2rb: ->(val, type) { val / 1000.0 }
+               fit2rb: ->(val, type) { val.nil? ? nil :  val / 1000.0 }
              })
     end
 
@@ -185,28 +187,28 @@ class RubyFit::Type
     def grade
       sint16({
                 rb2fit: ->(val, type) { (val * 100) },
-                fit2rb: ->(val, type) { val / 100.0 }
+                fit2rb: ->(val, type) { val.nil? ? nil :  val / 100.0 }
               })
     end
 
     def tss
       uint16({
                rb2fit: ->(val, type) { (val * 10) },
-               fit2rb: ->(val, type) { val / 10.0 }
+               fit2rb: ->(val, type) { val.nil? ? nil : val / 10.0 }
              })
     end
 
     def if
       uint16({
                rb2fit: ->(val, type) { (val * 1000) },
-               fit2rb: ->(val, type) { val / 1000.0 }
+               fit2rb: ->(val, type) { val.nil? ? nil :  val / 1000.0 }
              })
     end
 
     def uint8_scale2
       uint8({
                rb2fit: ->(val, type) { (val * 2) },
-               fit2rb: ->(val, type) { val / 2 }
+               fit2rb: ->(val, type) { val.nil? ? nil :  val / 2 }
              })
     end
 

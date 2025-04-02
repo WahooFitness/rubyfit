@@ -10,7 +10,7 @@ class FitParserTest < Minitest::Test
     fit_file_path = 'test/fixtures/2025-03-29-143824-ELEMNT_BOLT_EAB9-2-0.fit'
     raw = IO.read(fit_file_path)
     parser = RubyFit::FitFileParser.new
-    parser.parse2(raw) do |data|
+    parser.parse(raw) do |data|
       json_output = data
     end
     finish = Time.now
@@ -23,7 +23,7 @@ class FitParserTest < Minitest::Test
     raw = IO.read(fit_file_path)
 
     parser = RubyFit::FitFileParser.new
-    parser.parse2(raw) do |data|
+    parser.parse(raw) do |data|
 
       json_output = JSON.parse(data.to_json)
 

@@ -44,7 +44,6 @@ module RubyFit
     end
 
     def bytes2num(bytes, byte_count, unsigned = true, big_endian = true)
-      puts("be", big_endian)
       directive = {
         1 => "C",
         2 => "S",
@@ -94,6 +93,7 @@ module RubyFit
     end
 
     def semicircles2deg(degrees)
+      return nil if degrees.nil?
       result = degrees / DEGREES_TO_SEMICIRCLES
       result -= 360.0 if result > 180.0
       result += 360.0 if result < -180.0

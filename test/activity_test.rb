@@ -117,6 +117,7 @@ class RubyFitIntegrationTest < Minitest::Test
     parser = RubyFit::FitFileParser.new
     parser.parse(raw) do |data|
       json_output = JSON.parse(data.to_json)
+      puts(json_output)
       json_input = JSON.parse(json_input)
       assert_equal json_output['file_id']['manufacturer'], json_input['manufacturer']
       assert_equal json_output['activity']['timestamp'], json_input['timestamp']
