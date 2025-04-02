@@ -101,7 +101,24 @@
       "sub_sport": "generic",
       "event": "lap",
       "event_type": "stop",
-      "lap_trigger": "manual"
+      "lap_trigger": "manual",
+      "time_in_hr_zone": [
+        202.88,
+        46.528,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_in_power_zone": [
+        205.307,
+        2.88,
+        35.999,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     }
   ],
   "device_infos": [
@@ -145,7 +162,24 @@
       "event": "session",
       "event_type": "stop",
       "sport": "generic",
-      "sub_sport": "generic"
+      "sub_sport": "generic",
+      "time_in_hr_zone": [
+        202.88,
+        46.528,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_in_power_zone": [
+        205.307,
+        2.88,
+        35.999,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     }
   ],
   "records": [

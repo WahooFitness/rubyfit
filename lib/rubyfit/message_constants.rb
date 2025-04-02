@@ -314,10 +314,30 @@ module RubyFit::MessageConstants
     activity: 34,
     device_info: 23,
     sport: 12,
+    workout_step: 27,
     wahoo_custom_num: 65284,
     wahoo_clm: 65285,
     wahoo_id: 65281,
     developer_data_id: 207,
     field_description: 206
+  }.freeze
+
+  BATTERY_STATUS = {
+    new: 1,
+    good: 2,
+    ok: 3,
+    low: 4,
+    critical: 5,
+    charging: 6,
+    unknown: 7
+  }.freeze
+
+  SOURCE_TYPE = {
+    ant: 0,
+    antplus: 1,
+    bluetooth: 2,
+    bluetooth_low_energy: 3,
+    wifi: 4,
+    local: 5
   }.freeze
 end

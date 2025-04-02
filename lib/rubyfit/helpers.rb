@@ -44,6 +44,7 @@ module RubyFit
     end
 
     def bytes2num(bytes, byte_count, unsigned = true, big_endian = true)
+      puts("be", big_endian)
       directive = {
         1 => "C",
         2 => "S",

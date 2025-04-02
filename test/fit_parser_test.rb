@@ -1,0 +1,114 @@
+require 'minitest/autorun'
+require 'json'
+require_relative '../lib/rubyfit/writer'
+require_relative '../lib/rubyfit/message_constants'
+require_relative '../lib/rubyfit/fit_parser'
+require_relative '../examples/fit_callbacks'
+class FitParserTest < Minitest::Test
+  def test_extremely_large_file
+    start = Time.now
+    fit_file_path = 'test/fixtures/2025-03-29-143824-ELEMNT_BOLT_EAB9-2-0.fit'
+    raw = IO.read(fit_file_path)
+    parser = RubyFit::FitFileParser.new
+    parser.parse2(raw) do |data|
+      json_output = data
+    end
+    finish = Time.now
+    puts("Time to load test: #{finish - start}")
+  end
+
+  def test_little_endian_file_decoding
+    fit_file_path = 'test/fixtures/2025-01-03-143057-WAHOOAPPIOS62BB-3-0.fit'
+    # Read FIT file
+    raw = IO.read(fit_file_path)
+
+    parser = RubyFit::FitFileParser.new
+    parser.parse2(raw) do |data|
+
+      json_output = JSON.parse(data.to_json)
+
+      assert_equal(32, json_output['file_id']['manufacturer'])
+      assert_equal(4, json_output['file_id']['type'])
+      assert_equal(0, json_output['file_id']['product'])
+      assert_equal(1735914657, json_output['file_id']['time_created'])
+
+      assert_equal(1735914905, json_output['activity']['timestamp'])
+      assert_equal(247.886, json_output['activity']['total_timer_time'])
+      assert_equal(1, json_output['activity']['num_sessions'])
+      assert_equal(26, json_output['activity']['event'])
+      assert_equal(1, json_output['activity']['event_type'])
+
+      assert_equal(2, json_output['workout'][0]['sport'])
+      assert_equal(6, json_output['workout'][0]['sub_sport'])
+      assert_equal('Indoor Cycling', json_output['workout'][0]['wkt_name'])
+
+      assert_equal('WAHOOAPPIOS62BB', json_output['wahoo_id'][0]['app_token'])
+      assert_equal(3, json_output['wahoo_id'][0]['workout_num'])
+      assert_equal(12, json_output['wahoo_id'][0]['workout_type'])
+
+      assert_equal(2, json_output['session']['sport'])
+      assert_equal(6, json_output['session']['sub_sport'])
+      assert_equal(247.886, json_output['session']['total_timer_time'])
+      assert_equal(17, json_output['session']['total_calories'])
+      assert_equal(137, json_output['session']['max_heart_rate'])
+      assert_equal(108, json_output['session']['avg_heart_rate'])
+      assert_equal(124.2, json_output['session']['total_distance'])
+      assert_equal(2.1, json_output['session']['training_stress_score'])
+      assert_equal(0.592, json_output['session']['intensity_factor'])
+      assert_equal(124, json_output['session']['threshold_power'])
+
+      assert_equal([202.88, 46.528, 0, 0, 0], json_output['lap']['time_in_hr_zone'])
+      assert_equal([205.307, 2.88, 35.999, 0.0, 0.0, 0.0], json_output['lap']['time_in_power_zone'])
+
+      assert_equal(2, json_output['lap']['sport'])
+      assert_equal(6, json_output['lap']['sub_sport'])
+      assert_equal(247.886, json_output['lap']['total_timer_time'])
+      assert_equal(17, json_output['lap']['total_calories'])
+      assert_equal(137, json_output['lap']['max_heart_rate'])
+      assert_equal(108, json_output['lap']['avg_heart_rate'])
+      assert_equal(124.2, json_output['lap']['total_distance'])
+      assert_equal(17304, json_output['lap']['total_work'])
+      assert_equal([202.88, 46.528, 0, 0, 0], json_output['lap']['time_in_hr_zone'])
+      assert_equal([205.307, 2.88, 35.999, 0.0, 0.0, 0.0], json_output['lap']['time_in_power_zone'])
+
+      assert_equal(98, json_output['record'][1]['heart_rate'])
+      assert_equal(0, json_output['record'][1]['power'])
+      assert_equal(0, json_output['record'][1]['calories'])
+      assert_equal(85, json_output['record'][0]['battery_soc'])
+
+      assert_equal(85, json_output['record'][0]['battery_soc'])
+      assert_equal(110, json_output['record'][242]['power'])
+      assert_equal(124.2, json_output['record'][242]['distance'])
+      assert_equal(0.134, json_output['record'][242]['speed'])
+
+
+      assert_equal(5, json_output['hr_zone'].size)
+      assert_equal(0, json_output['hr_zone'][0]['message_index'])
+      assert_equal(1, json_output['hr_zone'][1]['message_index'])
+      assert_equal(2, json_output['hr_zone'][2]['message_index'])
+      assert_equal(3, json_output['hr_zone'][3]['message_index'])
+      assert_equal(4, json_output['hr_zone'][4]['message_index'])
+
+      assert_equal(6, json_output['power_zone'].size)
+      assert_equal(0, json_output['power_zone'][0]['message_index'])
+      assert_equal(1, json_output['power_zone'][1]['message_index'])
+      assert_equal(2, json_output['power_zone'][2]['message_index'])
+      assert_equal(3, json_output['power_zone'][3]['message_index'])
+      assert_equal(4, json_output['power_zone'][4]['message_index'])
+      assert_equal(5, json_output['power_zone'][5]['message_index'])
+
+      assert_equal(68, json_output['power_zone'][0]['high_value'])
+      assert_equal(87, json_output['power_zone'][1]['high_value'])
+      assert_equal(113, json_output['power_zone'][2]['high_value'])
+      assert_equal(119, json_output['power_zone'][3]['high_value'])
+      assert_equal(128, json_output['power_zone'][4]['high_value'])
+      assert_equal(65534, json_output['power_zone'][5]['high_value'])
+
+      assert_equal(0, json_output['device_info'][0]['device_index'])
+      assert_equal(32, json_output['device_info'][0]['manufacturer'])
+      assert_equal(0, json_output['device_info'][0]['product'])
+      assert_equal("WAHOO APP", json_output['device_info'][0]['product_name'])
+
+    end
+  end
+end

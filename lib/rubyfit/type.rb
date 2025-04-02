@@ -21,9 +21,9 @@ class RubyFit::Type
     result
   end
 
-  def bytes2val(bytes)
+  def bytes2val(bytes, **opts)
     result = bytes
-    result = @bytes2val.call(result, self)
+    result = @bytes2val.call(result, self, **opts)
     result = @fit2rb.call(result, self) if @fit2rb
     result
   end
@@ -46,7 +46,8 @@ class RubyFit::Type
       new({
         default_bytes: num2bytes(default, opts[:byte_count]),
         val2bytes: ->(val, type) { num2bytes(val, type.byte_count) },
-        bytes2val: ->(bytes, type) { bytes2num(bytes, type.byte_count, unsigned) },
+        bytes2val: ->(bytes, type, opts = {}) {
+          bytes2num(bytes, type.byte_count, unsigned, opts[:big_endian]) },
       }.merge(opts))
     end
 
@@ -62,7 +63,7 @@ class RubyFit::Type
         byte_count: byte_count,
         default_bytes: [0x00] * byte_count,
         val2bytes: ->(val, type) { str2bytes(val, type.byte_count) },
-        bytes2val: ->(bytes, type) { bytes2str(bytes) },
+        bytes2val: ->(bytes, type, opts = {}) { bytes2str(bytes) },
       }.merge(opts))
     end
 
@@ -166,12 +167,20 @@ class RubyFit::Type
       })
     end
 
-    def speed
+    def enhanced_speed
       uint32({
                rb2fit: ->(val, type) { (val * 1000) },
                fit2rb: ->(val, type) { val / 1000.0 }
              })
     end
+
+    def speed
+      uint8({
+               rb2fit: ->(val, type) { (val * 1000) },
+               fit2rb: ->(val, type) { val / 1000.0 }
+             })
+    end
+
 
     def grade
       sint16({
@@ -180,13 +189,34 @@ class RubyFit::Type
               })
     end
 
+    def tss
+      uint16({
+               rb2fit: ->(val, type) { (val * 10) },
+               fit2rb: ->(val, type) { val / 10.0 }
+             })
+    end
+
+    def if
+      uint16({
+               rb2fit: ->(val, type) { (val * 1000) },
+               fit2rb: ->(val, type) { val / 1000.0 }
+             })
+    end
+
+    def uint8_scale2
+      uint8({
+               rb2fit: ->(val, type) { (val * 2) },
+               fit2rb: ->(val, type) { val / 2 }
+             })
+    end
+
     def float64(opts = {})
       new({
             fit_id: 0x89,
             byte_count: 8,
             default_bytes: [0xFF] * 8,
             val2bytes: ->(val, type) { [val].pack("G").bytes },
-            bytes2val: ->(bytes, type) { bytes.pack("C*").unpack1("G") },
+            bytes2val: ->(bytes, type, opts = {}) { bytes.pack("C*").unpack1("G") },
           }.merge(opts))
     end
 
@@ -198,10 +228,24 @@ class RubyFit::Type
             val2bytes: ->(val, type) {
               val[0, length] + ([0xFF] * [length - val.length, 0].max)
             },
-            bytes2val: ->(bytes, type) {
+            bytes2val: ->(bytes, type, opts = {}) {
               bytes[0, length]
             },
           }.merge(opts))
     end
+  end
+
+  def self.uint32_array(length, opts = {})
+    new({
+          fit_id: 0x0D, # Assuming 0x0D is the correct fit_id for arrays
+          byte_count: length * 4, # Assuming each hr_zone value is 4 bytes
+          default_bytes: [0xFF] * (length * 4),
+          val2bytes: ->(val, type) {
+            val.flat_map { |v| [v * 1000].pack("L<").bytes } + ([0xFF] * [(length - val.length) * 4, 0].max)
+          },
+          bytes2val: ->(bytes, type, opts = {}) {
+            bytes.each_slice(4).map { |slice| slice.pack("C*").unpack1("L<") / 1000.0 }
+          },
+        }.merge(opts))
   end
 end

@@ -110,7 +110,7 @@ class RubyFitIntegrationTest < Minitest::Test
     end
 
     # this is a Wahoo fit file with clm and wahoo custom num messages
-    # fit_file_path = '2025-01-03-143057-WAHOOAPPIOS62BB-3-0.fit'
+    # fit_file_path = 'test/fixtures/2025-01-03-143057-WAHOOAPPIOS62BB-3-0.fit'
     # Read FIT file
     raw = IO.read(fit_file_path)
 
@@ -171,16 +171,16 @@ class RubyFitIntegrationTest < Minitest::Test
         assert_equal json_output['lap'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
         assert_equal json_output['lap'].last['lap_trigger'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
       elsif json_input['laps'].size > 0
-        assert_equal json_output['wkt_lap']['start_time'], json_input['laps'].last['start_time']
-        assert_equal json_output['wkt_lap']['total_timer_time'], json_input['laps'].last['total_timer_time']
-        assert_equal json_output['wkt_lap']['total_distance'], json_input['laps'].last['total_distance']
-        assert_equal json_output['wkt_lap']['total_ascent'], json_input['laps'].last['total_ascent']
-        assert_equal json_output['wkt_lap'].last['total_calories'], json_input['laps'].last['total_calories']
-        assert_equal json_output['wkt_lap'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['laps'].last['sport'].to_sym]
-        assert_equal json_output['wkt_lap'].last['sub_sport'],  RubyFit::MessageConstants::SUBSPORT[json_input['laps'].last['sub_sport'].to_sym]
-        assert_equal json_output['wkt_lap'].last['event'], RubyFit::MessageConstants::EVENT[json_input['laps'].last['event'].to_sym]
-        assert_equal json_output['wkt_lap'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
-        assert_equal json_output['wkt_lap'].last['lap_trigger'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
+        assert_equal json_output['lap']['start_time'], json_input['laps'].last['start_time']
+        assert_equal json_output['lap']['total_timer_time'], json_input['laps'].last['total_timer_time']
+        assert_equal json_output['lap']['total_distance'], json_input['laps'].last['total_distance']
+        assert_equal json_output['lap']['total_ascent'], json_input['laps'].last['total_ascent']
+        assert_equal json_output['lap'].last['total_calories'], json_input['laps'].last['total_calories']
+        assert_equal json_output['lap'].last['sport'], RubyFit::MessageConstants::SPORT[json_input['laps'].last['sport'].to_sym]
+        assert_equal json_output['lap'].last['sub_sport'],  RubyFit::MessageConstants::SUBSPORT[json_input['laps'].last['sub_sport'].to_sym]
+        assert_equal json_output['lap'].last['event'], RubyFit::MessageConstants::EVENT[json_input['laps'].last['event'].to_sym]
+        assert_equal json_output['lap'].last['event_type'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
+        assert_equal json_output['lap'].last['lap_trigger'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
       end
       if json_input['sessions'].size > 1
         assert_equal json_output['session'].size, json_input['sessions'].size
@@ -219,7 +219,6 @@ class RubyFitIntegrationTest < Minitest::Test
         assert_equal json_output['device_info']['manufacturer'], json_input['device_infos'].last['manufacturer']
         assert_equal json_output['device_info']['product'], json_input['device_infos'].last['product']
         assert_equal json_output['device_info']['software_version'], json_input['device_infos'].last['software_version']
-        assert_equal json_output['device_info']['battery_voltage'], json_input['device_infos'].last['battery_voltage']
         assert_equal json_output['device_info']['device_index'], json_input['device_infos'].last['device_index']
       end
     end

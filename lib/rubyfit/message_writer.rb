@@ -1,7 +1,3 @@
-# require "rubyfit/type"
-# require "rubyfit/helpers"
-# require "rubyfit/message_constants"
-
 require_relative 'type'
 require_relative 'helpers'
 require_relative 'message_constants'
@@ -59,8 +55,8 @@ class RubyFit::MessageWriter
         lap_trigger: { id: 24, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::LAP_TRIGGER },
         normalized_power: { id: 33, type: RubyFit::Type.uint16 },
         total_moving_time: { id: 52, type: RubyFit::Type.duration },
-        # time_in_hr_zone: { id: 57, type: RubyFit::Type.uint32 }, # should be array of hr_zone type
-        # time_in_power_zone: { id: 60, type: RubyFit::Type.uint32 }, # should be array of power_zone type
+        time_in_hr_zone: { id: 57, type: RubyFit::Type.uint32_array(5) },
+        time_in_power_zone: { id: 60, type: RubyFit::Type.uint32_array(8) },
         min_heart_rate: { id: 63, type: RubyFit::Type.uint8 },
         enhanced_avg_speed: { id: 65, type: RubyFit::Type.uint32 },
         enhanced_max_speed: { id: 66, type: RubyFit::Type.uint32 }
@@ -87,14 +83,21 @@ class RubyFit::MessageWriter
         y: { id: 0, type: RubyFit::Type.semicircles, required: true },
         x: { id: 1, type: RubyFit::Type.semicircles, required: true },
         distance: { id: 5, type: RubyFit::Type.centimeters },
+        speed: { id: 6, type: RubyFit::Type.speed },
         elevation: { id: 2, type: RubyFit::Type.altitude },
         heart_rate: { id: 3, type: RubyFit::Type.uint8 },
         cadence: { id: 4, type: RubyFit::Type.uint8 },
         power: { id: 7, type: RubyFit::Type.uint16 },
         calories: { id: 33, type: RubyFit::Type.uint16 },
-        enhanced_speed: { id: 73, type: RubyFit::Type.speed},
-        battery_soc: { id: 78, type: RubyFit::Type.uint8 },
+        enhanced_speed: { id: 73, type: RubyFit::Type.enhanced_speed},
+        battery_soc: { id: 81, type: RubyFit::Type.uint8_scale2 },
         grade: { id: 9, type: RubyFit::Type.grade},
+        temperature: { id: 13, type: RubyFit::Type.sint8 },
+        gps_accuracy: { id: 31, type: RubyFit::Type.uint8 },
+        left_torque_effectiveness: { id: 43, type: RubyFit::Type.uint8_scale2 },
+        right_torque_effectiveness: { id: 44, type: RubyFit::Type.uint8_scale2 },
+        left_pedal_smoothness: { id: 45, type: RubyFit::Type.uint8_scale2 },
+        right_pedal_smoothness: { id: 46, type: RubyFit::Type.uint8_scale2 }
       }
     },
 
@@ -104,6 +107,7 @@ class RubyFit::MessageWriter
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
         event: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: true },
         event_type: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: true },
+        data: { id: 3, type: RubyFit::Type.uint32 },
         event_group: { id: 4, type: RubyFit::Type.uint8 },
       }
     },
@@ -151,15 +155,16 @@ class RubyFit::MessageWriter
       id: 23,
       fields: {
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
+        device_type: { id: 1, type: RubyFit::Type.uint8 },
         serial_number: { id: 3, type: RubyFit::Type.uint32z },
         manufacturer: { id: 2, type: RubyFit::Type.uint16 },
         product: { id: 4, type: RubyFit::Type.uint16 },
         software_version: { id: 5, type: RubyFit::Type.uint16 },
         hardware_version: { id: 6, type: RubyFit::Type.uint8 },
-        battery_voltage: { id: 10, type: RubyFit::Type.uint16 },
-        # battery_status: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::BATTERY_STATUS },
-        # ant_device_number: { id: 21, type: RubyFit::Type.uint16 },
+        battery_status: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::BATTERY_STATUS },
+        ant_device_number: { id: 21, type: RubyFit::Type.uint16 },
         device_index: { id: 0, type: RubyFit::Type.uint8 },
+        source_type: { id: 25,type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SOURCE_TYPE },
         product_name: { id: 27, type: RubyFit::Type.string(20) }
       }
     },
@@ -203,14 +208,14 @@ class RubyFit::MessageWriter
         max_power: { id: 21, type: RubyFit::Type.uint16 },
         num_laps: { id: 26, type: RubyFit::Type.uint16 },
         normalized_power: { id: 34, type: RubyFit::Type.uint16 },
-        training_stress_score: { id: 35, type: RubyFit::Type.uint16 },
-        intensity_factor: { id: 36, type: RubyFit::Type.uint16 },
+        training_stress_score: { id: 35, type: RubyFit::Type.tss },
+        intensity_factor: { id: 36, type: RubyFit::Type.if },
         threshold_power: { id: 45, type: RubyFit::Type.uint16 },
         total_work: { id: 48, type: RubyFit::Type.uint32 },
         total_moving_time: { id: 59, type: RubyFit::Type.duration },
         min_heart_rate: { id: 64, type: RubyFit::Type.uint8 },
-        # time_in_hr_zone: { id: 65, type: RubyFit::Type.uint32 }, # should be array of hr_zone type
-        # time_in_power_zone: { id: 68, type: RubyFit::Type.uint32 }, # should be array of power_zone type
+        time_in_hr_zone: { id: 65, type: RubyFit::Type.uint32_array(5) },
+        time_in_power_zone: { id: 68, type: RubyFit::Type.uint32_array(8) },
         enhanced_avg_speed: { id: 124, type: RubyFit::Type.uint32 },
         enhanced_max_speed: { id: 125, type: RubyFit::Type.uint32 }
         # workout_type: { id: 78, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::WORKOUT_TYPE }
