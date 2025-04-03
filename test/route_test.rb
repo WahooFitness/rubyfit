@@ -53,8 +53,8 @@ class RubyFitIntegrationTest < Minitest::Test
     parser = RubyFit::FitFileParser.new
     parser.parse(raw) do |data|
       json_input = JSON.parse(json_input)
-      assert_equal(json_input['track_points'].size, data[:record].size)
-      assert_equal(json_input['course_points'].size, data[:course_point].size)
+      assert_equal(json_input['track_points'].size, data[:records].size)
+      assert_equal(json_input['course_points'].size, data[:course_points].size)
     end
   end
 end

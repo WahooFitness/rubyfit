@@ -172,9 +172,13 @@ class RubyFit::FitFileParser
             data = convert_to_json({ definition[:global_message_number] => values }, unpack_directive)
 
             data&.each do |key, value|
-              if all_data.key?(key)
+              plural_key = (key.to_s + 's').to_sym
+              if all_data.key?(plural_key)
+                all_data[plural_key] << value
+              elsif all_data.key?(key)
                 all_data[key] = [all_data[key]] unless all_data[key].is_a?(Array)
                 all_data[key] << value
+                all_data[plural_key] = all_data.delete(key)
               else
                 all_data[key] = value
               end
