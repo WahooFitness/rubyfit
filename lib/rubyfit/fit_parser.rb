@@ -45,7 +45,7 @@ class RubyFit::FitFileParser
       # known_field_ids = message_definition[:fields].map { |_, field_definition| field_definition[:id] }
       # unknown_keys = raw_values.keys - known_field_ids
       # puts("Unknown raw data for message definition #{message_type}: #{unknown_keys}") unless unknown_keys.empty?
-
+      #
 
       # Iterate through the message definition fields
       message_definition[:fields].each do |field_name, field_definition|

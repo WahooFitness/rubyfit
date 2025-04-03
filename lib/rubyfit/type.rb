@@ -172,7 +172,7 @@ class RubyFit::Type
     def enhanced_speed
       uint32({
                rb2fit: ->(val, type) { (val * 1000) },
-               fit2rb: ->(val, type) { val / 1000.0 }
+               fit2rb: ->(val, type) { val.nil? ? nil : val / 1000.0 }
              })
     end
 
@@ -211,6 +211,21 @@ class RubyFit::Type
                fit2rb: ->(val, type) { val.nil? ? nil :  val / 2 }
              })
     end
+
+    def uint16_scale100
+      uint16({
+              rb2fit: ->(val, type) { (val * 100) },
+              fit2rb: ->(val, type) { val.nil? ? nil :  val / 100 }
+            })
+    end
+
+    def uint32_scale100
+      uint32({
+               rb2fit: ->(val, type) { (val * 100).truncate },
+               fit2rb: ->(val, type) { val.nil? ? nil : val / 100.0 }
+             })
+    end
+
 
     def float64(opts = {})
       new({

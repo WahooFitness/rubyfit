@@ -315,6 +315,7 @@ module RubyFit::MessageConstants
     device_info: 23,
     sport: 12,
     workout_step: 27,
+    segment_lap: 142,
     wahoo_custom_num: 65284,
     wahoo_clm: 65285,
     wahoo_id: 65281,

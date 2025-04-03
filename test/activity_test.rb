@@ -109,15 +109,12 @@ class RubyFitIntegrationTest < Minitest::Test
       end
     end
 
-    # this is a Wahoo fit file with clm and wahoo custom num messages
-    # fit_file_path = 'test/fixtures/2025-01-03-143057-WAHOOAPPIOS62BB-3-0.fit'
     # Read FIT file
     raw = IO.read(fit_file_path)
 
     parser = RubyFit::FitFileParser.new
     parser.parse(raw) do |data|
       json_output = JSON.parse(data.to_json)
-      puts(json_output)
       json_input = JSON.parse(json_input)
       assert_equal json_output['file_id']['manufacturer'], json_input['manufacturer']
       assert_equal json_output['activity']['timestamp'], json_input['timestamp']
