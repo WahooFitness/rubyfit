@@ -158,7 +158,7 @@ class RubyFit::MessageWriter
       }
     },
 
-    power_zone: {
+    pwr_zone: {
       id: 9,
       fields: {
         message_index: { id: 254, type: RubyFit::Type.uint16 },

@@ -4,6 +4,18 @@ class RubyFit::FitFileParser
     def initialize
       @definitions = {}
       @fit_data = {}
+      @plural_message_types = {lap: :laps,
+                               length: :lengths,
+                               hr_zone: :hr_zones,
+                               pwr_zone: :pwr_zones,
+                               session: :sessions,
+                               event: :events,
+                               record: :records,
+                               course_point: :course_points,
+                               device_info: :device_infos,
+                               segment_lap: :segment_laps,
+                               wahoo_custom_num: :wahoo_custom_nums
+      }
     end
 
     def definition_message(local_num, global_message_number, fields, developer_fields)
@@ -32,7 +44,7 @@ class RubyFit::FitFileParser
       big_endian = unpack_directive == 'n'
       # Define the message type to look up
       type = RubyFit::MessageConstants::MESSAGE_TYPE.find { |key, value| value == fit_data.keys.first }
-      # puts("Unknown message type: #{fit_data.keys.first}") unless type
+      # puts("message type: #{fit_data.keys.first}")
       return unless type
       message_type = RubyFit::MessageConstants::MESSAGE_TYPE.find { |key, value| value == fit_data.keys.first }.first
       message_definition = RubyFit::MessageWriter::MESSAGE_DEFINITIONS[message_type]
@@ -172,13 +184,13 @@ class RubyFit::FitFileParser
             data = convert_to_json({ definition[:global_message_number] => values }, unpack_directive)
 
             data&.each do |key, value|
-              plural_key = (key.to_s + 's').to_sym
-              if all_data.key?(plural_key)
-                all_data[plural_key] << value
+              if @plural_message_types.key?(key)
+                key = @plural_message_types[key]
+                all_data[key] = [] unless all_data[key].is_a?(Array)
+                all_data[key] << value
               elsif all_data.key?(key)
                 all_data[key] = [all_data[key]] unless all_data[key].is_a?(Array)
                 all_data[key] << value
-                all_data[plural_key] = all_data.delete(key)
               else
                 all_data[key] = value
               end

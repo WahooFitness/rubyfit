@@ -310,7 +310,7 @@ module RubyFit::MessageConstants
     session: 18,
     workout: 26,
     hr_zone: 8,
-    power_zone: 9,
+    pwr_zone: 9,
     activity: 34,
     device_info: 23,
     sport: 12,

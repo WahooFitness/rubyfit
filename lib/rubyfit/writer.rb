@@ -332,7 +332,7 @@ class RubyFit::Writer
 
   def power_zone(values)
     raise "Can only write power zones inside 'power_zones' block" if @state != :power_zones
-    write_message(:power_zone, values)
+    write_message(:pwr_zone, values)
   end
 
   def wahoo_custom_num(values)
@@ -420,7 +420,7 @@ class RubyFit::Writer
       session: session_count,
       device_info: device_info_count,
       hr_zone: hr_zone_count,
-      power_zone: power_zone_count,
+      pwr_zone: power_zone_count,
       wahoo_custom_num: wahoo_custom_num_count,
       wahoo_clm: wahoo_clm_count
     }
