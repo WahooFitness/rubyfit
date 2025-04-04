@@ -58,7 +58,7 @@ class FitParserTest < Minitest::Test
       assert_equal(124, json_output['sessions'][0]['ftp'])
 
       assert_equal([202.88, 46.528, 0, 0, 0], json_output['laps'][0]['time_in_hr_zone_sec'])
-      assert_equal([205.307, 2.88, 35.999, 0.0, 0.0, 0.0], json_output['laps'][0]['time_in_pwr_zone_sec'])
+      assert_equal([205.307, 2.88, 35.999, 0.0, 0.0, 0.0, 0.0, 0.0], json_output['laps'][0]['time_in_pwr_zone_sec'])
 
       assert_equal(2, json_output['laps'][0]['sport_code'])
       assert_equal(6, json_output['laps'][0]['sub_sport_code'])
@@ -69,14 +69,14 @@ class FitParserTest < Minitest::Test
       assert_equal(124.2, json_output['laps'][0]['tot_dist_m'])
       assert_equal(17304, json_output['laps'][0]['tot_work_j'])
       assert_equal([202.88, 46.528, 0, 0, 0], json_output['laps'][0]['time_in_hr_zone_sec'])
-      assert_equal([205.307, 2.88, 35.999, 0.0, 0.0, 0.0], json_output['laps'][0]['time_in_pwr_zone_sec'])
+      assert_equal([205.307, 2.88, 35.999, 0.0, 0.0, 0.0, 0.0, 0.0], json_output['laps'][0]['time_in_pwr_zone_sec'])
 
       assert_equal(98, json_output['records'][1]['hr_bpm'])
       assert_equal(0, json_output['records'][1]['pwr_watts'])
       assert_equal(0, json_output['records'][1]['cal'])
       assert_equal(85, json_output['records'][0]['battery_soc_perc'])
 
-      assert_equal(85, json_output['records'][0]['battery_soc_perc'])
+      assert_equal(85.0, json_output['records'][0]['battery_soc_perc'])
       assert_equal(110, json_output['records'][242]['pwr_watts'])
       assert_equal(124.2, json_output['records'][242]['dist_m'])
       assert_equal(0.134, json_output['records'][242]['spd_mps'])

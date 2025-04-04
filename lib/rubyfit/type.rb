@@ -221,7 +221,7 @@ class RubyFit::Type
 
     def uint8_scale2
       uint8({
-               rb2fit: ->(val, type) { (val * 2).truncate },
+               rb2fit: ->(val, type) { (val * 2.0).truncate },
                fit2rb: ->(val, type) { val.nil? ? nil :  val / 2 }
              })
     end
@@ -275,7 +275,9 @@ class RubyFit::Type
             val.flat_map { |v| [v * 1000].pack("L<").bytes } + ([0xFF] * [(length - val.length) * 4, 0].max)
           },
           bytes2val: ->(bytes, type, opts = {}) {
-            bytes.each_slice(4).map { |slice| slice.pack("C*").unpack1("L<") / 1000.0 }
+            result = bytes.each_slice(4).map { |slice| slice.pack("C*").unpack1("L<") / 1000.0 }
+            result.fill(0.0, result.length...length) # Ensure the array has at least 8 elements
+            result
           },
         }.merge(opts))
   end
