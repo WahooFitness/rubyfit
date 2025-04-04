@@ -131,7 +131,7 @@ class RubyFit::Type
     def timestamp
       uint32({
         rb2fit: ->(val, type) { unix2fit_timestamp(val) },
-        fit2rb: ->(val, type) { val.nil? ? nil :  fit2unix_timestamp(val) }
+        fit2rb: ->(val, type) { val.nil? ? nil :  Time.at(fit2unix_timestamp(val)) }
       })
     end
 

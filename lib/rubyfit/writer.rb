@@ -12,7 +12,7 @@ class RubyFit::Writer
     @stream = stream
 
     %i(start_time duration course_point_count track_point_count name
-       total_distance time_created start_x start_y end_x end_y).each do |key|
+       tot_dist_m time_created start_x start_y end_x end_y).each do |key|
       raise ArgumentError.new("Missing required option #{key}") unless opts[key]
     end
 
@@ -26,8 +26,8 @@ class RubyFit::Writer
 
     write_message(:file_id, {
       time_created: opts[:time_created],
-      type: 6, # Course file
-      manufacturer: opts[:manufacturer],
+      type_code: 6, # Course file
+      manufacturer_code: opts[:manufacturer],
       product: opts[:product],
       serial_number: 0,
     })
@@ -37,22 +37,22 @@ class RubyFit::Writer
     write_message(:lap, {
       start_time: start_time,
       timestamp: start_time,
-      total_elapsed_time: duration,
-      total_timer_time: duration,
-      start_x: opts[:start_x],
-      start_y: opts[:start_y],
-      end_x: opts[:end_x],
-      end_y: opts[:end_y],
-      total_distance: opts[:total_distance],
-      total_ascent: opts[:total_ascent],
-      sport: opts[:sport],
-      sub_sport: opts[:subsport]
+      tot_elapsed_time_sec: duration,
+      tot_timer_time_sec: duration,
+      start_lat_deg: opts[:start_x],
+      start_lon_deg: opts[:start_y],
+      end_lat_deg: opts[:end_x],
+      end_lon_deg: opts[:end_y],
+      tot_dist_m: opts[:tot_dist_m],
+      tot_ascent_m: opts[:total_ascent],
+      sport_code: opts[:sport],
+      sub_sport_code: opts[:subsport]
     })
 
     write_message(:event, {
       timestamp: start_time,
-      event: :timer,
-      event_type: :start,
+      event_code: :timer,
+      event_type_code: :start,
       event_group: 0
     })
 
@@ -60,8 +60,8 @@ class RubyFit::Writer
 
     write_message(:event, {
       timestamp: start_time + duration,
-      event: :timer,
-      event_type: :stop_disable_all,
+      event_code: :timer,
+      event_type_code: :stop_disable_all,
       event_group: 0
     })
 
@@ -88,19 +88,19 @@ class RubyFit::Writer
 
     write_message(:file_id, {
       time_created: opts[:time_created],
-      type: 5, # workout file
-      manufacturer: opts[:manufacturer],
+      type_code: 5, # workout file
+      manufacturer_code: opts[:manufacturer],
       product: opts[:product],
       serial_number: 0,
     })
 
     # Every FIT Workout file MUST contain a Workout message as the second message
     write_message(:workout, {
-      sport: opts[:sport],
+      sport_code: opts[:sport],
       capabilities: opts[:capabilities],
       num_valid_steps: opts[:num_valid_steps],
       wkt_name: opts[:wkt_name],
-      sub_sport: opts[:subsport],
+      sub_sport_code: opts[:subsport],
       pool_length: opts[:pool_length],
       pool_length_unit: opts[:pool_length_unit]
     })
@@ -141,33 +141,33 @@ class RubyFit::Writer
 
     write_message(:file_id, {
       time_created: opts[:time_created],
-      type: 4, # activity file
-      manufacturer: opts[:manufacturer],
+      type_code: 4, # activity file
+      manufacturer_code: opts[:manufacturer],
       product: opts[:product],
       serial_number: 0,
     })
 
     write_message(:activity, {
       timestamp: opts[:timestamp],
-      total_timer_time: opts[:total_timer_time],
+      tot_timer_time_sec: opts[:tot_timer_time_sec],
       num_sessions: opts[:session_count],
-      type: opts[:type],
-      event: opts[:event],
-      event_type: opts[:event_type],
+      type_code: opts[:type],
+      event_code: opts[:event],
+      event_type_code: opts[:event_type],
       local_timestamp: opts[:local_timestamp]
     })
 
     write_message(:sport, {
-      sport: opts[:sport],
-      sub_sport: opts[:subsport]
+      sport_code: opts[:sport],
+      sub_sport_code: opts[:subsport]
     })
 
     write_message(:workout, {
-      sport: opts[:sport],
+      sport_code: opts[:sport],
       # capabilities: opts[:capabilities],
       num_valid_steps: opts[:num_valid_steps],
       wkt_name: opts[:name],
-      sub_sport: opts[:subsport],
+      sub_sport_code: opts[:subsport],
       # pool_length: opts[:pool_length],
       # pool_length_unit: opts[:pool_length_unit]
     })
@@ -182,8 +182,8 @@ class RubyFit::Writer
 
     write_message(:event, {
       timestamp: start_time,
-      event: :timer,
-      event_type: :start,
+      event_code: :timer,
+      event_type_code: :start,
       event_group: 0
     })
 
@@ -191,8 +191,8 @@ class RubyFit::Writer
 
     write_message(:event, {
       timestamp: start_time + duration,
-      event: :timer,
-      event_type: :stop_disable_all,
+      event_code: :timer,
+      event_type_code: :stop_disable_all,
       event_group: 0
     })
 
