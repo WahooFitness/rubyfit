@@ -138,7 +138,7 @@ class RubyFit::Type
     def semicircles
       sint32({
         rb2fit: ->(val, type) { deg2semicircles(val) },
-        fit2rb: ->(val, type) { val.nil? ? nil : semicircles2deg(val).round(5) }
+        fit2rb: ->(val, type) { val.nil? ? nil : semicircles2deg(val).round(6) }
       })
     end
 
@@ -152,11 +152,11 @@ class RubyFit::Type
     def altitude
       uint16({
         rb2fit: ->(val, type) {
-          result = (val).truncate
+          result = ((val + 500) * 5.0).truncate
           result
         },
         fit2rb: ->(val, type) {
-          result = val.nil? ? nil : val
+          result = val.nil? ? nil : val / 5.0 - 500
           result
         }
       })

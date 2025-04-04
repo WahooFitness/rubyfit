@@ -30,9 +30,9 @@ class FitParserTest < Minitest::Test
       assert_equal(32, json_output['file_id']['manufacturer_code'])
       assert_equal(4, json_output['file_id']['type_code'])
       assert_equal(0, json_output['file_id']['product'])
-      # assert_equal("2025-01-03 09:30:57 -0500", json_output['file_id']['time_created'])
+      assert_equal("2025-01-03 14:30:57 UTC", json_output['file_id']['time_created'])
 
-      # assert_equal("2025-01-03 09:35:05 -0500", json_output['activity']['timestamp'])
+      assert_equal("2025-01-03 14:35:05 UTC", json_output['activity']['timestamp'])
       assert_equal(247.886, json_output['activity']['tot_timer_time_sec'])
       assert_equal(1, json_output['activity']['num_sessions'])
       assert_equal(26, json_output['activity']['event_code'])

@@ -22,7 +22,7 @@ class RubyFitIntegrationTest < Minitest::Test
         track_point_count: (json['track_points']&.size || 0).to_i,
         name: json['name'] || 'unnamed',
         tot_dist_m: (json['distance'] || 0),
-        tot_ascent_m: (json['ascent'] || 0),
+        tot_ascent_m: (json['ascent'] / 5.0 - 500 || 0),
         time_created: (json['created_at'] || Time.now).to_i,
         start_x: (json['first_lng'] || 0),
         start_y: (json['first_lat'] || 0),
