@@ -222,7 +222,7 @@ class RubyFit::Type
     def uint8_scale2
       uint8({
                rb2fit: ->(val, type) { (val * 2.0).truncate },
-               fit2rb: ->(val, type) { val.nil? ? nil :  val / 2 }
+               fit2rb: ->(val, type) { val.nil? ? nil :  val / 2.0 }
              })
     end
 

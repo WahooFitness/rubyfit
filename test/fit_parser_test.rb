@@ -19,7 +19,6 @@ class FitParserTest < Minitest::Test
 
   def test_little_endian_file_decoding
     fit_file_path = 'test/fixtures/2025-01-03-143057-WAHOOAPPIOS62BB-3-0.fit'
-    # Read FIT file
     raw = IO.read(fit_file_path)
 
     parser = RubyFit::FitFileParser.new
