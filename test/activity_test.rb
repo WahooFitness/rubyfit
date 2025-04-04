@@ -40,7 +40,7 @@ class RubyFitIntegrationTest < Minitest::Test
         wahoo_clm_count: json[:wahoo_clms]&.size || 0,
         name: json[:name] || 'unnamed',
         tot_dist_m: (json[:total_distance] || 0),
-        tot_ascent_m: (json[:total_ascent] / 5.0 - 500 || 0),
+        tot_ascent_m: (json[:total_ascent] || 0),
         time_created: (json[:created_at] || Time.now).to_i,
         start_lat_deg: (json[:first_lng] || 0),
         start_lon_deg: (json[:first_lat] || 0),

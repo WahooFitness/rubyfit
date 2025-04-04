@@ -156,7 +156,7 @@ class RubyFit::Type
           result
         },
         fit2rb: ->(val, type) {
-          result = val.nil? ? nil : val / 5.0 - 500
+          result = val.nil? ? nil : (val / 5.0 - 500).round(1)
           result
         }
       })
