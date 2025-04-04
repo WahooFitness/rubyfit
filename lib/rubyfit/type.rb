@@ -162,6 +162,13 @@ class RubyFit::Type
       })
     end
 
+    def ascent
+      uint16({
+        rb2fit: ->(val, type) { (val).truncate },
+        fit2rb: ->(val, type) { val }
+      })
+    end
+
     def duration
       uint32({
         rb2fit: ->(val, type) { (val * 1000).truncate },
