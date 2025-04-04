@@ -137,7 +137,7 @@ class RubyFit::Type
 
     def semicircles
       sint32({
-        rb2fit: ->(val, type) { deg2semicircles(val).truncate },
+        rb2fit: ->(val, type) { deg2semicircles(val) },
         fit2rb: ->(val, type) { val.nil? ? nil : semicircles2deg(val).round(6) }
       })
     end
@@ -164,21 +164,21 @@ class RubyFit::Type
 
     def duration
       uint32({
-        rb2fit: ->(val, type) { (val * 1000) },
+        rb2fit: ->(val, type) { (val * 1000).truncate },
         fit2rb: ->(val, type) { val.nil? ? nil :  val / 1000.0 }
       })
     end
 
     def enhanced_speed
       uint32({
-               rb2fit: ->(val, type) { (val * 1000) },
+               rb2fit: ->(val, type) { (val * 1000).truncate },
                fit2rb: ->(val, type) { val.nil? ? nil : val / 1000.0 }
              })
     end
 
     def speed
       uint8({
-               rb2fit: ->(val, type) { (val * 1000) },
+               rb2fit: ->(val, type) { (val * 1000).truncate },
                fit2rb: ->(val, type) { val.nil? ? nil :  val / 1000.0 }
              })
     end
@@ -186,35 +186,35 @@ class RubyFit::Type
 
     def grade
       sint16({
-                rb2fit: ->(val, type) { (val * 100) },
+                rb2fit: ->(val, type) { (val * 100).truncate },
                 fit2rb: ->(val, type) { val.nil? ? nil :  val / 100.0 }
               })
     end
 
     def tss
       uint16({
-               rb2fit: ->(val, type) { (val * 10) },
+               rb2fit: ->(val, type) { (val * 10).truncate },
                fit2rb: ->(val, type) { val.nil? ? nil : val / 10.0 }
              })
     end
 
     def if
       uint16({
-               rb2fit: ->(val, type) { (val * 1000) },
+               rb2fit: ->(val, type) { (val * 1000).truncate },
                fit2rb: ->(val, type) { val.nil? ? nil :  val / 1000.0 }
              })
     end
 
     def uint8_scale2
       uint8({
-               rb2fit: ->(val, type) { (val * 2) },
+               rb2fit: ->(val, type) { (val * 2).truncate },
                fit2rb: ->(val, type) { val.nil? ? nil :  val / 2 }
              })
     end
 
     def uint16_scale100
       uint16({
-              rb2fit: ->(val, type) { (val * 100) },
+              rb2fit: ->(val, type) { (val * 100).truncate },
               fit2rb: ->(val, type) { val.nil? ? nil :  val / 100 }
             })
     end
