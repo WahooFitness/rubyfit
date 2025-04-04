@@ -137,7 +137,7 @@ class RubyFit::Type
 
     def semicircles
       sint32({
-        rb2fit: ->(val, type) { deg2semicircles(val) },
+        rb2fit: ->(val, type) { deg2semicircles(val).truncate },
         fit2rb: ->(val, type) { val.nil? ? nil : semicircles2deg(val).round(6) }
       })
     end
