@@ -108,7 +108,7 @@ class RubyFit::MessageWriter
         left_pedal_smooth_perc: { id: 45, type: RubyFit::Type.uint8_scale2 },
         right_pedal_smooth_perc: { id: 46, type: RubyFit::Type.uint8_scale2 },
         enhanced_spd_mps: { id: 73, type: RubyFit::Type.enhanced_speed},
-        battery_soc: { id: 81, type: RubyFit::Type.uint8_scale2 }
+        battery_soc_perc: { id: 81, type: RubyFit::Type.uint8_scale2 }
       }
     },
 
@@ -173,14 +173,14 @@ class RubyFit::MessageWriter
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
         device_type: { id: 1, type: RubyFit::Type.uint8 },
         serial_number: { id: 3, type: RubyFit::Type.uint32z },
-        manufacturer: { id: 2, type: RubyFit::Type.uint16 },
+        manufacturer_code: { id: 2, type: RubyFit::Type.uint16 },
         product: { id: 4, type: RubyFit::Type.uint16 },
         software_version: { id: 5, type: RubyFit::Type.uint16 },
         hardware_version: { id: 6, type: RubyFit::Type.uint8 },
         battery_status: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::BATTERY_STATUS },
         ant_device_number: { id: 21, type: RubyFit::Type.uint16 },
         device_index: { id: 0, type: RubyFit::Type.uint8 },
-        source_type: { id: 25,type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SOURCE_TYPE },
+        source_type_code: { id: 25,type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SOURCE_TYPE },
         product_name: { id: 27, type: RubyFit::Type.string(20) }
       }
     },

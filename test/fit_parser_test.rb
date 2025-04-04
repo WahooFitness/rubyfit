@@ -74,9 +74,9 @@ class FitParserTest < Minitest::Test
       assert_equal(98, json_output['records'][1]['hr_bpm'])
       assert_equal(0, json_output['records'][1]['pwr_watts'])
       assert_equal(0, json_output['records'][1]['cal'])
-      assert_equal(85, json_output['records'][0]['battery_soc'])
+      assert_equal(85, json_output['records'][0]['battery_soc_perc'])
 
-      assert_equal(85, json_output['records'][0]['battery_soc'])
+      assert_equal(85, json_output['records'][0]['battery_soc_perc'])
       assert_equal(110, json_output['records'][242]['pwr_watts'])
       assert_equal(124.2, json_output['records'][242]['dist_m'])
       assert_equal(0.134, json_output['records'][242]['spd_mps'])
@@ -105,7 +105,7 @@ class FitParserTest < Minitest::Test
       assert_equal(65534, json_output['pwr_zones'][5]['high_pwr_watts'])
 
       assert_equal(0, json_output['device_infos'][0]['device_index'])
-      assert_equal(32, json_output['device_infos'][0]['manufacturer'])
+      assert_equal(32, json_output['device_infos'][0]['manufacturer_code'])
       assert_equal(0, json_output['device_infos'][0]['product'])
       assert_equal("WAHOO APP", json_output['device_infos'][0]['product_name'])
 

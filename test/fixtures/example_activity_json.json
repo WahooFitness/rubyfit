@@ -102,14 +102,14 @@
       "event": "lap",
       "event_type": "stop",
       "lap_trigger": "manual",
-      "time_in_hr_zone": [
+      "time_in_hr_zone_sec": [
         202.88,
         46.528,
         0.0,
         0.0,
         0.0
       ],
-      "time_in_power_zone": [
+      "time_in_pwr_zone_sec": [
         205.307,
         2.88,
         35.999,
@@ -163,14 +163,14 @@
       "event_type": "stop",
       "sport": "generic",
       "sub_sport": "generic",
-      "time_in_hr_zone": [
+      "time_in_hr_zone_sec": [
         202.88,
         46.528,
         0.0,
         0.0,
         0.0
       ],
-      "time_in_power_zone": [
+      "time_in_pwr_zone_sec": [
         205.307,
         2.88,
         35.999,
@@ -194,7 +194,7 @@
       "pwr_watts": 0,
       "cal": 0,
       "enhanced_spd_mps": 0,
-      "battery_soc": 0,
+      "battery_soc_perc": 0,
       "grade_perc": 0
     },
     {
@@ -208,7 +208,7 @@
       "pwr_watts": 185,
       "cal": 100,
       "enhanced_spd_mps": 20,
-      "battery_soc": 30,
+      "battery_soc_perc": 30,
       "grade_perc": 5
     }
   ],

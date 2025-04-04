@@ -139,7 +139,7 @@ class RubyFitIntegrationTest < Minitest::Test
       assert_equal json_output['records'].last['cad_rpm'], json_input['records'].last['cad_rpm']
       assert_equal json_output['records'].last['pwr_watts'], json_input['records'].last['pwr_watts']
       assert_equal json_output['records'].last['enhanced_spd_mps'], json_input['records'].last['enhanced_spd_mps']
-      assert_equal json_output['records'].last['battery_soc'], json_input['records'].last['battery_soc']
+      assert_equal json_output['records'].last['battery_soc_perc'], json_input['records'].last['battery_soc_perc']
       assert_equal json_output['records'].last['grade_perc'], json_input['records'].last['grade_perc']
       assert_equal json_output['laps'].size, json_input['laps'].size
       assert_equal json_output['laps'].last['start_time'], Time.at(json_input['laps'].last['start_time']).to_s
@@ -152,6 +152,7 @@ class RubyFitIntegrationTest < Minitest::Test
       assert_equal json_output['laps'].last['event_code'], RubyFit::MessageConstants::EVENT[json_input['laps'].last['event'].to_sym]
       assert_equal json_output['laps'].last['event_type_code'], RubyFit::MessageConstants::EVENT_TYPE[json_input['laps'].last['event_type'].to_sym]
       assert_equal json_output['laps'].last['lap_trigger_code'], RubyFit::MessageConstants::LAP_TRIGGER[json_input['laps'].last['lap_trigger'].to_sym]
+      assert_equal json_output['laps'].last['time_in_hr_zone_sec'], json_input['laps'].last['time_in_hr_zone_sec']
       assert_equal json_output['sessions'].size, json_input['sessions'].size
       assert_equal json_output['sessions'].last['start_time'], Time.at(json_input['sessions'].last['start_time']).to_s
       assert_equal json_output['sessions'].last['tot_timer_time_sec'], json_input['sessions'].last['tot_timer_time_sec']
@@ -165,7 +166,7 @@ class RubyFitIntegrationTest < Minitest::Test
       assert_equal json_output['device_infos'].size, json_input['device_infos'].size
       assert_equal json_output['device_infos'].last['timestamp'], Time.at(json_input['device_infos'].last['timestamp']).to_s
       assert_equal json_output['device_infos'].last['serial_number'], json_input['device_infos'].last['serial_number']
-      assert_equal json_output['device_infos'].last['manufacturer'], json_input['device_infos'].last['manufacturer']
+      assert_equal json_output['device_infos'].last['manufacturer_code'], json_input['device_infos'].last['manufacturer_code']
       assert_equal json_output['device_infos'].last['product'], json_input['device_infos'].last['product']
       assert_equal json_output['device_infos'].last['software_version'], json_input['device_infos'].last['software_version']
       assert_equal json_output['device_infos'].last['device_index'], json_input['device_infos'].last['device_index']
