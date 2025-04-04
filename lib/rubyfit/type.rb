@@ -190,6 +190,13 @@ class RubyFit::Type
              })
     end
 
+    def uint16_scale1000
+      uint16({
+              rb2fit: ->(val, type) { (val * 1000).truncate },
+              fit2rb: ->(val, type) { val.nil? ? nil :  val / 1000.0 }
+            })
+    end
+
 
     def grade
       sint16({
