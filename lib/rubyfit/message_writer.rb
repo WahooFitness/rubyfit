@@ -108,7 +108,7 @@ class RubyFit::MessageWriter
         left_pedal_smooth_perc: { id: 45, type: RubyFit::Type.uint8_scale2 },
         right_pedal_smooth_perc: { id: 46, type: RubyFit::Type.uint8_scale2 },
         enhanced_spd_mps: { id: 73, type: RubyFit::Type.enhanced_speed},
-        battery_soc_perc: { id: 81, type: RubyFit::Type.uint8_scale2 }
+        batt_soc_perc: { id: 81, type: RubyFit::Type.uint8_scale2 }
       }
     },
 

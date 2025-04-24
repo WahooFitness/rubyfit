@@ -139,7 +139,7 @@ class RubyFitIntegrationTest < Minitest::Test
       assert_equal json_output['records'].last['cad_rpm'], json_input['records'].last['cad_rpm']
       assert_equal json_output['records'].last['pwr_watts'], json_input['records'].last['pwr_watts']
       assert_equal json_output['records'].last['enhanced_spd_mps'], json_input['records'].last['enhanced_spd_mps']
-      assert_equal json_output['records'].last['battery_soc_perc'], json_input['records'].last['battery_soc_perc']
+      assert_equal json_output['records'].last['batt_soc_perc'], json_input['records'].last['batt_soc_perc']
       assert_equal json_output['records'].last['grade_perc'], json_input['records'].last['grade_perc']
       assert_equal json_output['laps'].size, json_input['laps'].size
       assert_equal json_output['laps'].last['start_time'], Time.at(json_input['laps'].last['start_time']).utc.to_s

@@ -73,9 +73,9 @@ class FitParserTest < Minitest::Test
       assert_equal(98, json_output['records'][1]['hr_bpm'])
       assert_equal(0, json_output['records'][1]['pwr_watts'])
       assert_equal(0, json_output['records'][1]['cal'])
-      assert_equal(85, json_output['records'][0]['battery_soc_perc'])
+      assert_equal(85, json_output['records'][0]['batt_soc_perc'])
 
-      assert_equal(85.0, json_output['records'][0]['battery_soc_perc'])
+      assert_equal(85.0, json_output['records'][0]['batt_soc_perc'])
       assert_equal(110, json_output['records'][242]['pwr_watts'])
       assert_equal(124.2, json_output['records'][242]['dist_m'])
       assert_equal(0.134, json_output['records'][242]['spd_mps'])

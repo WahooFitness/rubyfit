@@ -194,7 +194,7 @@
       "pwr_watts": 0,
       "cal": 0,
       "enhanced_spd_mps": 0,
-      "battery_soc_perc": 0,
+      "batt_soc_perc": 0,
       "grade_perc": 0
     },
     {
@@ -208,7 +208,7 @@
       "pwr_watts": 185,
       "cal": 100,
       "enhanced_spd_mps": 20,
-      "battery_soc_perc": 30,
+      "batt_soc_perc": 30,
       "grade_perc": 5
     }
   ],
