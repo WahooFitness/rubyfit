@@ -54,9 +54,24 @@ class RubyFit::Type
     end
 
     # Base Types #
-    
+
     def enum(opts = {})
-      uint8(fit_id: 0x00)
+      uint8({
+              rb2fit: ->(val, type) {
+                if opts[:values] && val.is_a?(Symbol)
+                  opts[:values][val] || (raise ArgumentError, "Invalid enum value: #{val}")
+                else
+                  val
+                end
+              },
+              fit2rb: ->(val, type) {
+                if opts[:values]
+                  opts[:values].key(val) || val
+                else
+                  val
+                end
+              }
+            })
     end
 
     def string(byte_count, opts = {})
@@ -130,7 +145,10 @@ class RubyFit::Type
     
     def timestamp
       uint32({
-        rb2fit: ->(val, type) { unix2fit_timestamp(val) },
+               rb2fit: ->(val, type) {
+                 val = val.to_i if val.is_a?(Time) # Convert Time to Unix timestamp
+                 unix2fit_timestamp(val)
+               },
         fit2rb: ->(val, type) { val.nil? ? nil : Time.at(fit2unix_timestamp(val)).utc }
       })
     end

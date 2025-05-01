@@ -110,4 +110,24 @@ class FitParserTest < Minitest::Test
 
     end
   end
+
+  def test_fit_file_with_invalid_lap
+    fit_file_path = 'test/fixtures/zwift-activity.fit'
+    new_fit_file_path = 'test/fixtures/zwift-activity-new.fit'
+    raw = IO.read(fit_file_path)
+
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+
+    raw = IO.read(new_fit_file_path)
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      assert_equal(1, json_output['laps'].size)
+    end
+  end
 end

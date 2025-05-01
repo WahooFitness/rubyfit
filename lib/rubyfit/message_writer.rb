@@ -116,8 +116,8 @@ class RubyFit::MessageWriter
       id: 21,
       fields: {
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
-        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: true },
-        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: true },
+        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT.merge(RubyFit::MessageConstants::EVENT.values.map { |v| [v, v] }.to_h), required: true },
+        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE.merge(RubyFit::MessageConstants::EVENT_TYPE.values.map { |v| [v, v] }.to_h), required: true },
         data16: { id: 2, type: RubyFit::Type.uint16 },
         data: { id: 3, type: RubyFit::Type.uint32 },
         event_group: { id: 4, type: RubyFit::Type.uint8 },
@@ -131,7 +131,7 @@ class RubyFit::MessageWriter
     workout: {
       id: 26,
       fields: {
-        sport_code: { id: 4, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: true },
+        sport_code: { id: 4, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT.merge(RubyFit::MessageConstants::SPORT.values.map { |v| [v, v] }.to_h), required: true },
         # capabilities: { id: 5, type: RubyFit::Type.uint32z, required: true },  # should be workout_capabilities type
         num_valid_steps: { id: 6, type: RubyFit::Type.uint16 },
         wkt_name: { id: 8, type: RubyFit::Type.string(64) },
@@ -144,7 +144,7 @@ class RubyFit::MessageWriter
     sport: {
       id: 12,
       fields: {
-        sport_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: true },
+        sport_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT.merge(RubyFit::MessageConstants::SPORT.values.map { |v| [v, v] }.to_h), required: true },
         sub_sport_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT }
       }
     },
@@ -206,10 +206,10 @@ class RubyFit::MessageWriter
       id: 18,
       fields: {
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
-        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: true },
-        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: true },
+        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT.merge(RubyFit::MessageConstants::EVENT.values.map { |v| [v, v] }.to_h), required: true },
+        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE.merge(RubyFit::MessageConstants::EVENT_TYPE.values.map { |v| [v, v] }.to_h), required: true },
         start_time: { id: 2, type: RubyFit::Type.timestamp, required: true },
-        sport_code: { id: 5, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT, required: true },
+        sport_code: { id: 5, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT.merge(RubyFit::MessageConstants::SPORT.values.map { |v| [v, v] }.to_h), required: true },
         sub_sport_code: { id: 6, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT },
         tot_elapsed_time_sec: { id: 7, type: RubyFit::Type.duration },
         tot_timer_time_sec: { id: 8, type: RubyFit::Type.duration },
@@ -266,8 +266,8 @@ class RubyFit::MessageWriter
       id: 101,
       fields: {
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
-        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: true },
-        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: true },
+        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT.merge(RubyFit::MessageConstants::EVENT.values.map { |v| [v, v] }.to_h), required: true },
+        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE.merge(RubyFit::MessageConstants::EVENT_TYPE.values.map { |v| [v, v] }.to_h), required: true },
         start_time: { id: 2, type: RubyFit::Type.timestamp, required: true },
         total_elapsed_time: { id: 3, type: RubyFit::Type.duration },
         tot_timer_time_sec: { id: 4, type: RubyFit::Type.duration },
@@ -292,8 +292,8 @@ class RubyFit::MessageWriter
       id: 142,
       fields: {
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
-        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT, required: true },
-        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE, required: true },
+        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT.merge(RubyFit::MessageConstants::EVENT.values.map { |v| [v, v] }.to_h), required: true },
+        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE.merge(RubyFit::MessageConstants::EVENT_TYPE.values.map { |v| [v, v] }.to_h), required: true },
         start_time: { id: 2, type: RubyFit::Type.timestamp, required: true },
         start_lat_deg: { id: 3, type: RubyFit::Type.semicircles },
         start_lon_deg: { id: 4, type: RubyFit::Type.semicircles },
