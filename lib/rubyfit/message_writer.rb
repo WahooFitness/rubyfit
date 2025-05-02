@@ -255,9 +255,9 @@ class RubyFit::MessageWriter
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
         tot_timer_time_sec: { id: 0, type: RubyFit::Type.duration },
         num_sessions: { id: 1, type: RubyFit::Type.uint16 },
-        type_code: { id: 2, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::ACTIVITY_TYPE },
-        event_code: { id: 3, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT },
-        event_type_code: { id: 4, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE },
+        type_code: { id: 2, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::ACTIVITY_TYPE.merge(RubyFit::MessageConstants::ACTIVITY_TYPE.values.map { |v| [v, v] }.to_h) },
+        event_code: { id: 3, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT.merge(RubyFit::MessageConstants::EVENT.values.map { |v| [v, v] }.to_h) },
+        event_type_code: { id: 4, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE.merge(RubyFit::MessageConstants::EVENT_TYPE.values.map { |v| [v, v] }.to_h) },
         local_timestamp: { id: 5, type: RubyFit::Type.timestamp },
       }
     },

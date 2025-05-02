@@ -127,6 +127,7 @@ class FitParserTest < Minitest::Test
     raw = IO.read(new_fit_file_path)
     parser.parse(raw) do |data|
       json_output = JSON.parse(data.to_json)
+      assert_nil(json_output['activity']['local_timestamp'])
       assert_equal(1, json_output['laps'].size)
     end
   end

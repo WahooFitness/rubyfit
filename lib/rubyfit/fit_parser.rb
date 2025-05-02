@@ -78,7 +78,7 @@ class RubyFit::FitFileParser
       { message_type => readable_data }
     end
 
-    def convert_to_json_with_validations(fit_data, unpack_directive)
+    def get_valid_data(fit_data, unpack_directive)
       big_endian = unpack_directive == 'n'
       # Define the message type to look up
       type = RubyFit::MessageConstants::MESSAGE_TYPE.find { |key, value| value == fit_data.keys.first }
@@ -109,10 +109,9 @@ class RubyFit::FitFileParser
         end
       end
 
-      valid_data = RubyFit::Validations.validate_message(message_type, readable_data)
-      return if valid_data.nil?
+      valid_data, modified = RubyFit::Validations.validate_message(message_type, readable_data)
 
-      { message_type => valid_data }
+      [valid_data, modified]
     end
 
     def parse(raw)
@@ -243,6 +242,7 @@ class RubyFit::FitFileParser
 
     def repair_fit_file(raw)
       invalid_offsets = [] # To store offsets and lengths of invalid messages
+      modified_messages = [] # To store modified messages
       io = StringIO.new(raw)
 
       header = io.read(12)
@@ -310,20 +310,22 @@ class RubyFit::FitFileParser
           end
 
           data_message(local_num, values)
-          data = convert_to_json_with_validations({ definition[:global_message_number] => values }, unpack_directive)
-          if data.nil?
+          data, modified = get_valid_data({ definition[:global_message_number] => values }, unpack_directive)
+          if data.nil? && modified
             # Record the offset and length of the invalid message
             invalid_offsets << { start: record_start, length: buffer_io.pos - record_start }
+          elsif data && modified
+            modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: data }
           end
         end
       end
 
       # Pass invalid_offsets to the edit_fit_file_raw function
-      yield edit_fit_file_raw(raw, invalid_offsets)
+      yield edit_fit_file_raw(raw, invalid_offsets, modified_messages)
     end
 
 
-    def edit_fit_file_raw(raw, invalid_offsets)
+    def edit_fit_file_raw(raw, invalid_offsets, modified_messages)
       io = StringIO.new(raw)
 
       # Read and parse the header
@@ -350,9 +352,17 @@ class RubyFit::FitFileParser
           record_start >= offset[:start] && record_start < (offset[:start] + offset[:length])
         end
 
+        modified = modified_messages.find do |offset|
+          record_start >= offset[:start] && record_start < (offset[:start] + offset[:length])
+        end
+
         if invalid
           # Skip the invalid record
           buffer_io.seek(invalid[:start] + invalid[:length])
+        elsif modified
+          # Replace the invalid record with the modified one
+          modified_buffer << modified[:new_data]
+          buffer_io.seek(modified[:start] + modified[:length])
         else
           # Include the valid record
           modified_buffer << record_header
