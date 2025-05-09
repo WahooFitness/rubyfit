@@ -210,7 +210,7 @@ class RubyFit::MessageWriter
         event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE.merge(RubyFit::MessageConstants::EVENT_TYPE.values.map { |v| [v, v] }.to_h), required: true },
         start_time: { id: 2, type: RubyFit::Type.timestamp, required: true },
         sport_code: { id: 5, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SPORT.merge(RubyFit::MessageConstants::SPORT.values.map { |v| [v, v] }.to_h), required: true },
-        sub_sport_code: { id: 6, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT },
+        sub_sport_code: { id: 6, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT.merge(RubyFit::MessageConstants::SUBSPORT.values.map { |v| [v, v] }.to_h) },
         tot_elapsed_time_sec: { id: 7, type: RubyFit::Type.duration },
         tot_timer_time_sec: { id: 8, type: RubyFit::Type.duration },
         tot_dist_m: { id: 9, type: RubyFit::Type.centimeters },

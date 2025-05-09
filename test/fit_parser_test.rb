@@ -131,4 +131,24 @@ class FitParserTest < Minitest::Test
       assert_equal(1, json_output['laps'].size)
     end
   end
+
+  def test_fit_file_with_no_session
+    fit_file_path = 'test/fixtures/2025-05-08-114933-ELEMNT_ACE_115C-42-0.fit'
+    new_fit_file_path = 'test/fixtures/2025-05-08-114933-ELEMNT_ACE_115C-42-0-new.fit'
+    raw = IO.read(fit_file_path)
+
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+
+    raw = IO.read(new_fit_file_path)
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      assert_equal(1, json_output['sessions'].size)
+    end
+  end
 end
