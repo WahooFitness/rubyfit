@@ -18,6 +18,7 @@ class RubyFit::FitFileParser
                                segment_lap: :segment_laps,
                                wahoo_custom_num: :wahoo_custom_nums
       }
+      @use_last_message_only = [:wahoo_id]
     end
 
     def definition_message(local_num, global_message_number, fields, developer_fields)
@@ -226,7 +227,7 @@ class RubyFit::FitFileParser
                 key = @plural_message_types[key]
                 all_data[key] = [] unless all_data[key].is_a?(Array)
                 all_data[key] << value
-              elsif all_data.key?(key)
+              elsif all_data.key?(key) && !@use_last_message_only.include?(key)
                 all_data[key] = [all_data[key]] unless all_data[key].is_a?(Array)
                 all_data[key] << value
               else
