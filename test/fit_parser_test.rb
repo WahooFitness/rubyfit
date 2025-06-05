@@ -177,25 +177,25 @@ class FitParserTest < Minitest::Test
     end
   end
 
-  # def test_fit_file_with_rpe
-  #   fit_file_path = 'test/fixtures/2-very-strong.fit'
-  #   new_fit_file_path = 'test/fixtures/2-very-strong-new.fit'
-  #   raw = IO.read(fit_file_path)
-  #
-  #   parser = RubyFit::FitFileParser.new
-  #   parser.repair_fit_file(raw) do |data|
-  #     new_file_string = data
-  #     File.open(new_fit_file_path, 'wb') do |file|
-  #       file.write(new_file_string)
-  #     end
-  #   end
-  #
-  #   raw = IO.read(new_fit_file_path)
-  #   parser.parse(raw) do |data|
-  #     json_output = JSON.parse(data.to_json)
-  #     refute_nil(json_output)
-  #     assert_equal(1, json_output['sessions'].size)
-  #     assert_equal(20, json_output['sessions'][0]['workout_rpe'])
-  #   end
-  # end
+  def test_fit_file_with_rpe
+    fit_file_path = 'test/fixtures/2-very-strong.fit'
+    new_fit_file_path = 'test/fixtures/2-very-strong-new.fit'
+    raw = IO.read(fit_file_path)
+
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+
+    raw = IO.read(new_fit_file_path)
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      refute_nil(json_output)
+      assert_equal(1, json_output['sessions'].size)
+      assert_equal(20, json_output['sessions'][0]['workout_rpe'])
+    end
+  end
 end
