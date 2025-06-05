@@ -4,6 +4,7 @@ require_relative '../lib/rubyfit/writer'
 require_relative '../lib/rubyfit/message_constants'
 require_relative '../lib/rubyfit/fit_parser'
 require_relative '../examples/fit_callbacks'
+require_relative '../lib/rubyfit/helpers'
 class FitParserTest < Minitest::Test
   def test_extremely_large_file
     start = Time.now
@@ -151,4 +152,50 @@ class FitParserTest < Minitest::Test
       assert_equal(1, json_output['sessions'].size)
     end
   end
+
+  def test_fit_file_with_no_session_and_no_laps
+    fit_file_path = 'test/fixtures/2025-05-24-145948-WAHOOAPPIOS010F-131-0_fixed.fit'
+    new_fit_file_path = 'test/fixtures/2025-05-24-145948-WAHOOAPPIOS010F-131-0_fixed-new.fit'
+
+    raw = IO.read(fit_file_path)
+
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+
+    raw = IO.read(new_fit_file_path)
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      refute_nil(json_output)
+
+      assert_equal(1, json_output['sessions'].size)
+      assert_equal(1, json_output['laps'].size)
+    end
+  end
+
+  # def test_fit_file_with_rpe
+  #   fit_file_path = 'test/fixtures/2-very-strong.fit'
+  #   new_fit_file_path = 'test/fixtures/2-very-strong-new.fit'
+  #   raw = IO.read(fit_file_path)
+  #
+  #   parser = RubyFit::FitFileParser.new
+  #   parser.repair_fit_file(raw) do |data|
+  #     new_file_string = data
+  #     File.open(new_fit_file_path, 'wb') do |file|
+  #       file.write(new_file_string)
+  #     end
+  #   end
+  #
+  #   raw = IO.read(new_fit_file_path)
+  #   parser.parse(raw) do |data|
+  #     json_output = JSON.parse(data.to_json)
+  #     refute_nil(json_output)
+  #     assert_equal(1, json_output['sessions'].size)
+  #     assert_equal(20, json_output['sessions'][0]['workout_rpe'])
+  #   end
+  # end
 end

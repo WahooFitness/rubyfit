@@ -213,7 +213,7 @@ class RubyFit::FitFileParser
             definition[:developer_fields]&.each do |field|
               value = buffer_io.read(field[:size])
               if value.nil? || value.size < field[:size]
-                puts "Warning: Missing or incomplete developer field value for field ID #{field[:id]}"
+                puts "Warning: Missing or incomplete developer field value for field ID #{field} at #{buffer_io.pos} for parse"
                 next
               end
               developer_values[field[:id]] = value
@@ -247,6 +247,7 @@ class RubyFit::FitFileParser
       added_messages = [] # To store added messages
 
       processed_sessions = false
+      processed_laps = false
       io = StringIO.new(raw)
 
       header = io.read(12)
@@ -286,7 +287,6 @@ class RubyFit::FitFileParser
                              else
                                []
                              end
-
           definition_message(local_num, global_message_number, fields, developer_fields)
         else
           local_num = record_header & 0x0F
@@ -307,7 +307,7 @@ class RubyFit::FitFileParser
           definition[:developer_fields]&.each do |field|
             value = buffer_io.read(field[:size])
             if value.nil? || value.size < field[:size]
-              puts "Warning: Missing or incomplete developer field value for field ID #{field[:id]}"
+              puts "Warning: Missing or incomplete developer field value for field ID #{field[:id]}  at #{buffer_io.pos}"
               next
             end
             developer_values[field[:id]] = value
@@ -317,6 +317,9 @@ class RubyFit::FitFileParser
           data, modified = get_valid_data({ definition[:global_message_number] => values }, unpack_directive, raw)
           if definition[:global_message_number] == 18
             processed_sessions = true
+          end
+          if definition[:global_message_number] == 19
+            processed_laps = true
           end
 
           if data.nil? && modified
@@ -328,9 +331,16 @@ class RubyFit::FitFileParser
         end
       end
 
-      unless processed_sessions
-        data, modified = RubyFit::Validations.validate_message(:session, {}, raw)
-        added_messages << { start: header_size + data_size, length: data.size, new_data: data } if data && modified
+      if !processed_laps && !processed_sessions
+        lap_data, session_data, modified = RubyFit::Validations.build_lap_and_session(raw)
+        added_messages << { new_data: lap_data } if lap_data && modified
+        added_messages << { new_data: session_data } if session_data && modified
+      elsif !processed_laps
+        lap_data, modified = RubyFit::Validations.build_lap(raw)
+        added_messages << { new_data: lap_data } if lap_data && modified
+      elsif !processed_sessions
+        session_data, modified = RubyFit::Validations.build_session(raw)
+        added_messages << { new_data: session_data } if session_data && modified
       end
 
       yield edit_fit_file_raw(raw, invalid_offsets, modified_messages, added_messages)
@@ -346,7 +356,6 @@ class RubyFit::FitFileParser
 
       header_size, protocol_version, profile_version, data_size, data_type = header.unpack('C C v V a4')
       raise "Invalid FIT file: invalid data type" unless data_type == ".FIT"
-      puts("Header size: #{header_size}, Protocol version: #{protocol_version}, Profile version: #{profile_version}, Data size: #{data_size}, Data type: #{data_type}")
       # Parse the data section
       io.seek(header_size)
       buffer = io.read(data_size)

@@ -2,16 +2,11 @@ class RubyFit::Validations
 
   def self.validate_message(message_type, data, raw_data)
     if message_type == :lap
-      data, modified = self.lap(data)
+        data, modified = self.lap(data)
     elsif message_type == :activity
       data, modified = self.activity(data)
     elsif message_type == :session
-      if data == {}
-        fit_parser = RubyFit::FitFileParser.new
-        fit_parser.parse(raw_data) do |parsed_data|
-          data, modified = self.session(data, parsed_data[:laps], parsed_data[:sport])
-        end
-      end
+      data, modified = self.session(data)
     end
     [data, modified]
   end
@@ -36,6 +31,117 @@ class RubyFit::Validations
     [raw_lap, modified]
   end
 
+  def self.build_lap(raw_data)
+    lap = {}
+    modified = false
+    raw_lap = nil
+
+    fit_parser = RubyFit::FitFileParser.new
+    fit_parser.parse(raw_data) do |parsed_data|
+      records = parsed_data[:records]
+      events = parsed_data[:events]
+      sport = parsed_data[:sport] || {}
+
+      # calculates lap values and sets them in the lap hash if there is no lap
+      lap[:timestamp] = records.first[:timestamp]
+      lap[:start_time] = records.first[:timestamp]
+      lap[:start_lat_deg] = records.first[:lat_deg]
+      lap[:start_lon_deg] = records.first[:lon_deg]
+      lap[:tot_elapsed_time_sec] = records.last[:timestamp].to_i - records.first[:timestamp].to_i
+      lap[:tot_timer_time_sec] = RubyFit::Helpers.calculate_timer_time(events)
+      lap[:tot_dist_m] = records.last[:dist_m]
+      lap[:event_code] = 9
+      lap[:event_type_code] = 1
+      lap[:sport_code] = sport[:sport_code] || 2
+      lap[:sub_sport_code] = sport[:sub_sport_code] || 0
+
+      definition = RubyFit::MessageWriter.definition_message(:lap, 0)
+      data = RubyFit::MessageWriter.data_message(:lap, 0, lap)
+      raw_lap = definition + data
+      modified = true
+    end
+    [raw_lap, modified]
+  end
+
+  def self.build_session(raw_data)
+    session = {}
+    modified = false
+    raw_session = nil
+
+    fit_parser = RubyFit::FitFileParser.new
+    fit_parser.parse(raw_data) do |parsed_data|
+      laps = parsed_data[:laps]
+      return if laps.empty?
+      sport = parsed_data[:sport] || {}
+
+      session[:timestamp] = laps.last[:timestamp]
+      session[:start_time] = laps.first[:start_time]
+      session[:tot_elapsed_time_sec] = laps.sum { |lap| lap[:tot_elapsed_time_sec] }
+      session[:tot_timer_time_sec] = laps.sum { |lap| lap[:tot_timer_time_sec] }
+      session[:tot_dist_m] = laps.sum { |lap| lap[:tot_dist_m] }
+      session[:event_code] = 8
+      session[:event_type_code] = 0
+      session[:sport_code] = sport[:sport_code] || 2
+      session[:sub_sport_code] = sport[:sub_sport_code] || 0
+
+      definition = RubyFit::MessageWriter.definition_message(:session, 0)
+      data = RubyFit::MessageWriter.data_message(:session, 0, session)
+      raw_session = definition + data
+      modified = true
+    end
+    [raw_session, modified]
+  end
+
+  def self.build_lap_and_session(raw_data)
+    lap = {}
+    session = {}
+
+    modified = false
+    raw_lap = nil
+    raw_session = nil
+
+    fit_parser = RubyFit::FitFileParser.new
+    fit_parser.parse(raw_data) do |parsed_data|
+      records = parsed_data[:records]
+      events = parsed_data[:events]
+      sport = parsed_data[:sport] || {}
+
+      lap[:timestamp] = records.first[:timestamp]
+      lap[:start_time] = records.first[:timestamp]
+      lap[:start_lat_deg] = records.first[:lat_deg]
+      lap[:start_lon_deg] = records.first[:lon_deg]
+      lap[:tot_elapsed_time_sec] = records.last[:timestamp].to_i - records.first[:timestamp].to_i
+      lap[:tot_elapsed_time_sec] = 0
+      lap[:tot_timer_time_sec] = RubyFit::Helpers.calculate_timer_time(events)
+      lap[:tot_dist_m] = records.last[:dist_m]
+      lap[:event_code] = 9
+      lap[:event_type_code] = 1
+      lap[:sport_code] = sport[:sport_code] || 2
+      lap[:sub_sport_code] = sport[:sub_sport_code] || 0
+
+      session[:timestamp] = lap[:timestamp]
+      session[:start_time] = lap[:start_time]
+      session[:tot_elapsed_time_sec] = lap[:tot_elapsed_time_sec]
+      session[:tot_timer_time_sec] = lap[:tot_timer_time_sec]
+      session[:tot_dist_m] = lap[:tot_dist_m]
+      session[:event_code] = 8
+      session[:event_type_code] = 1
+      session[:sport_code] = sport[:sport_code] || 2
+      session[:sub_sport_code] = sport[:sub_sport_code] || 0
+
+      definition = RubyFit::MessageWriter.definition_message(:lap, 0)
+      data = RubyFit::MessageWriter.data_message(:lap, 0, lap)
+      raw_lap = definition + data
+
+      definition = RubyFit::MessageWriter.definition_message(:session, 0)
+      data = RubyFit::MessageWriter.data_message(:session, 0, session)
+      raw_session = definition + data
+
+      modified = true
+    end
+    [raw_lap, raw_session, modified]
+  end
+
   def self.activity(activity)
     raw_activity = nil
     modified = false
@@ -55,25 +161,10 @@ class RubyFit::Validations
     [raw_activity, modified]
   end
 
-  def self.session(session, laps, sport)
+  def self.session(session)
     raw_session = nil
-    if session == {}
-      # calculates session values and sets them in the session hash if there is no session
-      session[:timestamp] = laps.last[:timestamp]
-      session[:start_time] = laps.first[:start_time]
-      session[:tot_elapsed_time_sec] = laps.sum { |lap| lap[:tot_elapsed_time_sec] }
-      session[:tot_timer_time_sec] = laps.sum { |lap| lap[:tot_timer_time_sec] }
-      session[:tot_dist_m] = laps.sum { |lap| lap[:tot_dist_m] }
-      session[:event_code] = 8
-      session[:event_type_code] = 0
-      session[:sport_code] = sport[:sport_code] || 2
-      session[:sub_sport_code] = sport[:sub_sport_code] || 0
+    modified = false
 
-      definition = RubyFit::MessageWriter.definition_message(:session, 0)
-      data = RubyFit::MessageWriter.data_message(:session, 0, session)
-      raw_session = definition + data
-      modified = true
-    end
     [raw_session, modified]
   end
 

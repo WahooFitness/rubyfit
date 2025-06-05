@@ -66,10 +66,10 @@ module RubyFit
 
     # Converts a byte array to a string. Omits the last character of the byte
     # array from the result if it is 0
-  def bytes2str(bytes)
-    bytes.pop while bytes.last == 0
-    bytes.pack("C*")
-  end
+    def bytes2str(bytes)
+      bytes.pop while bytes.last == 0
+      bytes.pack("C*")
+    end
 
     # Generates strings of hex bytes (for debugging)
     def bytes2hex(bytes)
@@ -107,20 +107,36 @@ module RubyFit
       result
     end
 
-  def self.update_crc(crc, data)
-    crc_table = [0x0000, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00, 0x2800, 0xE401,
-                 0xA001, 0x6C00, 0x7800, 0xB401, 0x5000, 0x9C01, 0x8801, 0x4400]
-    data.each_byte do |byte|
-      # compute checksum of lower four bits of byte
-      tmp = crc_table[crc & 0xF]
-      crc  = (crc >> 4) & 0x0FFF
-      crc  = crc ^ tmp ^ crc_table[byte & 0xF]
-      # now compute checksum of upper four bits of byte
-      tmp = crc_table[crc & 0xF]
-      crc  = (crc >> 4) & 0x0FFF
-      crc  = crc ^ tmp ^ crc_table[(byte >> 4) & 0xF]
+    def self.update_crc(crc, data)
+      crc_table = [0x0000, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00, 0x2800, 0xE401,
+                   0xA001, 0x6C00, 0x7800, 0xB401, 0x5000, 0x9C01, 0x8801, 0x4400]
+      data.each_byte do |byte|
+        # compute checksum of lower four bits of byte
+        tmp = crc_table[crc & 0xF]
+        crc  = (crc >> 4) & 0x0FFF
+        crc  = crc ^ tmp ^ crc_table[byte & 0xF]
+        # now compute checksum of upper four bits of byte
+        tmp = crc_table[crc & 0xF]
+        crc  = (crc >> 4) & 0x0FFF
+        crc  = crc ^ tmp ^ crc_table[(byte >> 4) & 0xF]
+      end
+      crc
     end
-    crc
-  end
+
+    def self.calculate_timer_time(events)
+      total_time = 0
+      start_time = nil
+
+      events.each do |event|
+        if event[:event_type_code] == :start
+          start_time = event[:timestamp]
+        elsif event[:event_type_code] == :stop && start_time
+          total_time += event[:timestamp] - start_time
+          start_time = nil
+        end
+      end
+
+      total_time
+    end
   end
 end
