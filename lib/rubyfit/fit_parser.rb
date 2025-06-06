@@ -245,6 +245,7 @@ class RubyFit::FitFileParser
       invalid_offsets = [] # To store offsets and lengths of invalid messages
       modified_messages = [] # To store modified messages
       added_messages = [] # To store added messages
+      original_data_info = {}
 
       processed_sessions = false
       processed_laps = false
@@ -322,6 +323,8 @@ class RubyFit::FitFileParser
             processed_laps = true
           end
 
+          original_data_info[:global_message_number] = {start: record_start, length: buffer_io.pos - record_start}
+
           if data.nil? && modified
             # Record the offset and length of the invalid message
             invalid_offsets << { start: record_start, length: buffer_io.pos - record_start }
@@ -331,19 +334,31 @@ class RubyFit::FitFileParser
         end
       end
 
-      if !processed_laps && !processed_sessions
-        lap_data, session_data, modified = RubyFit::Validations.build_lap_and_session(raw)
-        added_messages << { new_data: lap_data } if lap_data && modified
-        added_messages << { new_data: session_data } if session_data && modified
-      elsif !processed_laps
-        lap_data, modified = RubyFit::Validations.build_lap(raw)
-        added_messages << { new_data: lap_data } if lap_data && modified
-      elsif !processed_sessions
-        session_data, modified = RubyFit::Validations.build_session(raw)
-        added_messages << { new_data: session_data } if session_data && modified
-      end
-
+      added_messages, modified_messages = post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info)
       yield edit_fit_file_raw(raw, invalid_offsets, modified_messages, added_messages)
+    end
+
+    def post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info)
+      parser = RubyFit::FitFileParser.new
+      parser.parse(raw) do |parsed_data|
+        if !processed_laps && !processed_sessions
+          lap_data, session_data, modified = RubyFit::Validations.build_lap_and_session(parsed_data)
+          added_messages << { new_data: lap_data } if lap_data && modified
+          added_messages << { new_data: session_data } if session_data && modified
+        elsif !processed_laps
+          lap_data, modified = RubyFit::Validations.build_lap(parsed_data)
+          added_messages << { new_data: lap_data } if lap_data && modified
+        elsif !processed_sessions
+          session_data, modified = RubyFit::Validations.build_session(parsed_data)
+          added_messages << { new_data: session_data } if session_data && modified
+        end
+        activity_data, modified = RubyFit::Validations.post_parsed_activity(parsed_data)
+        activity_info = original_data_info[:global_message_number]
+        if activity_data && modified && activity_info
+          modified_messages << { start: activity_info[:start], length: activity_info[:length], new_data: activity_data }
+        end
+      end
+      [added_messages, modified_messages]
     end
 
 

@@ -126,13 +126,15 @@ module RubyFit
     def self.calculate_timer_time(events)
       total_time = 0
       start_time = nil
+      timer_on = false
 
       events.each do |event|
-        if event[:event_type_code] == :start
-          start_time = event[:timestamp]
-        elsif event[:event_type_code] == :stop && start_time
-          total_time += event[:timestamp] - start_time
-          start_time = nil
+        if event[:event_type_code] == 0
+          timer_on = true
+          start_time = event[:timestamp].to_i
+        elsif (event[:event_type_code] == 1 || event[:event_type_code] == 4 || event[:event_type_code] == 8) && timer_on
+          total_time += event[:timestamp].to_i - start_time
+          timer_on = false
         end
       end
 

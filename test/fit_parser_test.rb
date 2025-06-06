@@ -198,4 +198,26 @@ class FitParserTest < Minitest::Test
       assert_equal(20, json_output['sessions'][0]['workout_rpe'])
     end
   end
+
+
+  def test_total_vs_timer_time
+    fit_file_path = 'test/fixtures/chip_zwift_run.fit'
+    new_fit_file_path = 'test/fixtures/chip_zwift_run-new.fit'
+    raw = IO.read(fit_file_path)
+
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+
+    raw = IO.read(new_fit_file_path)
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      refute_nil(json_output)
+      assert_equal(4116, json_output['activity']['tot_timer_time_sec'])
+    end
+  end
 end
