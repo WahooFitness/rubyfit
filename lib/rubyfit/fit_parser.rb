@@ -6,6 +6,7 @@ class RubyFit::FitFileParser
     def initialize
       @definitions = {}
       @fit_data = {}
+      @record_index = 0
       @plural_message_types = {lap: :laps,
                                length: :lengths,
                                hr_zone: :hr_zones,
@@ -223,6 +224,11 @@ class RubyFit::FitFileParser
             data = convert_to_json({ definition[:global_message_number] => values }, unpack_directive)
 
             data&.each do |key, value|
+              if key == :record
+                value[:sec] = @record_index
+                @record_index += 1
+              end
+
               if @plural_message_types.key?(key)
                 key = @plural_message_types[key]
                 all_data[key] = [] unless all_data[key].is_a?(Array)
