@@ -219,6 +219,29 @@ class FitParserTest < Minitest::Test
       json_output = JSON.parse(data.to_json)
       refute_nil(json_output)
       assert_equal(4116, json_output['activity']['tot_timer_time_sec'])
+      assert_equal(1, json_output['laps'].size)
+    end
+  end
+
+  def test_event_time
+    fit_file_path = 'test/fixtures/zwift-activity-bad-events.fit'
+    new_fit_file_path = 'test/fixtures/zwift-activity-bad-events-new.fit'
+    raw = IO.read(fit_file_path)
+
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+
+    raw = IO.read(new_fit_file_path)
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      refute_nil(json_output)
+      assert_equal("2025-06-09 21:02:05 UTC", json_output['events'][1]['timestamp'])
+      # assert_equal(1, json_output['laps'].size)
     end
   end
 end

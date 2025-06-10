@@ -51,5 +51,6 @@
     "manufacturer_code": 1,
     "product": 65534,
     "manufacturer": "Garmin"
-  }
+  },
+  "wahoo_clms": [{"clm_id": 73, "timestamp": 1104849057, "data": {"dist_m": 1279.116, "duration_sec": 404.2188, "pwr_watts": 141, "spd_mps": 3.174, "grade_perc": 4.972, "wind_spd_mps": 1.343, "wind_is_headwind": true, "wind_resist_coef": 0.32156836800000005, "roll_resist_coef": 0.00251, "weight_kg": 78.47}}, {"clm_id": 73, "data": {"dist_m": 1269.067, "duration_sec": 101.4372, "pwr_watts": 66, "spd_mps": 14.395, "grade_perc": -4.665, "wind_spd_mps": 1.069, "wind_is_headwind": true, "wind_resist_coef": 0.32101122200000004, "roll_resist_coef": 0.00251, "weight_kg": 78.47}}]
 }

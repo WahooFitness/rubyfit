@@ -116,8 +116,8 @@ class RubyFit::MessageWriter
       id: 21,
       fields: {
         timestamp: { id: 253, type: RubyFit::Type.timestamp, required: true },
-        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT.merge(RubyFit::MessageConstants::EVENT.values.map { |v| [v, v] }.to_h), required: true },
-        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE.merge(RubyFit::MessageConstants::EVENT_TYPE.values.map { |v| [v, v] }.to_h), required: true },
+        event_code: { id: 0, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT.merge(RubyFit::MessageConstants::EVENT.values.map { |v| [v, v] }.to_h), required: false },
+        event_type_code: { id: 1, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::EVENT_TYPE.merge(RubyFit::MessageConstants::EVENT_TYPE.values.map { |v| [v, v] }.to_h), required: false },
         data16: { id: 2, type: RubyFit::Type.uint16 },
         data: { id: 3, type: RubyFit::Type.uint32 },
         event_group: { id: 4, type: RubyFit::Type.uint8 },
@@ -332,7 +332,7 @@ class RubyFit::MessageWriter
         timestamp: { id: 0, type: RubyFit::Type.timestamp, required: false },
         device_index: { id: 1, type: RubyFit::Type.uint8, required: false },
         data_len: { id: 2, type: RubyFit::Type.uint8, required: true },
-        data: { id: 3, type: RubyFit::Type.byte_array(26), required: true }
+        data: { id: 3, type: RubyFit::Type.byte_array(23), required: true }
       }
     },
 

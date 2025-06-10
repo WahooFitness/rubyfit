@@ -20,6 +20,7 @@ class RubyFitIntegrationTest < Minitest::Test
         duration: json['duration'].to_i || 0,
         course_point_count: (json['course_points']&.size || 0).to_i,
         track_point_count: (json['track_points']&.size || 0).to_i,
+        wahoo_clm_count: (json['wahoo_clms']&.size || 0).to_i,
         name: json['name'] || 'unnamed',
         tot_dist_m: (json['distance'] || 0),
         total_ascent: (json['ascent'] || 0),
@@ -46,6 +47,12 @@ class RubyFitIntegrationTest < Minitest::Test
             writer.course_point(point)
           end
         end
+
+        writer.wahoo_clms do
+          json['wahoo_clms']&.each do |clm|
+            writer.wahoo_clm(clm)
+          end
+        end
       end
     end
 
@@ -55,6 +62,7 @@ class RubyFitIntegrationTest < Minitest::Test
       json_input = JSON.parse(json_input)
       assert_equal(json_input['track_points'].size, data[:records].size)
       assert_equal(json_input['course_points'].size, data[:course_points].size)
+      assert_equal(json_input['wahoo_clms'].size, data[:wahoo_clm].size)
     end
   end
 end

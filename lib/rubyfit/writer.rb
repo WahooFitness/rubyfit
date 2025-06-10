@@ -21,7 +21,7 @@ class RubyFit::Writer
     
     @data_crc = 0
 
-    data_size = calculate_data_size(opts[:course_point_count], opts[:track_point_count])
+    data_size = calculate_data_size(opts[:course_point_count], opts[:track_point_count], opts[:wahoo_clm_count] || 0)
     write_data(RubyFit::MessageWriter.file_header(data_size))
 
     write_message(:file_id, {
@@ -342,7 +342,8 @@ class RubyFit::Writer
 
   def wahoo_clm(values)
     raise "Can only write wahoo clms inside 'wahoo_clms' block" if @state != :wahoo_clms
-    write_message(:wahoo_clm, values)
+    formatted_clm_values = format_clm(values)
+    write_message(:wahoo_clm, formatted_clm_values)
   end
 
   protected
@@ -380,7 +381,7 @@ class RubyFit::Writer
     crc
   end
 
-  def calculate_data_size(course_point_count, track_point_count)
+  def calculate_data_size(course_point_count, track_point_count, wahoo_clm_count = 0)
     record_counts = {
       file_id: 1,
       course: 1,
@@ -388,6 +389,7 @@ class RubyFit::Writer
       event: 2,
       course_point: course_point_count, 
       record: track_point_count,
+      wahoo_clm: wahoo_clm_count
     }
 
     data_sizes = record_counts.map do |type, count|
@@ -437,5 +439,33 @@ class RubyFit::Writer
     end
 
     data_sizes.reduce(&:+)
+  end
+
+  def format_clm(clm_json)
+    timestamp = clm_json['timestamp'] || Time.now.to_i # Example timestamp, replace with actual logic
+    device_index = 255 # Example device index, replace with actual logic
+
+    if clm_json['clm_id'] == 73
+      data = clm_json['data']
+      # Pack each value into its appropriate byte representation
+      packed_data = []
+      packed_data += [73].pack('S<').bytes # clm_id as UINT8
+      packed_data += [(data['wind_is_headwind'] ? 1 : 0)].pack('C').bytes # Boolean as UINT8
+      packed_data += [(data['dist_m'] * 100).to_i].pack('L<').bytes # UINT32 (scaled)
+      packed_data += [(data['duration_sec']).to_i].pack('S<').bytes # UINT16 (scaled)
+      packed_data += [data['pwr_watts'].to_i].pack('S<').bytes # UINT16 (scaled)
+      packed_data += [(data['spd_mps'] * 1000).to_i].pack('S<').bytes # UINT16 (scaled)
+      packed_data += [(data['grade_perc'] * 100).to_i].pack('s<').bytes # UINT16 (scaled)
+      packed_data += [(data['wind_spd_mps'] * 1000).to_i].pack('S<').bytes # UINT16 (scaled)
+      packed_data += [(data['wind_resist_coef'] * 1000).to_i].pack('S<').bytes # UINT16 (scaled)
+      packed_data += [(data['roll_resist_coef'] * 10000).to_i].pack('S<').bytes # UINT16 (scaled)
+      packed_data += [(data['weight_kg'] * 10).to_i].pack('S<').bytes # UINT16 (scaled)
+    end
+    {
+      timestamp: timestamp,
+      device_index: device_index,
+      data_len: 23,
+      data: packed_data
+    }
   end
 end

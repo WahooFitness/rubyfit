@@ -329,7 +329,8 @@ class RubyFit::FitFileParser
             processed_laps = true
           end
 
-          original_data_info[:global_message_number] = {start: record_start, length: buffer_io.pos - record_start}
+          original_data_info[definition[:global_message_number]] ||= []
+          original_data_info[definition[:global_message_number]] << { start: record_start, length: buffer_io.pos - record_start }
 
           if data.nil? && modified
             # Record the offset and length of the invalid message
@@ -359,9 +360,17 @@ class RubyFit::FitFileParser
           added_messages << { new_data: session_data } if session_data && modified
         end
         activity_data, modified = RubyFit::Validations.post_parsed_activity(parsed_data)
-        activity_info = original_data_info[:global_message_number]
+        activity_info = original_data_info[34][0] if original_data_info[34]
         if activity_data && modified && activity_info
           modified_messages << { start: activity_info[:start], length: activity_info[:length], new_data: activity_data }
+        end
+
+        events_data, modified = RubyFit::Validations.post_parsed_events(parsed_data)
+        events_info = original_data_info[21]
+        if events_data && modified && events_info && events_info.size == events_data.size
+          events_data.each_with_index do |event_data, index|
+            modified_messages << { start: events_info[index][:start], length: events_info[index][:length], new_data: event_data }
+          end
         end
       end
       [added_messages, modified_messages]

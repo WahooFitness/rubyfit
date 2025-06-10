@@ -164,6 +164,33 @@ class RubyFit::Validations
     [raw_activity, modified]
   end
 
+  def self.post_parsed_events(parsed_data)
+    events = parsed_data[:events] || []
+    records = parsed_data[:records] || []
+    raw_events = []
+    modified = false
+
+    events.each do |event|
+      if (event[:event_type_code] == 4 || event[:event_type_code] == 1) && event[:timestamp] > (records.last[:timestamp] + 5)
+        event[:timestamp] = records.last[:timestamp]
+
+        definition = RubyFit::MessageWriter.definition_message(:event, 0)
+        data = RubyFit::MessageWriter.data_message(:event, 0, event)
+
+        raw_event = definition + data
+        modified = true
+        raw_events << raw_event
+      else
+        definition = RubyFit::MessageWriter.definition_message(:event, 0)
+        data = RubyFit::MessageWriter.data_message(:event, 0, event)
+        raw_event = definition + data
+        raw_events << raw_event
+      end
+    end
+
+    [raw_events, modified]
+  end
+
   def self.session(session)
     raw_session = nil
     modified = false
