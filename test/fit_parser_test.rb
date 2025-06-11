@@ -241,7 +241,7 @@ class FitParserTest < Minitest::Test
       json_output = JSON.parse(data.to_json)
       refute_nil(json_output)
       assert_equal("2025-06-09 21:02:05 UTC", json_output['events'][1]['timestamp'])
-      # assert_equal(1, json_output['laps'].size)
+      assert_equal(1, json_output['laps'].size)
     end
   end
 end

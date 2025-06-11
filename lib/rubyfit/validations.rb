@@ -181,9 +181,7 @@ class RubyFit::Validations
         modified = true
         raw_events << raw_event
       else
-        definition = RubyFit::MessageWriter.definition_message(:event, 0)
-        data = RubyFit::MessageWriter.data_message(:event, 0, event)
-        raw_event = definition + data
+        raw_event = nil
         raw_events << raw_event
       end
     end

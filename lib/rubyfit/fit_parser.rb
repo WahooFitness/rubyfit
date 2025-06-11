@@ -341,11 +341,11 @@ class RubyFit::FitFileParser
         end
       end
 
-      added_messages, modified_messages = post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info)
+      added_messages, modified_messages, invalid_offsets = post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info, invalid_offsets)
       yield edit_fit_file_raw(raw, invalid_offsets, modified_messages, added_messages)
     end
 
-    def post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info)
+    def post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info, invalid_offsets)
       parser = RubyFit::FitFileParser.new
       parser.parse(raw) do |parsed_data|
         if !processed_laps && !processed_sessions
@@ -362,18 +362,22 @@ class RubyFit::FitFileParser
         activity_data, modified = RubyFit::Validations.post_parsed_activity(parsed_data)
         activity_info = original_data_info[34][0] if original_data_info[34]
         if activity_data && modified && activity_info
-          modified_messages << { start: activity_info[:start], length: activity_info[:length], new_data: activity_data }
+          added_messages << { new_data: activity_data } if activity_data && modified
+          invalid_offsets << { start: activity_info[:start], length: activity_info[:length] } if invalid_offsets.empty? || !invalid_offsets.any? { |offset| offset[:start] == activity_info[:start] && offset[:length] == activity_info[:length] }
         end
 
         events_data, modified = RubyFit::Validations.post_parsed_events(parsed_data)
-        events_info = original_data_info[21]
+        events_info = original_data_info[21] if original_data_info[21]
         if events_data && modified && events_info && events_info.size == events_data.size
           events_data.each_with_index do |event_data, index|
-            modified_messages << { start: events_info[index][:start], length: events_info[index][:length], new_data: event_data }
+            if event_data.present?
+              added_messages << { new_data: event_data } if event_data && modified
+              invalid_offsets << { start: events_info[index][:start], length: events_info[index][:length] } if invalid_offsets.empty? || !invalid_offsets.any? { |offset| offset[:start] == events_info[index][:start] && offset[:length] == events_info[index][:length] }
+            end
           end
         end
       end
-      [added_messages, modified_messages]
+      [added_messages, modified_messages, invalid_offsets]
     end
 
 
