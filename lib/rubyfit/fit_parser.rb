@@ -233,6 +233,11 @@ class RubyFit::FitFileParser
                 key = @plural_message_types[key]
                 all_data[key] = [] unless all_data[key].is_a?(Array)
                 all_data[key] << value
+              elsif key == :wahoo_clm
+                key, clm = parse_clm(value)
+                all_data[:CLM] ||= {}
+                all_data[:CLM][key] ||= []
+                all_data[:CLM][key] << clm
               elsif all_data.key?(key) && !@use_last_message_only.include?(key)
                 all_data[key] = [all_data[key]] unless all_data[key].is_a?(Array)
                 all_data[key] << value
@@ -244,6 +249,36 @@ class RubyFit::FitFileParser
         end
       end
       yield all_data
+    end
+
+    def parse_clm(data)
+      # Convert the array of bytes into a binary string
+      binary_data = data[:data].pack('C*')
+
+      # Unpack the binary data using the same format as encoding
+      clm_id, wind_is_headwind, dist_m, duration_sec, pwr_watts, spd_mps, grade_perc, wind_spd_mps, wind_resist_coef, roll_resist_coef, weight_kg =
+        binary_data.unpack('S<C L< S< S< S< s< S< S< S< S<')
+
+
+      if clm_id == 73
+        key = :ROUTE_COURSE_SECTOR
+        clm = {
+                clm: {
+                  clm_id: clm_id,
+                  wind_is_headwind: wind_is_headwind == 1,
+                  dist_m: dist_m / 100.0,
+                  duration_sec: duration_sec,
+                  pwr_watts: pwr_watts,
+                  spd_mps: spd_mps / 1000.0,
+                  grade_perc: grade_perc / 100.0,
+                  wind_spd_mps: wind_spd_mps / 1000.0,
+                  wind_resist_coef: wind_resist_coef / 1000.0,
+                  roll_resist_coef: roll_resist_coef / 1000.0,
+                  weight_kg: weight_kg / 10.0
+                }
+              }
+      end
+      [key, clm] || [:unkown, data]
     end
 
 

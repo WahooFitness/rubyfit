@@ -62,7 +62,7 @@ class RubyFitIntegrationTest < Minitest::Test
       json_input = JSON.parse(json_input)
       assert_equal(json_input['track_points'].size, data[:records].size)
       assert_equal(json_input['course_points'].size, data[:course_points].size)
-      assert_equal(json_input['wahoo_clms'].size, data[:wahoo_clm].size)
+      assert_equal(data[:CLM][:ROUTE_COURSE_SECTOR].size, json_input['wahoo_clms'].size)
     end
   end
 end
