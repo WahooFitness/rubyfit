@@ -244,4 +244,14 @@ class FitParserTest < Minitest::Test
       assert_equal(1, json_output['laps'].size)
     end
   end
+
+  def test_dev_fields
+    fit_file_path = 'test/fixtures/DeveloperData.fit'
+    raw = IO.read(fit_file_path)
+    parser = RubyFit::FitFileParser.new
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      puts(json_output.inspect)
+    end
+  end
 end

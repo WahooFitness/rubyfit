@@ -18,11 +18,29 @@ class RubyFit::Writer
 
     start_time = opts[:start_time].to_i
     duration = opts[:duration].to_i
+    course_point_dev_field_count = opts[:course_point_dev_field_count] || 0
     
     @data_crc = 0
 
-    data_size = calculate_data_size(opts[:course_point_count], opts[:track_point_count], opts[:wahoo_clm_count] || 0)
+    data_size = calculate_data_size(opts[:course_point_count], opts[:track_point_count], opts[:wahoo_clm_count] || 0, course_point_dev_field_count)
     write_data(RubyFit::MessageWriter.file_header(data_size))
+
+    if course_point_dev_field_count > 0
+      # Write developer data ID
+      write_message(:developer_data_id, {
+        manufacturer_id: opts[:manufacturer_id] || 32,
+        developer_data_index: opts[:developer_data_index] || 0
+      })
+
+      # Write field description for "course_point_type"
+      # TO DO: Change name and field_definition_number to match CRUX
+      write_message(:field_description, {
+        developer_data_index: opts[:developer_data_index] || 0,
+        field_definition_number: 0,
+        fit_base_type_id: :uint8,
+        field_name: "course_point_type"
+      })
+    end
 
     write_message(:file_id, {
       time_created: opts[:time_created],
@@ -350,14 +368,14 @@ class RubyFit::Writer
 
   def write_message(type, values)
     local_num = @local_nums[type]
+    developer_fields = values[:developer_fields]
     unless local_num
       @last_local_num += 1
       local_num = @last_local_num
       @local_nums[type] = local_num
-      write_data(RubyFit::MessageWriter.definition_message(type, local_num))
+      write_data(RubyFit::MessageWriter.definition_message(type, local_num, developer_fields))
     end
-
-    write_data(RubyFit::MessageWriter.data_message(type, local_num, values))
+    write_data(RubyFit::MessageWriter.data_message(type, local_num, values, developer_fields))
   end
 
   def write_data(data)
@@ -381,9 +399,11 @@ class RubyFit::Writer
     crc
   end
 
-  def calculate_data_size(course_point_count, track_point_count, wahoo_clm_count = 0)
+  def calculate_data_size(course_point_count, track_point_count, wahoo_clm_count = 0, course_point_dev_field_count = 0)
     record_counts = {
       file_id: 1,
+      developer_data_id: course_point_dev_field_count > 0 ? 1 : 0,
+      field_description: course_point_dev_field_count > 0 ? 1 : 0,
       course: 1,
       lap: 1,
       event: 2,
@@ -393,8 +413,10 @@ class RubyFit::Writer
     }
 
     data_sizes = record_counts.map do |type, count|
-      def_size = RubyFit::MessageWriter.definition_message_size(type)
-      data_size = RubyFit::MessageWriter.data_message_size(type) * count
+      developer_fields = (type == :course_point && course_point_dev_field_count > 0) ? [{ developer_data_index: 0, field_definition_number: 0, data: 1 }] : nil
+      def_size = RubyFit::MessageWriter.definition_message_size(type, developer_fields)
+      data_size = RubyFit::MessageWriter.data_message_size(type, developer_fields) * count
+
       result = if count > 0
                  def_size + data_size
                else

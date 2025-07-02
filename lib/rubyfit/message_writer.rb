@@ -84,7 +84,7 @@ class RubyFit::MessageWriter
         name: { id: 6, type: RubyFit::Type.string(48) },
         message_index: { id: 254, type: RubyFit::Type.uint16 },
         type: { id: 5, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::COURSE_POINT_TYPE, required: true }
-      },
+      }
     },
 
     record: {
@@ -343,7 +343,7 @@ class RubyFit::MessageWriter
         developer_data_index: { id: 0, type: RubyFit::Type.uint8 },
         field_definition_number: { id: 1, type: RubyFit::Type.uint8 },
         fit_base_type_id: { id: 2, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::FIT_BASE_TYPE },
-        field_name: { id: 3, type: RubyFit::Type.string(16) },
+        field_name: { id: 3, type: RubyFit::Type.string(32) },
         units: { id: 8, type: RubyFit::Type.string(16) },
       }
     },
@@ -360,10 +360,10 @@ class RubyFit::MessageWriter
 
   }
 
-  def self.definition_message(type, local_num)
+  def self.definition_message(type, local_num, developer_fields = nil)
     pack_bytes do |bytes|
       message_data = MESSAGE_DEFINITIONS[type]
-      bytes << header_byte(local_num, true)
+      bytes << header_byte(local_num, true, developer_fields&.present?)
       bytes << 0x00 # Reserved uint8
       bytes << 0x01 # Big endian
       bytes.push(*num2bytes(message_data[:id], 2)) # Global message ID
@@ -375,10 +375,19 @@ class RubyFit::MessageWriter
         bytes << type.byte_count
         bytes << type.fit_id
       end
+
+      if developer_fields
+        bytes << developer_fields.length # Developer field count
+        developer_fields.each do |field|
+          bytes << field[:field_definition_number]&.to_i # Field number:	Maps to the field_definition_number of a field_description Message
+          bytes << 1 # Data Size: Size (in bytes) of the specified FIT message’s field
+          bytes << field[:developer_data_index]&.to_i # Developer Data Index: Maps to the developer_data_index of a developer_data_id Message
+        end
+      end
     end
   end
 
-  def self.data_message(type, local_num, values)
+  def self.data_message(type, local_num, values, developer_fields = nil)
     pack_bytes do |bytes|
       message_data = MESSAGE_DEFINITIONS[type]
       bytes << header_byte(local_num, false)
@@ -398,19 +407,38 @@ class RubyFit::MessageWriter
         value_bytes = value ? field_type.val2bytes(value) : field_type.default_bytes
         bytes.push(*value_bytes)
       end
+
+      # Add developer fields if provided
+      if developer_fields
+        developer_fields.each do |field|
+          bytes.push(*field[:data])
+        end
+      end
     end
   end
 
-  def self.definition_message_size(type)
+  def self.definition_message_size(type, developer_fields = nil)
     message_data = MESSAGE_DEFINITIONS[type]
     raise ArgumentError.new("Unknown message type '#{type}'") unless message_data
-    6 + message_data[:fields].count * 3
+
+    # Base size: header (6 bytes) + fields (3 bytes per field)
+    base_size = 6 + message_data[:fields].count * 3
+
+    # Add developer fields size (1 byte to store the count then 3 bytes per developer field)
+    developer_fields_size = developer_fields ? 1 + developer_fields.size * 3 : 0
+    base_size + developer_fields_size
   end
 
-  def self.data_message_size(type)
+  def self.data_message_size(type, developer_fields = nil)
     message_data = MESSAGE_DEFINITIONS[type]
     raise ArgumentError.new("Unknown message type '#{type}'") unless message_data
-    1 + message_data[:fields].values.map{|info| info[:type].byte_count}.reduce(&:+)
+
+    # Base size: header (1 byte) + field data sizes
+    base_size = 1 + message_data[:fields].values.map { |info| info[:type].byte_count }.reduce(&:+)
+
+    # Add developer field data sizes
+    developer_fields_size = developer_fields ? developer_fields.sum { |field| field[:data].is_a?(Array) ? field[:data].size : 1 } : 0
+    base_size + developer_fields_size
   end
 
   def self.file_header(data_byte_count = 0) 
@@ -432,9 +460,8 @@ class RubyFit::MessageWriter
   end
 
   # Internal
-  
-  def self.header_byte(local_number, definition)
-    local_number & 0xF | (definition ? 0x40 : 0x00)
+  def self.header_byte(local_number, definition, developer = false)
+    local_number & 0xF | (definition ? 0x40 : 0x00) | (developer ? 0x20 : 0x00)
   end
   
   def self.pack_bytes

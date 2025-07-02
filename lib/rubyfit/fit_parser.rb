@@ -31,7 +31,7 @@ class RubyFit::FitFileParser
       @definitions[local_num] || { fields: [] }
     end
 
-    def data_message(local_num, values)
+    def data_message(local_num, values, developer_values = [])
       formatted_values = values.map do |key, value|
         formatted_value = if value.is_a?(String)
                             value.bytes.map { |byte| sprintf('%02X', byte) }.join(' ')
@@ -55,7 +55,8 @@ class RubyFit::FitFileParser
 
       # Convert each field in the raw FIT data to a readable format
       readable_data = {}
-      raw_values = fit_data.values.first
+      raw_values = fit_data.values.first.first
+      raw_dev_values = fit_data.values.first.last if fit_data.values.first.size > 1
 
       # for debugging
       # known_field_ids = message_definition[:fields].map { |_, field_definition| field_definition[:id] }
@@ -77,6 +78,21 @@ class RubyFit::FitFileParser
           readable_data[field_name] = nil
         end
       end
+
+      # Process developer fields
+      if raw_dev_values
+        raw_dev_values.each do |field_id, raw_value|
+          # Check if the field ID exists in DEVELOPER_FIELDS
+          field_name = RubyFit::MessageConstants::DEVELOPER_FIELDS.key(field_id)
+          next unless field_name
+
+          # Convert raw value to readable format
+          readable_value = raw_value.bytes.map { |byte| sprintf('%02X', byte) }.join(' ')
+          readable_data[field_name] = readable_value
+        end
+      end
+
+
       { message_type => readable_data }
     end
 
@@ -220,8 +236,8 @@ class RubyFit::FitFileParser
               developer_values[field[:id]] = value
             end
 
-            data_message(local_num, values)
-            data = convert_to_json({ definition[:global_message_number] => values }, unpack_directive)
+            data_message(local_num, values, developer_values)
+            data = convert_to_json({ definition[:global_message_number] => [values, developer_values] }, unpack_directive)
 
             data&.each do |key, value|
               if key == :record
