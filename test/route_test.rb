@@ -113,7 +113,7 @@ class RubyFitIntegrationTest < Minitest::Test
               {
                 developer_data_index: 0, # Matches the developer_data_id
                 field_definition_number: 0, # Matches the field_description
-                data: index + 1 # Example value (1-3 digit number)
+                data: 18 # Example value (1-3 digit number)
               }
             ]
           point = point.merge(developer_fields: developer_fields)

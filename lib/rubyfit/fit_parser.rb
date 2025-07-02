@@ -87,7 +87,8 @@ class RubyFit::FitFileParser
           next unless field_name
 
           # Convert raw value to readable format
-          readable_value = raw_value.bytes.map { |byte| sprintf('%02X', byte) }.join(' ')
+          # readable_value = raw_value.bytes.map { |byte| sprintf('%02X', byte) }.join(' ')
+          readable_value = raw_value.unpack1('C')
           readable_data[field_name] = readable_value
         end
       end
