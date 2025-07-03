@@ -36,7 +36,7 @@ class RubyFit::Writer
       # TO DO: Change name and field_definition_number to match CRUX
       write_message(:field_description, {
         developer_data_index: opts[:developer_data_index] || 0,
-        field_definition_number: 0,
+        field_definition_number: 16,
         fit_base_type_id: :uint8,
         field_name: "course_point_type"
       })

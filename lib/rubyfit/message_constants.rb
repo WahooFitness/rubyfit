@@ -344,46 +344,112 @@ module RubyFit::MessageConstants
   }.freeze
 
   WAYPOINT_TYPE = {
-    atm: 1,
-    aid_station: 1, # aid station, alert
-    art: 2,
-    attraction: 3,
-    bar: 4,
-    swimming: 5, # beach, swimming, pool
-    bike_parking: 6,
-    bike_share: 7,
-    bike_shop: 8, # bike shop, bike repair
-    camping: 9,
-    chairlift: 10, # chair lift, cable car
-    checkpoint: 11, # checkpoint, control point, stamp station
-    coffee: 12,
-    distance_marker: 13,
-    dog_park: 14,
-    e_bike_charging: 15,
-    ferry: 16, # ferry, boat
-    gas_station: 17, # gas station, petrol station
-    generic: 18,
-    geocache: 19,
-    grocery: 20, # grocery store, convenience store
-    hospital: 21,
-    info: 22,
-    park: 23,
-    parking: 24,
-    peak: 25, # peak, summit, mountain top
-    pharmacy: 26,
-    rest_area: 27, # rest area, picnic area, shelter, benches
-    restaurant: 28, # restaurant, food, food and drink
-    restroom: 29, # restroom
-    segment_end: 30,
-    segment_start: 31,
-    shopping: 32,
-    shower: 33,
-    trailhead: 34,
-    transit: 35, # transit, bus stop, train station
-    transition_zone: 36,
-    viewpoint: 37, # viewpoint, lookout, scenic view
-    water: 38, # water, water fountain, water tap
-    winery: 39, # winery, vineyard
+    # atm: 1,
+    # aid_station: 1, # aid station, alert
+    # art: 2,
+    # attraction: 3,
+    # bar: 4,
+    # swimming: 5, # beach, swimming, pool
+    # bike_parking: 6,
+    # bike_share: 7,
+    # bike_shop: 8, # bike shop, bike repair
+    # camping: 9,
+    # chairlift: 10, # chair lift, cable car
+    # checkpoint: 11, # checkpoint, control point, stamp station
+    # coffee: 12,
+    # distance_marker: 13,
+    # dog_park: 14,
+    # e_bike_charging: 15,
+    # ferry: 16, # ferry, boat
+    # gas_station: 17, # gas station, petrol station
+    # generic: 18,
+    # geocache: 19,
+    # grocery: 20, # grocery store, convenience store
+    # hospital: 21,
+    # info: 22,
+    # park: 23,
+    # parking: 24,
+    # peak: 25, # peak, summit, mountain top
+    # pharmacy: 26,
+    # rest_area: 27, # rest area, picnic area, shelter, benches
+    # restaurant: 28, # restaurant, food, food and drink
+    # restroom: 29, # restroom
+    # segment_end: 30,
+    # segment_start: 31,
+    # shopping: 32,
+    # shower: 33,
+    # trailhead: 34,
+    # transit: 35, # transit, bus stop, train station
+    # transition_zone: 36,
+    # viewpoint: 37, # viewpoint, lookout, scenic view
+    # water: 38, # water, water fountain, water tap
+    # winery: 39, # winery, vineyard
+    other: 0,
+    slight_right: 1,
+    right: 2,
+    sharp_right: 3,
+    u_turn: 4,
+    slight_left: 5,
+    left: 6,
+    sharp_left: 7,
+    depart: 9,
+    arrive: 10,
+    roundabout: 11,
+    way_point: 12,
+    warning: 13, # warning, caution
+    summit: 14, # summit, peak, mountain top
+    valley: 15, # valley, low point
+    water: 16, # water fountain, water tap
+    food: 17, # food, restaurant, cafe
+    first_aid: 18, # first aid, medical assistance
+    climb_4th_cat: 19, # climb 4th category
+    climb_3rd_cat: 20, # climb 3rd category
+    climb_2nd_cat: 21, # climb 2nd category
+    climb_1st_cat: 22, # climb 1st category
+    climb_hors_cat: 23, # climb hors category
+    sprint: 24, # sprint point
+    roundabout_right: 25,
+    roundabout_left: 26,
+    atm: 27, # ATM
+    art: 28, # Art installation
+    attraction: 29, # Attraction
+    bar: 30, # Bar
+    swimming: 31, # Swimming area
+    bike_parking: 32, # Bike parking
+    bike_share: 33, # Bike share station
+    bike_shop: 34, # Bike shop
+    campsite: 35, # Camping area
+    chairlift: 36, # Chair lift
+    checkpoint: 37,
+    coffee: 38,
+    distance_marker: 39, # Distance marker
+    dog_park: 40, # Dog park
+    e_bike_charging: 41, # E-bike charging station
+    ferry: 42, # Ferry
+    gas_station: 43, # Gas station
+    geocache: 44,
+    groceries: 45, # Grocery store
+    hospital: 46, # Hospital
+    info: 47, # Information point
+    internet: 48, # Internet access point
+    for_kids: 49, # For kids
+    library: 50, # Library
+    lodging: 51, # Lodging
+    meeting_spot: 52, # Meeting point
+    monument: 53,
+    park: 54,
+    parking: 55, # Parking area
+    pharmacy: 56, # Pharmacy
+    rest_area: 57, # Rest area
+    shopping: 58, # Shopping area
+    toilet: 59, # Toilet
+    shower: 60, # Shower
+    trailhead: 61, # Trailhead
+    transition: 62,
+    transit: 63, # Transit stop
+    viewpoint: 64, # Viewpoint
+    winery: 65,
+    unknown: 255, # Unknown waypoint type
   }.freeze
 
   DEVELOPER_FIELDS = {
