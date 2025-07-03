@@ -87,12 +87,13 @@ class RubyFit::FitFileParser
           next unless field_name
 
           # Convert raw value to readable format
-          # readable_value = raw_value.bytes.map { |byte| sprintf('%02X', byte) }.join(' ')
           readable_value = raw_value.unpack1('C')
+          if RubyFit::MessageConstants::WAYPOINT_TYPE.value?(readable_value)
+            readable_value = RubyFit::MessageConstants::WAYPOINT_TYPE.key(readable_value)
+          end
           readable_data[field_name] = readable_value
         end
       end
-
 
       { message_type => readable_data }
     end

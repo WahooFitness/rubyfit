@@ -454,6 +454,6 @@ module RubyFit::MessageConstants
 
   DEVELOPER_FIELDS = {
     # TO DO: Change these to match the actual developer data IDs and field definitions
-    course_point_type: 0
+    course_point_type: 16
   }
 end
