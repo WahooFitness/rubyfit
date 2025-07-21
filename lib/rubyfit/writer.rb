@@ -482,6 +482,8 @@ class RubyFit::Writer
       packed_data += [(data['wind_resist_coef'] * 1000).to_i].pack('S<').bytes # UINT16 (scaled)
       packed_data += [(data['roll_resist_coef'] * 10000).to_i].pack('S<').bytes # UINT16 (scaled)
       packed_data += [(data['weight_kg'] * 10).to_i].pack('S<').bytes # UINT16 (scaled)
+    else
+      packed_data = clm_json[:data] || clm_json['data']
     end
     {
       timestamp: timestamp,
