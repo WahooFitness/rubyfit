@@ -245,7 +245,7 @@ class RubyFit::MessageWriter
         min_alt_m: { id: 71, type: RubyFit::Type.altitude },
         enhanced_avg_speed: { id: 124, type: RubyFit::Type.uint32 },
         enhanced_max_speed: { id: 125, type: RubyFit::Type.uint32 },
-        workout_rpe: { id: 193, type: RubyFit::Type.uint8 }
+        workout_rpe: { id: 193, type: RubyFit::Type.uint8_scale10 },
       }
     },
 

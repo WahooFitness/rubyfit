@@ -244,6 +244,13 @@ class RubyFit::Type
              })
     end
 
+    def uint8_scale10
+      uint8({
+              rb2fit: ->(val, type) { (val * 10.0).truncate },
+              fit2rb: ->(val, type) { val.nil? ? nil :  val / 10.0 }
+            })
+    end
+
     def uint16_scale100
       uint16({
               rb2fit: ->(val, type) { (val * 100).truncate },

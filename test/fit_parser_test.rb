@@ -196,7 +196,7 @@ class FitParserTest < Minitest::Test
       json_output = JSON.parse(data.to_json)
       refute_nil(json_output)
       assert_equal(1, json_output['sessions'].size)
-      assert_equal(20, json_output['sessions'][0]['workout_rpe'])
+      assert_equal(2.0, json_output['sessions'][0]['workout_rpe'])
     end
   end
 
