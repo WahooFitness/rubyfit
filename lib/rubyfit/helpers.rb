@@ -59,9 +59,11 @@ module RubyFit
     # Converts an ASCII string into a byte array, truncating or right-filling
     # with 0 to match byte_count
     def str2bytes(str, byte_count)
-      str
-        .unpack("C#{byte_count - 1}") # Convert to n-1 bytes
-        .map{|v| v || 0} + [0] # Convert nils to 0 and add null terminator
+      if byte_count == 1
+        [str.bytes.first || 0]
+      else
+        str.unpack("C#{byte_count - 1}").map { |v| v || 0 } + [0]
+      end
     end
 
     # Converts a byte array to a string. Omits the last character of the byte

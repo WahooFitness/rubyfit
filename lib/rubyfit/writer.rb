@@ -33,12 +33,18 @@ class RubyFit::Writer
       })
 
       # Write field description for "course_point_type"
-      # TO DO: Change name and field_definition_number to match CRUX
       write_message(:field_description, {
         developer_data_index: opts[:developer_data_index] || 0,
         field_definition_number: 16,
         fit_base_type_id: :uint8,
         field_name: "course_point_type"
+      })
+
+      write_message(:field_description, {
+        developer_data_index: opts[:developer_data_index] || 0,
+        field_definition_number: 17,
+        fit_base_type_id: :string,
+        field_name: "course_point_description"
       })
     end
 
@@ -403,7 +409,7 @@ class RubyFit::Writer
     record_counts = {
       file_id: 1,
       developer_data_id: course_point_dev_field_count > 0 ? 1 : 0,
-      field_description: course_point_dev_field_count > 0 ? 1 : 0,
+      field_description: course_point_dev_field_count > 0 ? 2 : 0,
       course: 1,
       lap: 1,
       event: 2,
@@ -413,7 +419,7 @@ class RubyFit::Writer
     }
 
     data_sizes = record_counts.map do |type, count|
-      developer_fields = (type == :course_point && course_point_dev_field_count > 0) ? [{ developer_data_index: 0, field_definition_number: 0, data: 1 }] : nil
+      developer_fields = (type == :course_point && course_point_dev_field_count > 0) ? [{ developer_data_index: 0, field_definition_number: 16, data: 1 }, { developer_data_index: 0, field_definition_number: 17, data: 48 }] : nil
       def_size = RubyFit::MessageWriter.definition_message_size(type, developer_fields)
       data_size = RubyFit::MessageWriter.data_message_size(type, developer_fields) * count
 

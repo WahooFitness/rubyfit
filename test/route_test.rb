@@ -114,6 +114,11 @@ class RubyFitIntegrationTest < Minitest::Test
                 developer_data_index: 0, # Matches the developer_data_id
                 field_definition_number: 16, # Matches the field_description
                 data: 18 # Example value (1-3 digit number)
+              },
+              {
+                developer_data_index: 0, # Matches the developer_data_id
+                field_definition_number: 17, # Matches the field_description
+                data: "this is my longer description" # Example value (string)
               }
             ]
           point = point.merge(developer_fields: developer_fields)

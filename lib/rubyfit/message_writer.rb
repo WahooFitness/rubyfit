@@ -379,8 +379,12 @@ class RubyFit::MessageWriter
       if developer_fields
         bytes << developer_fields.length # Developer field count
         developer_fields.each do |field|
+          field_size = 1
+          if field[:field_definition_number]&.to_i == 17
+            field_size = 48
+          end
           bytes << field[:field_definition_number]&.to_i # Field number:	Maps to the field_definition_number of a field_description Message
-          bytes << 1 # Data Size: Size (in bytes) of the specified FIT message’s field
+          bytes << field_size
           bytes << field[:developer_data_index]&.to_i # Developer Data Index: Maps to the developer_data_index of a developer_data_id Message
         end
       end
@@ -411,7 +415,16 @@ class RubyFit::MessageWriter
       # Add developer fields if provided
       if developer_fields
         developer_fields.each do |field|
-          bytes.push(*field[:data])
+          if field[:field_definition_number]&.to_i == 17
+            type = RubyFit::Type.string(48)
+          elsif field[:field_definition_number]&.to_i == 16
+            type = RubyFit::Type.uint8
+          else
+            type = nil
+          end
+          value = field[:data]
+          value_bytes = type ? type.val2bytes(value) : [value].pack("C*").bytes
+          bytes.push(*value_bytes)
         end
       end
     end
@@ -437,7 +450,7 @@ class RubyFit::MessageWriter
     base_size = 1 + message_data[:fields].values.map { |info| info[:type].byte_count }.reduce(&:+)
 
     # Add developer field data sizes
-    developer_fields_size = developer_fields ? developer_fields.sum { |field| field[:data].is_a?(Array) ? field[:data].size : 1 } : 0
+    developer_fields_size = developer_fields ? developer_fields.sum { |field| field[:data].is_a?(Array) ? field[:data].size : field[:data] } : 0
     base_size + developer_fields_size
   end
 

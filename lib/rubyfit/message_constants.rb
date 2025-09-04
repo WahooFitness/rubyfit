@@ -404,46 +404,6 @@ module RubyFit::MessageConstants
   }.freeze
 
   WAYPOINT_TYPE = {
-    # atm: 1,
-    # aid_station: 1, # aid station, alert
-    # art: 2,
-    # attraction: 3,
-    # bar: 4,
-    # swimming: 5, # beach, swimming, pool
-    # bike_parking: 6,
-    # bike_share: 7,
-    # bike_shop: 8, # bike shop, bike repair
-    # camping: 9,
-    # chairlift: 10, # chair lift, cable car
-    # checkpoint: 11, # checkpoint, control point, stamp station
-    # coffee: 12,
-    # distance_marker: 13,
-    # dog_park: 14,
-    # e_bike_charging: 15,
-    # ferry: 16, # ferry, boat
-    # gas_station: 17, # gas station, petrol station
-    # generic: 18,
-    # geocache: 19,
-    # grocery: 20, # grocery store, convenience store
-    # hospital: 21,
-    # info: 22,
-    # park: 23,
-    # parking: 24,
-    # peak: 25, # peak, summit, mountain top
-    # pharmacy: 26,
-    # rest_area: 27, # rest area, picnic area, shelter, benches
-    # restaurant: 28, # restaurant, food, food and drink
-    # restroom: 29, # restroom
-    # segment_end: 30,
-    # segment_start: 31,
-    # shopping: 32,
-    # shower: 33,
-    # trailhead: 34,
-    # transit: 35, # transit, bus stop, train station
-    # transition_zone: 36,
-    # viewpoint: 37, # viewpoint, lookout, scenic view
-    # water: 38, # water, water fountain, water tap
-    # winery: 39, # winery, vineyard
     other: 0,
     slight_right: 1,
     right: 2,
@@ -514,6 +474,7 @@ module RubyFit::MessageConstants
 
   DEVELOPER_FIELDS = {
     # TO DO: Change these to match the actual developer data IDs and field definitions
-    course_point_type: 16
-  }
+    course_point_type: 16,
+    course_point_description: 17
+  }.freeze
 end

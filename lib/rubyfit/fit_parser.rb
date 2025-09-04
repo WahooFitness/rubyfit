@@ -87,10 +87,15 @@ class RubyFit::FitFileParser
           next unless field_name
 
           # Convert raw value to readable format
-          readable_value = raw_value.unpack1('C')
-          if RubyFit::MessageConstants::WAYPOINT_TYPE.value?(readable_value)
-            readable_value = RubyFit::MessageConstants::WAYPOINT_TYPE.key(readable_value)
-          end
+          readable_value =
+            if field_id == 16
+              value = raw_value.unpack1('C')
+              RubyFit::MessageConstants::WAYPOINT_TYPE.value?(value) ? RubyFit::MessageConstants::WAYPOINT_TYPE.key(value) : value
+            elsif field_id == 17
+              raw_value.delete("\u0000").force_encoding('UTF-8')
+            else
+              raw_value
+            end
           readable_data[field_name] = readable_value
         end
       end
