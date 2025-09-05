@@ -162,9 +162,19 @@ class RubyFit::Type
 
     def centimeters
       uint32({
-        rb2fit: ->(val, type) { (val * 100).truncate },
-        fit2rb: ->(val, type) { val.nil? ? nil : val / 100.0 }
-      })
+               rb2fit: ->(val, type) {
+                 val == 0xFFFFFFFF ? val : (val * 100).truncate
+               },
+               fit2rb: ->(val, type) {
+                 if val.nil?
+                   nil
+                 elsif val == 0xFFFFFFFF
+                   0xFFFFFFFF
+                 else
+                   val / 100.0
+                 end
+               }
+             })
     end
 
     def altitude
