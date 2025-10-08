@@ -19,7 +19,7 @@ class RubyFit::FitFileParser
                                segment_lap: :segment_laps,
                                wahoo_custom_num: :wahoo_custom_nums
       }
-      @use_last_message_only = [:wahoo_id]
+      @use_last_message_only = [:wahoo_id, :workout]
     end
 
     def definition_message(local_num, global_message_number, fields, developer_fields)

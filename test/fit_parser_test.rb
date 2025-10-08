@@ -38,9 +38,9 @@ class FitParserTest < Minitest::Test
       assert_equal(26, json_output['activity']['event_code'])
       assert_equal(1, json_output['activity']['event_type_code'])
 
-      assert_equal(2, json_output['workout'][0]['sport_code'])
-      assert_equal(6, json_output['workout'][0]['sub_sport_code'])
-      assert_equal('Indoor Cycling', json_output['workout'][0]['wkt_name'])
+      assert_equal(2, json_output['workout']['sport_code'])
+      assert_equal(6, json_output['workout']['sub_sport_code'])
+      assert_equal('Indoor Cycling', json_output['workout']['wkt_name'])
 
       assert_equal('WAHOOAPPIOS62BB', json_output['wahoo_id']['app_token'])
       assert_equal(3, json_output['wahoo_id']['workout_num'])
