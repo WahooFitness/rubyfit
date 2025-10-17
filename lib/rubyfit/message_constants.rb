@@ -469,6 +469,8 @@ module RubyFit::MessageConstants
     transit: 63, # Transit stop
     viewpoint: 64, # Viewpoint
     winery: 65,
+    segment_start: 66,
+    segment_end: 67,
     unknown: 255, # Unknown waypoint type
   }.freeze
 
