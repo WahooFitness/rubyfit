@@ -280,4 +280,17 @@ class FitParserTest < Minitest::Test
       end
     end
   end
+
+  def test_fit_file_with_no_laps_and_no_records
+    fit_file_path = 'test/fixtures/2025-10-24-170242-WAHOOAPPIOSFFAE-397-0.fit'
+    new_fit_file_path = 'test/fixtures/2025-10-24-170242-WAHOOAPPIOSFFAE-397-0-new.fit'
+    raw = IO.read(fit_file_path)
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+  end
 end

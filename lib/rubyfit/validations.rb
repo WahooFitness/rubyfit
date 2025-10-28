@@ -91,6 +91,8 @@ class RubyFit::Validations
     events = parsed_data[:events]
     sport = parsed_data[:sport] || {}
 
+    return [nil, nil, false] if records.nil?
+
     lap[:timestamp] = records.first[:timestamp]
     lap[:start_time] = records.first[:timestamp]
     lap[:start_lat_deg] = records.first[:lat_deg]
