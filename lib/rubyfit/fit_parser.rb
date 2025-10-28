@@ -203,6 +203,9 @@ class RubyFit::FitFileParser
             fields = field_count.times.map do
               field_def = buffer_io.read(3)&.unpack('C*')
               raise "Invalid FIT file: unable to read field definition" unless field_def
+              if field_def.nil? || field_def.size < 3
+                next
+              end
               { id: field_def[0], size: field_def[1], type: field_def[2] }
             end
 
@@ -340,8 +343,11 @@ class RubyFit::FitFileParser
 
           fields = field_count.times.map do
             field_def = buffer_io.read(3)&.unpack('C*')
+            if field_def.nil? || field_def.size < 3
+              next
+            end
             { id: field_def[0], size: field_def[1], type: field_def[2] }
-          end
+          end.compact
 
           developer_fields = if record_header & 0x20 == 0x20
                                developer_field_count = buffer_io.read(1)&.unpack1('C')
@@ -369,7 +375,7 @@ class RubyFit::FitFileParser
           end
 
           developer_values = {}
-          definition[:developer_fields]&.each do |field|
+          (definition[:developer_fields] || []).each do |field|
             value = buffer_io.read(field[:size])
             if value.nil? || value.size < field[:size]
               puts "Warning: Missing or incomplete developer field value for field ID #{field[:id]}  at #{buffer_io.pos}"

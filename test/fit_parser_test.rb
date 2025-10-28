@@ -254,4 +254,30 @@ class FitParserTest < Minitest::Test
       puts(json_output.inspect)
     end
   end
+
+  def test_undefined_method_in_field_definition_error_handling
+    fit_file_path = 'test/fixtures/2025-04-04-052736-WAHOOAPPIOS1568-146-0.fit'
+    new_fit_file_path = 'test/fixtures/2025-04-04-052736-WAHOOAPPIOS1568-146-0-new.fit'
+    raw = IO.read(fit_file_path)
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+  end
+
+  def test_undefined_method_in_validations_error_handling
+    fit_file_path = 'test/fixtures/2025-10-25-163604-ManualSummaryFit9639-7357631-0.fit'
+    new_fit_file_path = 'test/fixtures/2025-10-25-163604-ManualSummaryFit9639-7357631-0-new.fit'
+    raw = IO.read(fit_file_path)
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+  end
 end
