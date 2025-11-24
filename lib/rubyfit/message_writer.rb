@@ -135,7 +135,7 @@ class RubyFit::MessageWriter
         # capabilities: { id: 5, type: RubyFit::Type.uint32z, required: true },  # should be workout_capabilities type
         num_valid_steps: { id: 6, type: RubyFit::Type.uint16 },
         wkt_name: { id: 8, type: RubyFit::Type.string(64) },
-        sub_sport_code: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT },
+        sub_sport_code: { id: 11, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::SUBSPORT.merge(RubyFit::MessageConstants::SUBSPORT.values.map { |v| [v, v] }.to_h) },
         # pool_length: { id: 14, type: RubyFit::Type.uint16 },
         # pool_length_unit: { id: 15, type: RubyFit::Type.enum, values: RubyFit::MessageConstants::DISPLAY_MEASURE }
       }

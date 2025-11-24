@@ -129,6 +129,63 @@ class RubyFit::Validations
     [raw_lap, raw_session, modified]
   end
 
+  def self.build_workout(parsed_data)
+    workout = {}
+
+    return if parsed_data[:sessions].nil?
+
+    sport = parsed_data[:sport] || {}
+    sport_code = sport&.[](:sport_code) || parsed_data[:sessions]&.first[:sport_code] || 2
+    sub_sport_code = sport&.[](:sub_sport_code) || parsed_data[:sessions]&.first[:sub_sport_code] || 0
+
+    workout[:sport_code] = sport_code
+    workout[:sub_sport_code] = sub_sport_code
+
+    if sub_sport_code == 0
+      workout[:wkt_name] = RubyFit::MessageConstants::SPORT.key(sport_code).to_s.capitalize
+    else
+      subsport_name = RubyFit::MessageConstants::SUBSPORT.key(sub_sport_code).to_s
+      if subsport_name.include?('_')
+        workout[:wkt_name] = subsport_name.split('_').map(&:capitalize).join(' ')
+      else
+        workout[:wkt_name] = subsport_name.capitalize + ' ' + RubyFit::MessageConstants::SPORT.key(sport_code).to_s.capitalize
+      end
+    end
+
+    definition = RubyFit::MessageWriter.definition_message(:workout, 0)
+    data = RubyFit::MessageWriter.data_message(:workout, 0, workout)
+    raw_workout = definition + data
+    modified = true
+
+    [raw_workout, modified]
+  end
+
+  def self.build_wahoo_id(parsed_data)
+    return if parsed_data[:file_id].nil? || (parsed_data[:sessions].nil? && parsed_data[:sport].nil?)
+
+    wahoo_id = {}
+
+    time_created = parsed_data[:file_id][:time_created] || Time.now
+    fit_epoch = Time.utc(1989, 12, 31, 0, 0, 0)
+    time_created_fit = (time_created - fit_epoch).to_i
+
+    sport = parsed_data[:sport] || {}
+    sport_code = sport&.[](:sport_code) || parsed_data[:sessions]&.first[:sport_code] || 2
+    sub_sport_code = sport&.[](:sub_sport_code) || parsed_data[:sessions]&.first[:sub_sport_code] || 0
+    workout_type = RubyFit::Helpers.get_workout_type_from_sport_and_subsport(sport_code, sub_sport_code) || 47
+
+    wahoo_id[:app_token] = "FID14 #{time_created_fit.to_i.to_s(16).upcase.rjust(8, '0')}"
+    wahoo_id[:workout_num] = 0
+    wahoo_id[:workout_type] = workout_type
+
+    definition = RubyFit::MessageWriter.definition_message(:wahoo_id, 0)
+    data = RubyFit::MessageWriter.data_message(:wahoo_id, 0, wahoo_id)
+    raw_wahoo_id = definition + data
+    modified = true
+
+    [raw_wahoo_id, modified]
+  end
+
   def self.activity(activity)
     raw_activity = nil
     modified = false

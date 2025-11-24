@@ -178,6 +178,34 @@ class FitParserTest < Minitest::Test
     end
   end
 
+  def test_file_with_no_workout_and_no_wahoo_id
+    fit_file_path = 'test/fixtures/tp-371176.2025-11-11-21-31-03-088Z.GarminPing.AAAAAGkTqxbgWQ9T.FIT'
+    new_fit_file_path = 'test/fixtures/tp-371176.2025-11-11-21-31-03-088Z.GarminPing.AAAAAGkTqxbgWQ9T-repaired.FIT'
+
+    raw = IO.read(fit_file_path)
+
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+
+    raw = IO.read(new_fit_file_path)
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      refute_nil(json_output)
+
+      assert_equal(4, json_output['workout'].size)
+      assert_equal(3, json_output['wahoo_id'].size)
+
+      assert_equal("Road Cycling", json_output['workout']['wkt_name'])
+      assert_equal("FID14 43761D44", json_output['wahoo_id']['app_token'])
+      assert_equal(15, json_output['wahoo_id']['workout_type'])
+    end
+  end
+
   def test_fit_file_with_rpe
     fit_file_path = 'test/fixtures/2-very-strong.fit'
     new_fit_file_path = 'test/fixtures/2-very-strong-new.fit'

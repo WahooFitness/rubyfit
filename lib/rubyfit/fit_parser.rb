@@ -316,6 +316,8 @@ class RubyFit::FitFileParser
 
       processed_sessions = false
       processed_laps = false
+      processed_workout = false
+      processed_wahoo_id = false
       io = StringIO.new(raw)
 
       header = io.read(12)
@@ -392,6 +394,12 @@ class RubyFit::FitFileParser
           if definition[:global_message_number] == 19
             processed_laps = true
           end
+          if definition[:global_message_number] == 26
+            processed_workout = true
+          end
+          if definition[:global_message_number] == 65281
+            processed_wahoo_id = true
+          end
 
           original_data_info[definition[:global_message_number]] ||= []
           original_data_info[definition[:global_message_number]] << { start: record_start, length: buffer_io.pos - record_start }
@@ -405,11 +413,11 @@ class RubyFit::FitFileParser
         end
       end
 
-      added_messages, modified_messages, invalid_offsets = post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info, invalid_offsets)
+      added_messages, modified_messages, invalid_offsets = post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info, invalid_offsets, processed_workout, processed_wahoo_id)
       yield edit_fit_file_raw(raw, invalid_offsets, modified_messages, added_messages)
     end
 
-    def post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info, invalid_offsets)
+    def post_parse_repairs(raw, processed_laps, processed_sessions, added_messages, modified_messages, original_data_info, invalid_offsets, processed_workout, processed_wahoo_id)
       parser = RubyFit::FitFileParser.new
       parser.parse(raw) do |parsed_data|
         if !processed_laps && !processed_sessions
@@ -428,6 +436,14 @@ class RubyFit::FitFileParser
         if activity_data && modified && activity_info
           added_messages << { new_data: activity_data } if activity_data && modified
           invalid_offsets << { start: activity_info[:start], length: activity_info[:length] } if invalid_offsets.empty? || !invalid_offsets.any? { |offset| offset[:start] == activity_info[:start] && offset[:length] == activity_info[:length] }
+        end
+        unless processed_workout
+          workout_data, modified = RubyFit::Validations.build_workout(parsed_data)
+          added_messages << { new_data: workout_data } if workout_data && modified
+        end
+        unless processed_wahoo_id
+          wahoo_id_data, modified = RubyFit::Validations.build_wahoo_id(parsed_data)
+          added_messages << { new_data: wahoo_id_data } if wahoo_id_data && modified
         end
 
         events_data, modified = RubyFit::Validations.post_parsed_events(parsed_data)

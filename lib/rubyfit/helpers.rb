@@ -142,5 +142,10 @@ module RubyFit
 
       total_time
     end
+
+    def self.get_workout_type_from_sport_and_subsport(sport_code, subsport_code)
+      workout_type = RubyFit::MessageConstants::SPORT_SUBSPORT_TO_WORKOUT_ID[[sport_code, subsport_code]] || 47
+      workout_type
+    end
   end
 end

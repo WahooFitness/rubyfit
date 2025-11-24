@@ -479,4 +479,72 @@ module RubyFit::MessageConstants
     course_point_type: 16,
     course_point_description: 17
   }.freeze
+
+
+  SPORT_SUBSPORT_TO_WORKOUT_ID = {
+    [2, 0] => 0,    # Cycling, Generic
+    [1, 0] => 1,    # Running, Generic
+    [4, 0] => 2,    # Fitness Equip, Generic
+    [1, 4] => 3,    # Running, Track
+    [1, 3] => 4,    # Running, Trail
+    [1, 1] => 5,    # Running, Treadmill
+    [11, 0] => 6,   # Walking, Generic
+    [11, 31] => 7,  # Walking, Speed Walking
+    [11, 30] => 8,  # Walking, Nordic Walking
+    [17, 0] => 9,   # Hiking, Generic
+    [16, 0] => 10,  # Mountaineering, Generic
+    [2, 11] => 11,  # Cycling, Cyclocross
+    [2, 6] => 12,   # Cycling, Indoor Cycling
+    [2, 8] => 13,   # Cycling, Mountain
+    [2, 10] => 14,  # Cycling, Recumbent
+    [2, 7] => 15,   # Cycling, Road
+    [2, 13] => 16,  # Cycling, Track Cycling
+    [22, 0] => 17,  # Motorcycling, Generic
+    [4, 0] => 18,   # Fitness Equip, Generic
+    [1, 1] => 19,   # Running, Treadmill
+    [4, 15] => 20,  # Fitness Equip, Elliptical
+    [2, 6] => 21,   # Cycling, Indoor Cycling
+    [4, 14] => 22,  # Fitness Equip, Indoor Rowing
+    [4, 16] => 23,  # Fitness Equip, Stair Climbing
+    [5, 0] => 24,   # Swimming, Generic
+    [5, 17] => 25,  # Swimming, Lap Swimming
+    [5, 18] => 26,  # Swimming, Open Water
+    [14, 0] => 27,  # Snowboarding, Generic
+    [13, 0] => 28,  # Alpine Skiing, Generic
+    [13, 9] => 29,  # Alpine Skiing, Downhill
+    [12, 0] => 30,  # Cross Country Skiing, Generic
+    [31, 0] => 31,  # Skating, Generic
+    [33, 0] => 32,  # Ice Skating, Generic
+    [30, 0] => 33,  # Inline Skating, Generic
+    [31, 0] => 34,  # Skating, Long Boarding
+    [32, 0] => 35,  # Sailing, Generic
+    [43, 0] => 36,  # Windsurfing, Generic
+    [19, 0] => 37,  # Paddling, Canoeing
+    [41, 0] => 38,  # Kayaking, Generic
+    [15, 0] => 39,  # Rowing, Generic
+    [44, 0] => 40,  # Kitesurfing, Generic
+    [37, 0] => 41,  # Stand Up Paddleboarding, Generic
+    [10, 20] => 42, # Training, Strength Training
+    [10, 26] => 43, # Training, Cardio Training
+    [4, 16] => 44,  # Fitness Equip, Stair Climbing
+    [65, 0] => 45,  # Wheelchair Push Walk, Generic
+    [25, 0] => 46,  # Golf, Generic
+    [0, 0] => 47,   # Generic, Generic
+    [2, 5] => 49,   # Cycling, Spin
+    [11, 1] => 56,  # Walking, Treadmill
+    [2, 6] => 61,   # Cycling, Indoor Trainer
+    [18, 0] => 62,  # Multisport, Generic
+    [3, 0] => 63,   # Transition, Generic
+    [21, 0] => 64,  # E Biking, Generic
+    [0, 23] => 65,  # Generic, Excercise
+    [10, 43] => 66, # Training, Yoga
+    [1, 0] => 67,   # Running, Race Running
+    [2, 58] => 68,  # Cycling, Virtual Activity
+    [69, 0] => 69,  # Mental Strength Training, Generic
+    [2, 12] => 70,  # Cycling, Handcycling
+    [1, 58] => 71,  # Running, Virtual Activity
+    [10, 0] => 72,  # Training, Generic
+    [0, 0] => 73,   # Generic, Generic
+    [255, 0] => 255 # Unknown
+  }.freeze
 end
