@@ -255,6 +255,10 @@ class RubyFit::FitFileParser
                 @record_index += 1
               end
 
+              if key == :session
+                value[:workout_type_code] = RubyFit::Helpers.get_workout_type_from_sport_and_subsport(value[:sport_code], value[:sub_sport_code])
+              end
+
               if @plural_message_types.key?(key)
                 key = @plural_message_types[key]
                 all_data[key] = [] unless all_data[key].is_a?(Array)
