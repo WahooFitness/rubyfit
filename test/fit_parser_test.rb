@@ -198,12 +198,12 @@ class FitParserTest < Minitest::Test
       refute_nil(json_output)
 
       assert_equal(4, json_output['workout'].size)
-      assert_equal(3, json_output['wahoo_id'].size)
+      assert_equal(4, json_output['wahoo_id'].size)
 
       assert_equal("Road Cycling", json_output['workout']['wkt_name'])
       assert_equal("FID14 43761D44", json_output['wahoo_id']['app_token'])
       assert_equal(15, json_output['wahoo_id']['workout_type'])
-      puts(json_output['sessions'][0].inspect)
+      assert_equal("FID14 43761D44:0", json_output['wahoo_id']['workout_token'])
       assert_equal(15, json_output['sessions'][0]['workout_type_code'])
     end
   end
