@@ -230,7 +230,7 @@ class RubyFit::Validations
     modified = false
 
     events.each do |event|
-      if (event[:event_type_code] == 4 || event[:event_type_code] == 1) && records.last && event[:timestamp] > (records.last[:timestamp] + 5)
+      if (event[:event_type_code] == 4 || event[:event_type_code] == 1) && records.last && records.last[:timestamp] && event[:timestamp] && event[:timestamp] > (records.last[:timestamp] + 5)
         event[:timestamp] = records.last[:timestamp]
 
         definition = RubyFit::MessageWriter.definition_message(:event, 0)
