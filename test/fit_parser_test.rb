@@ -323,4 +323,17 @@ class FitParserTest < Minitest::Test
       end
     end
   end
+
+  def test_conversion_error
+    fit_file_path = 'test/fixtures/2025-08-24-091308-ELEMNT_BOLT_F73E-3-0.fit'
+    new_fit_file_path = 'test/fixtures/2025-08-24-091308-ELEMNT_BOLT_F73E-3-0-new.fit'
+    raw = IO.read(fit_file_path)
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+  end
 end

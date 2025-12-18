@@ -89,7 +89,7 @@ class RubyFit::Validations
 
     records = parsed_data[:records]
     events = parsed_data[:events]
-    sport = parsed_data[:sport] || {}
+    sport = parsed_data[:sport].is_a?(Array) ? parsed_data[:sport].last : (parsed_data[:sport] || {})
 
     return [nil, nil, false] if records.nil?
 
