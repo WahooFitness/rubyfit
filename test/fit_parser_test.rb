@@ -336,4 +336,15 @@ class FitParserTest < Minitest::Test
       end
     end
   end
+
+  def test_wahoo_clm_workout_plan
+    fit_file_path = 'test/fixtures/running_assessment.fit'
+    raw = IO.read(fit_file_path)
+    parser = RubyFit::FitFileParser.new
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      assert_equal(1, json_output['CLM']['WORKOUT_PLAN_INFO'].size)
+      assert_equal(10781682, json_output['CLM']['WORKOUT_PLAN_INFO'][0]['clm']['plan_cloud_id'])
+    end
+  end
 end

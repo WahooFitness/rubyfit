@@ -288,13 +288,12 @@ class RubyFit::FitFileParser
     def parse_clm(data)
       # Convert the array of bytes into a binary string
       binary_data = data[:data].pack('C*')
-
-      # Unpack the binary data using the same format as encoding
-      clm_id, wind_is_headwind, dist_m, duration_sec, pwr_watts, spd_mps, grade_perc, wind_spd_mps, wind_resist_coef, roll_resist_coef, weight_kg =
-        binary_data.unpack('S<C L< S< S< S< s< S< S< S< S<')
-
+      clm_id = binary_data.unpack1('S<C')
 
       if clm_id == 73
+        # Unpack the binary data using the same format as encoding
+        clm_id, wind_is_headwind, dist_m, duration_sec, pwr_watts, spd_mps, grade_perc, wind_spd_mps, wind_resist_coef, roll_resist_coef, weight_kg =
+          binary_data.unpack('S<C L< S< S< S< s< S< S< S< S<')
         key = :ROUTE_COURSE_SECTOR
         clm = {
                 clm: {
@@ -311,6 +310,46 @@ class RubyFit::FitFileParser
                   weight_kg: weight_kg / 10.0
                 }
               }
+      elsif clm_id == 53
+        provider_type = binary_data[2].ord
+
+        provider_id_start = 3
+        provider_id_end = provider_id_start
+        while provider_id_end < binary_data.length && binary_data[provider_id_end].ord != 0
+          provider_id_end += 1
+        end
+        provider_id = binary_data[provider_id_start...provider_id_end]
+
+        percent_complete = binary_data[provider_id_end + 1].ord
+        fitness_app_id   = binary_data[provider_id_end + 2, 2].unpack1('S<')
+
+        workout_cloud_id_start = provider_id_end + 4
+        workout_cloud_id_end = workout_cloud_id_start
+        while workout_cloud_id_end < binary_data.length && binary_data[workout_cloud_id_end].ord != 0
+          workout_cloud_id_end += 1
+        end
+
+        workout_cloud_id = binary_data[workout_cloud_id_start, workout_cloud_id_end].unpack1('L<')
+        workout_cloud_id = nil if workout_cloud_id == 0xFFFFFFFF
+
+        raw = binary_data[workout_cloud_id_end + 1..]
+        raw += "\x00" if raw.bytesize < 4
+        plan_cloud_id = raw.unpack1('L<')
+        plan_cloud_id = nil if plan_cloud_id == 0xFFFFFFFF
+
+
+        provider_id = provider_id.delete("\x00")
+        key = :WORKOUT_PLAN_INFO
+        clm = {
+          clm: {
+            provider_type: provider_type,
+            provider_id: provider_id,
+            fitness_app_id: fitness_app_id,
+            percent_complete: percent_complete == 0xFF ? nil : percent_complete,
+            plan_cloud_id: plan_cloud_id,
+            workout_cloud_id: workout_cloud_id
+          }
+        }
       end
       [key, clm] || [:unkown, data]
     end
