@@ -501,7 +501,6 @@ module RubyFit::MessageConstants
     [2, 13] => 16,  # Cycling, Track Cycling
     [22, 0] => 17,  # Motorcycling, Generic
     [4, 0] => 18,   # Fitness Equip, Generic
-    [1, 1] => 19,   # Running, Treadmill
     [4, 15] => 20,  # Fitness Equip, Elliptical
     [2, 6] => 21,   # Cycling, Indoor Cycling
     [4, 14] => 22,  # Fitness Equip, Indoor Rowing

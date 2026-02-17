@@ -134,9 +134,9 @@ class RubyFit::FitFileParser
         end
       end
 
-      valid_data, modified = RubyFit::Validations.validate_message(message_type, readable_data, raw_data)
+      valid_data, modified, parsed_data = RubyFit::Validations.validate_message(message_type, readable_data, raw_data)
 
-      [valid_data, modified]
+      [valid_data, modified, parsed_data]
     end
 
     def parse(raw)
@@ -434,7 +434,7 @@ class RubyFit::FitFileParser
           end
 
           data_message(local_num, values)
-          data, modified = get_valid_data({ definition[:global_message_number] => values }, unpack_directive, raw)
+          data, modified, parsed_data = get_valid_data({ definition[:global_message_number] => values }, unpack_directive, raw)
           if definition[:global_message_number] == 18
             processed_sessions = true
           end
@@ -455,7 +455,7 @@ class RubyFit::FitFileParser
             # Record the offset and length of the invalid message
             invalid_offsets << { start: record_start, length: buffer_io.pos - record_start }
           elsif data && modified
-            modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: data }
+            modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: data, parsed_message: parsed_data }
           end
         end
       end

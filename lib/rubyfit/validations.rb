@@ -2,23 +2,32 @@ class RubyFit::Validations
 
   def self.validate_message(message_type, data, raw_data)
     if message_type == :lap
-        data, modified = self.lap(data)
+        data, modified, parsed_data = self.lap(data)
     elsif message_type == :activity
-      data, modified = self.activity(data)
+      data, modified, parsed_data = self.activity(data)
     elsif message_type == :session
-      data, modified = self.session(data)
+      data, modified, parsed_data = self.session(data)
     end
-    [data, modified]
+    [data, modified, parsed_data]
   end
 
 
   def self.lap(lap)
     raw_lap = nil
     modified = false
-    if lap[:timestamp].nil? || lap[:timestamp] == 0 || lap[:timestamp].to_s == "1989-12-31 00:00:00 UTC"
+    if lap[:timestamp].nil? || lap[:timestamp] == 0 || lap[:timestamp].to_s == "1989-12-31 00:00:00 UTC" || (lap[:sport_code] == 1 && lap[:sub_sport_code] == 45)
       if !lap[:start_time].nil? && !lap[:tot_elapsed_time_sec].nil?
         lap[:timestamp] = lap[:start_time] + lap[:tot_elapsed_time_sec]
 
+        if lap[:sport_code] == 1 && lap[:sub_sport_code] == 45
+          lap[:sub_sport_code] = 1
+          if lap[:event_type_code].nil?
+            lap[:event_type_code] = 1
+          end
+          if lap[:event_code].nil?
+            lap[:event_code] = 9
+          end
+        end
         definition = RubyFit::MessageWriter.definition_message(:lap, 0)
         data = RubyFit::MessageWriter.data_message(:lap, 0, lap)
         raw_lap = definition + data
@@ -28,7 +37,7 @@ class RubyFit::Validations
       end
       modified = true
     end
-    [raw_lap, modified]
+    [raw_lap, modified, lap]
   end
 
   def self.build_lap(parsed_data)
@@ -137,6 +146,10 @@ class RubyFit::Validations
     sport = parsed_data[:sport] || {}
     sport_code = sport&.[](:sport_code) || parsed_data[:sessions]&.first[:sport_code] || 2
     sub_sport_code = sport&.[](:sub_sport_code) || parsed_data[:sessions]&.first[:sub_sport_code] || 0
+    if sport_code == 1 && sub_sport_code == 45
+      sport_code = 1
+      sub_sport_code = 1
+    end
 
     workout[:sport_code] = sport_code
     workout[:sub_sport_code] = sub_sport_code
@@ -172,6 +185,12 @@ class RubyFit::Validations
     sport = parsed_data[:sport] || {}
     sport_code = sport&.[](:sport_code) || parsed_data[:sessions]&.first[:sport_code] || 2
     sub_sport_code = sport&.[](:sub_sport_code) || parsed_data[:sessions]&.first[:sub_sport_code] || 0
+
+    if sport_code == 1 && sub_sport_code == 45
+      sport_code = 1
+      sub_sport_code = 1
+    end
+
     workout_type = RubyFit::Helpers.get_workout_type_from_sport_and_subsport(sport_code, sub_sport_code) || 47
 
     wahoo_id[:app_token] = "FID14 #{time_created_fit.to_i.to_s(16).upcase.rjust(8, '0')}"
@@ -202,7 +221,7 @@ class RubyFit::Validations
       end
     end
 
-    [raw_activity, modified]
+    [raw_activity, modified, activity]
   end
 
   def self.post_parsed_activity(parsed_data)
@@ -252,7 +271,21 @@ class RubyFit::Validations
     raw_session = nil
     modified = false
 
-    [raw_session, modified]
+    if session[:sport_code] == 1 && session[:sub_sport_code] == 45
+      session[:sub_sport_code] = 1
+      if session[:event_type_code].nil?
+        session[:event_type_code] = 1
+      end
+      if session[:event_code].nil?
+        session[:event_code] = 8
+      end
+      definition = RubyFit::MessageWriter.definition_message(:session, 0)
+      data = RubyFit::MessageWriter.data_message(:session, 0, session)
+      raw_session = definition + data
+      modified = true
+    end
+
+    [raw_session, modified, session]
   end
 
 end

@@ -347,4 +347,28 @@ class FitParserTest < Minitest::Test
       assert_equal(10781682, json_output['CLM']['WORKOUT_PLAN_INFO'][0]['clm']['plan_cloud_id'])
     end
   end
+
+  def test_coros_indoor_running_repair
+    fit_file_path = 'test/fixtures/coros_running_indoor.fit'
+    new_fit_file_path = 'test/fixtures/coros_indoor_run-new.fit'
+    raw = IO.read(fit_file_path)
+    parser = RubyFit::FitFileParser.new
+    parser.repair_fit_file(raw) do |data|
+      new_file_string = data
+      File.open(new_fit_file_path, 'wb') do |file|
+        file.write(new_file_string)
+      end
+    end
+
+    raw = IO.read(new_fit_file_path)
+    parser.parse(raw) do |data|
+      json_output = JSON.parse(data.to_json)
+      assert_equal(1, json_output['sessions'].size)
+      assert_equal(1, json_output['laps'].size)
+      assert_equal(1, json_output['sessions'][0]['sport_code'])
+      assert_equal(1, json_output['sessions'][0]['sub_sport_code'])
+      assert_equal(1, json_output['laps'][0]['sport_code'])
+      assert_equal(1, json_output['laps'][0]['sub_sport_code'])
+    end
+  end
 end
