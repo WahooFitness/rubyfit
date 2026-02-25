@@ -350,12 +350,11 @@ class FitParserTest < Minitest::Test
 
   def test_wahoo_clm_parsing_should_not_error
     fit_file_path = 'test/fixtures/clm-parsing-issue.fit'
-    puts("Testing Wahoo CLM parsing issue with file: #{fit_file_path}")
     raw = IO.read(fit_file_path)
     parser = RubyFit::FitFileParser.new
     parser.parse(raw) do |data|
       json_output = JSON.parse(data.to_json)
-      puts(json_output.inspect)
+      puts(json_output['CLM'].inspect)
       assert_equal(5, json_output['CLM']['WORKOUT_PLAN_INFO'].size)
     end
   end

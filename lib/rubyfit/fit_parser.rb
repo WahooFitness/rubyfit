@@ -286,72 +286,126 @@ class RubyFit::FitFileParser
     end
 
     def parse_clm(data)
-      # Convert the array of bytes into a binary string
-      binary_data = data[:data].pack('C*')
-      clm_id = binary_data.unpack1('S<C')
+      begin
+        # Convert the array of bytes into a binary string
+        binary_data = data[:data].pack('C*')
+        clm_id = binary_data.unpack1('S<C')
 
-      if clm_id == 73
-        # Unpack the binary data using the same format as encoding
-        clm_id, wind_is_headwind, dist_m, duration_sec, pwr_watts, spd_mps, grade_perc, wind_spd_mps, wind_resist_coef, roll_resist_coef, weight_kg =
-          binary_data.unpack('S<C L< S< S< S< s< S< S< S< S<')
-        key = :ROUTE_COURSE_SECTOR
-        clm = {
-                clm: {
-                  clm_id: clm_id,
-                  wind_is_headwind: wind_is_headwind == 1,
-                  dist_m: dist_m / 100.0,
-                  duration_sec: duration_sec,
-                  pwr_watts: pwr_watts,
-                  spd_mps: spd_mps / 1000.0,
-                  grade_perc: grade_perc / 100.0,
-                  wind_spd_mps: wind_spd_mps / 1000.0,
-                  wind_resist_coef: wind_resist_coef / 1000.0,
-                  roll_resist_coef: roll_resist_coef / 1000.0,
-                  weight_kg: weight_kg / 10.0
+        if clm_id == 73
+          # Unpack the binary data using the same format as encoding
+          clm_id, wind_is_headwind, dist_m, duration_sec, pwr_watts, spd_mps, grade_perc, wind_spd_mps, wind_resist_coef, roll_resist_coef, weight_kg =
+            binary_data.unpack('S<C L< S< S< S< s< S< S< S< S<')
+          key = :ROUTE_COURSE_SECTOR
+          clm = {
+                  clm: {
+                    clm_id: clm_id,
+                    wind_is_headwind: wind_is_headwind == 1,
+                    dist_m: dist_m / 100.0,
+                    duration_sec: duration_sec,
+                    pwr_watts: pwr_watts,
+                    spd_mps: spd_mps / 1000.0,
+                    grade_perc: grade_perc / 100.0,
+                    wind_spd_mps: wind_spd_mps / 1000.0,
+                    wind_resist_coef: wind_resist_coef / 1000.0,
+                    roll_resist_coef: roll_resist_coef / 1000.0,
+                    weight_kg: weight_kg / 10.0
+                  }
                 }
-              }
-      elsif clm_id == 53
-        provider_type = binary_data[2].ord
+        elsif clm_id == 53
+          provider_type = binary_data[2].ord
 
-        provider_id_start = 3
-        provider_id_end = provider_id_start
-        while provider_id_end < binary_data.length && binary_data[provider_id_end].ord != 0
-          provider_id_end += 1
-        end
-        provider_id = binary_data[provider_id_start...provider_id_end]
+          provider_id_start = 3
+          provider_id_end = provider_id_start
+          while provider_id_end < binary_data.length && binary_data[provider_id_end].ord != 0
+            provider_id_end += 1
+          end
+          provider_id = binary_data[provider_id_start...provider_id_end]
 
-        percent_complete = binary_data[provider_id_end + 1].ord
-        fitness_app_id   = binary_data[provider_id_end + 2, 2].unpack1('S<')
+          percent_complete = binary_data[provider_id_end + 1].ord
+          fitness_app_id   = binary_data[provider_id_end + 2, 2].unpack1('S<')
 
-        workout_cloud_id_start = provider_id_end + 4
-        workout_cloud_id_end = workout_cloud_id_start
-        while workout_cloud_id_end < binary_data.length && binary_data[workout_cloud_id_end].ord != 0
-          workout_cloud_id_end += 1
-        end
+          workout_cloud_id_start = provider_id_end + 4
+          workout_cloud_id_end = workout_cloud_id_start
+          while workout_cloud_id_end < binary_data.length && binary_data[workout_cloud_id_end].ord != 0
+            workout_cloud_id_end += 1
+          end
 
-        workout_cloud_id = binary_data[workout_cloud_id_start, workout_cloud_id_end].unpack1('L<')
-        workout_cloud_id = nil if workout_cloud_id == 0xFFFFFFFF
+          workout_cloud_id = binary_data[workout_cloud_id_start, workout_cloud_id_end].unpack1('L<')
+          workout_cloud_id = nil if workout_cloud_id == 0xFFFFFFFF
 
-        raw = binary_data[workout_cloud_id_end + 1..]
-        raw += "\x00" if raw && raw.bytesize < 4
-        plan_cloud_id = raw&.unpack1('L<')
-        plan_cloud_id = nil if plan_cloud_id == 0xFFFFFFFF
+          raw = binary_data[workout_cloud_id_end + 1..]
+          raw += "\x00" if raw && raw.bytesize < 4
+          plan_cloud_id = raw&.unpack1('L<')
+          plan_cloud_id = nil if plan_cloud_id == 0xFFFFFFFF
 
 
-        provider_id = provider_id.delete("\x00")
-        key = :WORKOUT_PLAN_INFO
-        clm = {
-          clm: {
-            provider_type: provider_type,
-            provider_id: provider_id,
-            fitness_app_id: fitness_app_id,
-            percent_complete: percent_complete == 0xFF ? nil : percent_complete,
-            plan_cloud_id: plan_cloud_id,
-            workout_cloud_id: workout_cloud_id
+          provider_id = provider_id.delete("\x00")
+          key = :WORKOUT_PLAN_INFO
+          clm = {
+            clm: {
+              provider_type: provider_type,
+              provider_id: provider_id,
+              fitness_app_id: fitness_app_id,
+              percent_complete: percent_complete == 0xFF ? nil : percent_complete,
+              plan_cloud_id: plan_cloud_id,
+              workout_cloud_id: workout_cloud_id
+            }
           }
-        }
+        elsif clm_id == 83
+          # Read encode_len (first 2 bytes, little-endian)
+          encode_len = binary_data[2, 4].unpack1('S<')
+
+          # Take a subdata slice based on encode_len (like C subdecoder)
+          subdata = binary_data[4, encode_len]
+          offset = 0
+
+          # Read cloud_user_id (4 bytes) — we don't need it
+          offset += 4
+
+          # Read cloud_id (4 bytes, little-endian)
+          cloud_id = subdata[offset, 4].unpack1('V')
+          cloud_id = nil if cloud_id == 0xFFFFFFFF
+          offset += 4
+
+          # Skip token
+          offset += 7
+
+          # Skip update_abs_time_ms (4 bytes) + is_deleted (1 byte)
+          offset += 4 + 1
+
+          # Read location_type (1 byte)
+          location_type_code = subdata[offset].ord
+          location_type = case location_type_code
+                          when 0 then "INDOOR"
+                          when 1 then "OUTDOOR"
+                          else "UNKNOWN"
+                          end
+          offset += 1
+
+          # Read 4dp power fields sequentially (2 bytes each)
+          power_5s  = subdata[offset, 2].unpack1('S<'); offset += 2
+          power_1m  = subdata[offset, 2].unpack1('S<'); offset += 2
+          power_5m  = subdata[offset, 2].unpack1('S<'); offset += 2
+          power_20m = subdata[offset, 2].unpack1('S<'); offset += 2
+
+          # Build simplified CLM JSON
+          clm = {
+            clm: {
+              cloud_id: cloud_id,
+              location_type: location_type,
+              location_type_code: location_type_code,
+              power_5s: power_5s == 0xFFFF ? nil : power_5s,
+              power_1m: power_1m == 0xFFFF ? nil : power_1m,
+              power_5m: power_5m == 0xFFFF ? nil : power_5m,
+              power_20m: power_20m == 0xFFFF ? nil : power_20m
+            }
+          }
+          key = :BIKING_PROFILE
+        end
+        [key, clm] || [:unknown, data]
+        rescue => e
+          puts "Error parsing CLM data: #{e.message}"
       end
-      [key, clm] || [:unkown, data]
     end
 
 
