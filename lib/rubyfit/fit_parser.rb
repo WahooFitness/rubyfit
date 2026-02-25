@@ -333,8 +333,8 @@ class RubyFit::FitFileParser
         workout_cloud_id = nil if workout_cloud_id == 0xFFFFFFFF
 
         raw = binary_data[workout_cloud_id_end + 1..]
-        raw += "\x00" if raw.bytesize < 4
-        plan_cloud_id = raw.unpack1('L<')
+        raw += "\x00" if raw && raw.bytesize < 4
+        plan_cloud_id = raw&.unpack1('L<')
         plan_cloud_id = nil if plan_cloud_id == 0xFFFFFFFF
 
 
