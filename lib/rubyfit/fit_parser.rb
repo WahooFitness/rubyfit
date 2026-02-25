@@ -403,7 +403,7 @@ class RubyFit::FitFileParser
           key = :BIKING_PROFILE
         end
         [key, clm] || [:unknown, data]
-        rescue => e
+      rescue => e
           puts "Error parsing CLM data: #{e.message}"
       end
     end
