@@ -332,7 +332,7 @@ class RubyFit::MessageWriter
         timestamp: { id: 0, type: RubyFit::Type.timestamp, required: false },
         device_index: { id: 1, type: RubyFit::Type.uint8, required: false },
         data_len: { id: 2, type: RubyFit::Type.uint8, required: true },
-        data: { id: 3, type: RubyFit::Type.byte_array(23), required: true }
+        data: { id: 3, type: RubyFit::Type.byte_array(35), required: true }
       }
     },
 
