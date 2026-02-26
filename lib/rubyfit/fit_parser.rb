@@ -48,7 +48,6 @@ class RubyFit::FitFileParser
       big_endian = unpack_directive == 'n'
       # Define the message type to look up
       type = RubyFit::MessageConstants::MESSAGE_TYPE.find { |key, value| value == fit_data.keys.first }
-      # puts("message type: #{fit_data.keys.first}")
       return unless type
       message_type = RubyFit::MessageConstants::MESSAGE_TYPE.find { |key, value| value == fit_data.keys.first }.first
       message_definition = RubyFit::MessageWriter::MESSAGE_DEFINITIONS[message_type]
@@ -107,7 +106,6 @@ class RubyFit::FitFileParser
       big_endian = unpack_directive == 'n'
       # Define the message type to look up
       type = RubyFit::MessageConstants::MESSAGE_TYPE.find { |key, value| value == fit_data.keys.first }
-      # puts("message type: #{fit_data.keys.first}")
       return unless type
       message_type = RubyFit::MessageConstants::MESSAGE_TYPE.find { |key, value| value == fit_data.keys.first }.first
       message_definition = RubyFit::MessageWriter::MESSAGE_DEFINITIONS[message_type]
@@ -467,11 +465,13 @@ class RubyFit::FitFileParser
           definition = get_definition(local_num)
           raise "Unknown definition for local number #{local_num}" unless definition
 
+          truncated = false
           values = {}
           definition[:fields].each do |field|
             value = buffer_io.read(field[:size])
             if value.nil? || value.size < field[:size]
               puts "Warning: Missing or incomplete field value for field ID #{field[:id]}"
+              truncated = true
               next
             end
             values[field[:id]] = value
@@ -482,6 +482,7 @@ class RubyFit::FitFileParser
             value = buffer_io.read(field[:size])
             if value.nil? || value.size < field[:size]
               puts "Warning: Missing or incomplete developer field value for field ID #{field[:id]}  at #{buffer_io.pos}"
+              truncated = true
               next
             end
             developer_values[field[:id]] = value
@@ -505,7 +506,12 @@ class RubyFit::FitFileParser
           original_data_info[definition[:global_message_number]] ||= []
           original_data_info[definition[:global_message_number]] << { start: record_start, length: buffer_io.pos - record_start }
 
-          if data.nil? && modified
+          if truncated
+            # The record was cut off mid-read. Exclude it from the repaired file so that
+            # bytes from any subsequently appended message are not mistakenly consumed as
+            # the remainder of this incomplete record during re-parsing.
+            invalid_offsets << { start: record_start, length: buffer_io.pos - record_start }
+          elsif data.nil? && modified
             # Record the offset and length of the invalid message
             invalid_offsets << { start: record_start, length: buffer_io.pos - record_start }
           elsif data && modified
@@ -617,8 +623,13 @@ class RubyFit::FitFileParser
       # Update the header with the new data size
       new_header = [header_size, protocol_version, profile_version, new_data_size, data_type].pack('C C v V a4')
 
-      new_header_crc = RubyFit::Helpers.update_crc(0, new_header)
-      new_header += [new_header_crc].pack('v')
+      # Only append a header CRC if the original file had a 14-byte header (header_size >= 14).
+      # A 12-byte header has no CRC field; writing one would shift the data start by 2 bytes
+      # while header_size still says 12, causing parse to read from the wrong offset.
+      if header_size >= 14
+        new_header_crc = RubyFit::Helpers.update_crc(0, new_header)
+        new_header += [new_header_crc].pack('v')
+      end
 
       # Recalculate the CRC for the modified data
       new_crc = RubyFit::Helpers.update_crc(0, new_header + modified_buffer)
