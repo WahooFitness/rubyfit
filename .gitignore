@@ -8,4 +8,5 @@ Makefile
 tmp/
 lib/rubyfit/rubyfit.bundle
 *.fit
+!test/fixtures/*.fit
 .DS_Store

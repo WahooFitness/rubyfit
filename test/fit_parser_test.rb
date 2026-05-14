@@ -383,6 +383,38 @@ class FitParserTest < Minitest::Test
     end
   end
 
+  def test_repair_backfills_spd_mps_from_enhanced_spd_mps
+    fit_file_path = 'test/fixtures/missing-spd-mps.fit'
+    new_fit_file_path = 'test/fixtures/missing-spd-mps-new.fit'
+    raw = IO.read(fit_file_path)
+
+    original_enhanced_by_sec = {}
+    RubyFit::FitFileParser.new.parse(raw) do |data|
+      (JSON.parse(data.to_json)['records'] || []).each do |r|
+        original_enhanced_by_sec[r['sec']] = r['enhanced_spd_mps'] unless r['enhanced_spd_mps'].nil?
+      end
+    end
+    refute_empty(original_enhanced_by_sec, 'expected fixture to have at least one record with enhanced_spd_mps')
+
+    RubyFit::FitFileParser.new.repair_fit_file(raw) do |data|
+      File.open(new_fit_file_path, 'wb') { |file| file.write(data) }
+    end
+
+    repaired = IO.read(new_fit_file_path)
+    RubyFit::FitFileParser.new.parse(repaired) do |data|
+      records = JSON.parse(data.to_json)['records']
+      refute_nil(records)
+      refute_empty(records)
+
+      records.each do |record|
+        original_enhanced = original_enhanced_by_sec[record['sec']]
+        next if original_enhanced.nil?
+        assert_equal(original_enhanced.round(1), record['spd_mps']&.round(1),
+                     "record at sec=#{record['sec']} should have spd_mps backfilled from enhanced_spd_mps")
+      end
+    end
+  end
+
   def test_repair_causing_invalid_field_error
     fit_file_path = 'test/fixtures/2025-06-19-070353-ELEMNT_ROAM_63BA-16-0.fit'
     new_fit_file_path = 'test/fixtures/2025-06-19-070353-ELEMNT_ROAM_63BA-16-0-new.fit'

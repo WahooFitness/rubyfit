@@ -137,6 +137,81 @@ class RubyFit::FitFileParser
       [valid_data, modified, parsed_data]
     end
 
+    # Backfill spd_mps from enhanced_spd_mps on a record. Two shapes are supported,
+    # both keeping the original definition's local_num so subsequent local-num
+    # bindings stay intact:
+    #   1. Record has both fields, spd_mps invalid: overwrite spd_mps bytes in place.
+    #   2. Record has enhanced_spd_mps but no spd_mps: convert each 4-byte enhanced
+    #      slot into a 2-byte spd_mps slot. The matching definition rewrite is
+    #      handled in repair_fit_file when the record definition is read.
+    # Returns nil when no patch applies.
+    def patch_record_spd_mps(record_header, values, developer_values, definition, unpack_directive)
+      has_spd_mps_field = definition[:fields].any? { |f| f[:id] == 6 }
+      enhanced_field = definition[:fields].find { |f| f[:id] == 73 }
+      return nil unless enhanced_field && values[73]
+
+      big_endian = unpack_directive == 'n'
+      enhanced_val = RubyFit::Type.enhanced_speed.bytes2val(values[73].bytes, big_endian: big_endian)
+
+      if has_spd_mps_field
+        return nil unless values[6]
+        spd_mps_val = RubyFit::Type.uint16_scale1000.bytes2val(values[6].bytes, big_endian: big_endian)
+        return nil unless spd_mps_val.nil? && !enhanced_val.nil?
+      end
+
+      scaled = enhanced_val.nil? ? 0xFFFF : (enhanced_val * 1000).to_i.clamp(0, 0xFFFE)
+      new_spd_bytes = [scaled].pack(big_endian ? 'n' : 'v')
+
+      out = String.new(encoding: 'ASCII-8BIT')
+      out << [record_header].pack('C')
+      definition[:fields].each do |field|
+        if has_spd_mps_field
+          out << (field[:id] == 6 ? new_spd_bytes : values[field[:id]])
+        else
+          # enhanced_spd_mps slot becomes the spd_mps slot (4 bytes -> 2 bytes).
+          out << (field[:id] == 73 ? new_spd_bytes : values[field[:id]])
+        end
+      end
+      (definition[:developer_fields] || []).each do |field|
+        out << developer_values[field[:id]]
+      end
+      out
+    end
+
+    # When a record's definition has enhanced_spd_mps (id 73) but no spd_mps (id 6),
+    # rewrite the definition message so the enhanced_spd_mps field descriptor is
+    # replaced with the spd_mps descriptor. Field descriptors are 3 bytes each, so
+    # the definition's byte length is unchanged. Each subsequent record will be
+    # shrunk by 2 bytes (4-byte uint32 -> 2-byte uint16) at the data-message stage.
+    # Returns nil when no rewrite applies.
+    def patch_record_definition_for_spd_mps(record_header, architecture, global_message_number, fields, developer_fields)
+      return nil unless global_message_number == 20
+      return nil if fields.any? { |f| f[:id] == 6 }
+      return nil unless fields.any? { |f| f[:id] == 73 }
+
+      big_endian = architecture == 1
+      new_fields = fields.map do |f|
+        f[:id] == 73 ? { id: 6, size: 2, type: 0x84 } : f
+      end
+
+      has_dev_fields = developer_fields && !developer_fields.empty?
+      header = 0x40 | (record_header & 0x0F)
+      header |= 0x20 if has_dev_fields
+
+      out = String.new(encoding: 'ASCII-8BIT')
+      out << [header].pack('C')
+      out << [0x00].pack('C')
+      out << [architecture].pack('C')
+      out << [global_message_number].pack(big_endian ? 'n' : 'v')
+      out << [new_fields.size].pack('C')
+      new_fields.each { |f| out << [f[:id], f[:size], f[:type]].pack('CCC') }
+      if has_dev_fields
+        out << [developer_fields.size].pack('C')
+        developer_fields.each { |f| out << [f[:id], f[:size], f[:type]].pack('CCC') }
+      end
+      out
+    end
+
     def parse(raw)
       all_data = {}
       io = StringIO.new(raw)
@@ -460,6 +535,11 @@ class RubyFit::FitFileParser
                                []
                              end
           definition_message(local_num, global_message_number, fields, developer_fields)
+
+          patched_def = patch_record_definition_for_spd_mps(record_header, architecture, global_message_number, fields, developer_fields)
+          if patched_def
+            modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: patched_def }
+          end
         else
           local_num = record_header & 0x0F
           definition = get_definition(local_num)
@@ -501,6 +581,14 @@ class RubyFit::FitFileParser
           end
           if definition[:global_message_number] == 65281
             processed_wahoo_id = true
+          end
+
+          if !truncated && definition[:global_message_number] == 20
+            patched = patch_record_spd_mps(record_header, values, developer_values, definition, unpack_directive)
+            if patched
+              data = patched
+              modified = true
+            end
           end
 
           original_data_info[definition[:global_message_number]] ||= []
