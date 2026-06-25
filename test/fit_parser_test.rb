@@ -435,4 +435,49 @@ class FitParserTest < Minitest::Test
       assert_equal(1, json_output['sessions'].size)
     end
   end
+
+  def test_patching_altitudes
+    fit_file_path = 'test/fixtures/no-elevation-data.fit'
+    new_fit_file_path = 'test/fixtures/added-elevation-data.fit'
+    raw = IO.read(fit_file_path)
+
+    # Baseline: parse the original file and grab its records.
+    original = nil
+    RubyFit::FitFileParser.new.parse(raw) { |data| original = data }
+    records = original[:records]
+    refute_empty records, "fixture should contain GPS records"
+
+    # Assign a known, distinct altitude (meters) to every record.
+    altitudes = records.each_index.map { |i| 100.0 + i }
+
+    # Patch the altitudes in place.
+    patched_raw = nil
+    RubyFit::FitFileParser.new.patch_altitudes(raw, altitudes) { |data| patched_raw = data }
+    refute_nil patched_raw
+
+    File.open(new_fit_file_path, 'wb') { |file| file.write(patched_raw) }
+
+    # The fixture's records have no altitude field, so patching appends one to the
+    # record definition (+3 bytes) and 2 bytes per record. The file must therefore
+    # grow by exactly 2 bytes per record (definition growth and the recomputed CRC
+    # net out separately, so assert the per-record portion at minimum).
+    assert_operator patched_raw.bytesize, :>=, raw.bytesize + 2 * records.size
+
+    # Re-parse the patched file and verify the new altitudes round-trip. FIT
+    # altitude has scale 5 (0.2 m resolution), so allow a small delta.
+    reparsed = nil
+    RubyFit::FitFileParser.new.parse(patched_raw) { |data| reparsed = data }
+    new_records = reparsed[:records]
+    puts("new records: #{new_records.inspect}")
+
+    assert_equal records.size, new_records.size
+    new_records.each_with_index do |record, i|
+      assert_in_delta altitudes[i], record[:alt_m], 0.2, "record #{i} altitude was not patched"
+    end
+
+    # Non-altitude fields must be preserved untouched.
+    assert_equal records.first[:lat_deg], new_records.first[:lat_deg]
+    assert_equal records.last[:lon_deg],  new_records.last[:lon_deg]
+    assert_equal records.first[:timestamp], new_records.first[:timestamp]
+  end
 end

@@ -212,6 +212,196 @@ class RubyFit::FitFileParser
       out
     end
 
+    # Overwrite the altitude field in a single record (global msg 20) data message
+    # with new_alt_m (meters), preserving the rest of the record byte-for-byte.
+    # Mirrors patch_record_spd_mps. Prefers enhanced_altitude (id 78, uint32) and
+    # falls back to altitude (id 2, uint16); both use FIT scale 5 / offset 500, so
+    # raw = (meters + 500) * 5. Field sizes come from the definition, so the record
+    # length is unchanged. Returns nil when the record has no altitude field or
+    # new_alt_m is nil.
+    def patch_record_alt_m(record_header, values, developer_values, definition, unpack_directive, new_alt_m)
+      return nil if new_alt_m.nil?
+
+      target = definition[:fields].find { |f| f[:id] == 78 } ||
+        definition[:fields].find { |f| f[:id] == 2 }
+      return nil unless target && values[target[:id]]
+
+      big_endian = unpack_directive == 'n'
+      raw = ((new_alt_m + 500) * 5).round
+      new_bytes = if target[:id] == 78
+                    [raw.clamp(0, 0xFFFFFFFE)].pack(big_endian ? 'N' : 'V')
+                  else
+                    [raw.clamp(0, 0xFFFE)].pack(big_endian ? 'n' : 'v')
+                  end
+
+      out = String.new(encoding: 'ASCII-8BIT')
+      out << [record_header].pack('C')
+      definition[:fields].each do |field|
+        out << (field[:id] == target[:id] ? new_bytes : values[field[:id]])
+      end
+      (definition[:developer_fields] || []).each do |field|
+        out << developer_values[field[:id]]
+      end
+      out
+    end
+
+    # Encode new_alt_m (meters) as the 2-byte altitude raw value (FIT uint16,
+    # scale 5 / offset 500: raw = (meters + 500) * 5), clamped below the 0xFFFF
+    # invalid sentinel. big_endian follows the record's architecture.
+    def encode_alt_m_bytes(new_alt_m, big_endian)
+      raw = ((new_alt_m + 500) * 5).round.clamp(0, 0xFFFE)
+      [raw].pack(big_endian ? 'n' : 'v')
+    end
+
+    # Append an altitude field descriptor (id 2, uint16, 2 bytes) to a record
+    # (global msg 20) definition message that has no altitude field, so each
+    # subsequent record can carry a patched altitude. Field descriptors are 3
+    # bytes, so the definition grows by 3 bytes and each data record grows by 2.
+    # Returns the rewritten definition bytes.
+    def append_altitude_to_definition(record_header, architecture, global_message_number, fields, developer_fields)
+      big_endian = architecture == 1
+      new_fields = fields + [{ id: 2, size: 2, type: 0x84 }]
+      has_dev_fields = developer_fields && !developer_fields.empty?
+
+      header = 0x40 | (record_header & 0x0F)
+      header |= 0x20 if has_dev_fields
+
+      out = String.new(encoding: 'ASCII-8BIT')
+      out << [header].pack('C')
+      out << [0x00].pack('C')
+      out << [architecture].pack('C')
+      out << [global_message_number].pack(big_endian ? 'n' : 'v')
+      out << [new_fields.size].pack('C')
+      new_fields.each { |f| out << [f[:id], f[:size], f[:type]].pack('CCC') }
+      if has_dev_fields
+        out << [developer_fields.size].pack('C')
+        developer_fields.each { |f| out << [f[:id], f[:size], f[:type]].pack('CCC') }
+      end
+      out
+    end
+
+    # Rebuild a record (global msg 20) data message whose definition was augmented
+    # with a trailing altitude field, appending the 2-byte altitude for new_alt_m.
+    # The original field bytes are preserved; the altitude bytes are inserted after
+    # the regular fields and before any developer fields, matching the augmented
+    # definition's field order. Returns nil when new_alt_m is nil.
+    def append_record_alt_m(record_header, values, developer_values, definition, big_endian, new_alt_m)
+      return nil if new_alt_m.nil?
+
+      out = String.new(encoding: 'ASCII-8BIT')
+      out << [record_header].pack('C')
+      definition[:fields].each { |field| out << values[field[:id]] }
+      out << encode_alt_m_bytes(new_alt_m, big_endian)
+      (definition[:developer_fields] || []).each { |field| out << developer_values[field[:id]] }
+      out
+    end
+
+    # Set per-record altitude using altitudes[i] (meters) for the i-th record
+    # (global msg 20) in stream order; nil entries leave that record unchanged.
+    # When a record definition already carries an altitude field the value is
+    # overwritten in place; when it has none, an altitude field is appended to the
+    # definition (and 2 bytes to each record), so the file grows. Everything else
+    # is preserved. Yields the rewritten raw bytes. Record indexing matches #parse:
+    # only normal data-message records are counted.
+    def patch_altitudes(raw, altitudes)
+      modified_messages = []
+      record_index = 0
+      # Per-local-number state for global-msg-20 definitions: :inplace when the
+      # definition already has an altitude field, :append when we add one. The
+      # architecture is tracked so appended altitude bytes match endianness.
+      altitude_mode = {}
+      architecture_by_local = {}
+
+      io = StringIO.new(raw)
+      header = io.read(12)
+      raise "Invalid FIT file: unable to read header" unless header && header.size == 12
+
+      header_size, _protocol_version, _profile_version, data_size, data_type = header.unpack('C C v V a4')
+      raise "Invalid FIT file: invalid data type" unless data_type == ".FIT"
+
+      io.seek(header_size) if io.pos < header_size
+
+      unpack_directive = 'v'
+      buffer = io.read(header_size + data_size - io.pos)
+      buffer_io = StringIO.new(buffer)
+
+      while buffer_io.pos < buffer.size
+        record_start = buffer_io.pos
+        record_header = buffer_io.read(1)&.unpack1('C')
+        raise "Invalid FIT file: unable to read record header" unless record_header
+
+        if record_header & 0x80 == 0x80
+          # Compressed-timestamp data message: consume its bytes; not counted as a
+          # record by #parse, so do not touch record_index or patch it.
+          local_num = (record_header & 0x60) >> 5
+          definition = get_definition(local_num)
+          definition[:fields].each { |field| buffer_io.read(field[:size]) }
+        elsif record_header & 0x40 == 0x40
+          local_num = record_header & 0x0F
+          _reserved, architecture = buffer_io.read(2).unpack('C C')
+          unpack_directive = 'n' if architecture == 1
+          global_message_number, field_count = buffer_io.read(3).unpack("#{unpack_directive} C")
+
+          fields = field_count.times.map do
+            field_def = buffer_io.read(3).unpack('C*')
+            { id: field_def[0], size: field_def[1], type: field_def[2] }
+          end
+          developer_fields = if record_header & 0x20 == 0x20
+                               dev_count = buffer_io.read(1).unpack1('C')
+                               dev_count.times.map do
+                                 fd = buffer_io.read(3).unpack('C*')
+                                 { id: fd[0], size: fd[1], type: fd[2] }
+                               end
+                             else
+                               []
+                             end
+
+          # Register the original (unmodified) definition so the record bytes
+          # following it are read with the layout actually present in the file.
+          definition_message(local_num, global_message_number, fields, developer_fields)
+
+          if global_message_number == 20
+            architecture_by_local[local_num] = architecture
+            has_altitude = fields.any? { |f| f[:id] == 78 || f[:id] == 2 }
+            if has_altitude
+              altitude_mode[local_num] = :inplace
+            else
+              altitude_mode[local_num] = :append
+              new_def = append_altitude_to_definition(record_header, architecture, global_message_number, fields, developer_fields)
+              modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: new_def }
+            end
+          else
+            altitude_mode[local_num] = nil
+          end
+        else
+          local_num = record_header & 0x0F
+          definition = get_definition(local_num)
+          raise "Unknown definition for local number #{local_num}" unless definition
+
+          values = {}
+          definition[:fields].each { |field| values[field[:id]] = buffer_io.read(field[:size]) }
+          developer_values = {}
+          (definition[:developer_fields] || []).each { |field| developer_values[field[:id]] = buffer_io.read(field[:size]) }
+
+          if definition[:global_message_number] == 20
+            new_alt_m = altitudes[record_index]
+            patched = if altitude_mode[local_num] == :append
+                        big_endian = architecture_by_local[local_num] == 1
+                        append_record_alt_m(record_header, values, developer_values, definition, big_endian, new_alt_m)
+                      else
+                        patch_record_alt_m(record_header, values, developer_values, definition, unpack_directive, new_alt_m)
+                      end
+            record_index += 1
+            if patched
+              modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: patched }
+            end
+          end
+        end
+      end
+
+      yield edit_fit_file_raw(raw, [], modified_messages, [])
+    end
+
     def parse(raw)
       all_data = {}
       io = StringIO.new(raw)
