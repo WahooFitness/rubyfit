@@ -296,20 +296,26 @@ class RubyFit::FitFileParser
       out
     end
 
-    # Set per-record altitude using altitudes[i] (meters) for the i-th record
-    # (global msg 20) in stream order; nil entries leave that record unchanged.
-    # When a record definition already carries an altitude field the value is
-    # overwritten in place; when it has none, an altitude field is appended to the
-    # definition (and 2 bytes to each record), so the file grows. Everything else
-    # is preserved. Yields the rewritten raw bytes. Record indexing matches #parse:
-    # only normal data-message records are counted.
-    def patch_altitudes(raw, altitudes)
+    # Set per-record altitude (msg 20) and session/lap total ascent/descent
+    # (msg 18 fields 22/23, msg 19 fields 21/22) in a single pass.
+    #   * altitudes[i] (meters)            -> i-th record
+    #   * session_totals[i] = [asc_m, desc_m] -> i-th session
+    #   * lap_totals[i]     = [asc_m, desc_m] -> i-th lap
+    # Each array is aligned to its message type's stream order; nil leaves a
+    # message unchanged. When a definition already carries the target field(s) the
+    # value is overwritten in place; when it has none, the field(s) are appended to
+    # the definition (and bytes to each message), so the file grows. Everything
+    # else is preserved. Record indexing matches #parse (only normal data-message
+    # records are counted). Yields the rewritten raw bytes.
+    def patch_altitudes(raw, altitudes, session_totals: [], lap_totals: [])
       modified_messages = []
       record_index = 0
-      # Per-local-number state for global-msg-20 definitions: :inplace when the
-      # definition already has an altitude field, :append when we add one. The
-      # architecture is tracked so appended altitude bytes match endianness.
+      session_index = 0
+      lap_index = 0
+      # Per-local-number state. altitude_mode: :inplace/:append/nil. totals_spec:
+      # {ascent_id:, descent_id:, missing:[ids appended to the definition]} or nil.
       altitude_mode = {}
+      totals_spec_by_local = {}
       architecture_by_local = {}
 
       io = StringIO.new(raw)
@@ -356,12 +362,14 @@ class RubyFit::FitFileParser
                                []
                              end
 
-          # Register the original (unmodified) definition so the record bytes
+          # Register the original (unmodified) definition so the data bytes
           # following it are read with the layout actually present in the file.
           definition_message(local_num, global_message_number, fields, developer_fields)
 
-          if global_message_number == 20
+          case global_message_number
+          when 20
             architecture_by_local[local_num] = architecture
+            totals_spec_by_local[local_num] = nil
             has_altitude = fields.any? { |f| f[:id] == 78 || f[:id] == 2 }
             if has_altitude
               altitude_mode[local_num] = :inplace
@@ -370,8 +378,20 @@ class RubyFit::FitFileParser
               new_def = append_altitude_to_definition(record_header, architecture, global_message_number, fields, developer_fields)
               modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: new_def }
             end
+          when 18, 19
+            altitude_mode[local_num] = nil
+            architecture_by_local[local_num] = architecture
+            ascent_id, descent_id = global_message_number == 18 ? [22, 23] : [21, 22]
+            present = [ascent_id, descent_id].select { |id| fields.any? { |f| f[:id] == id } }
+            missing = [ascent_id, descent_id] - present
+            totals_spec_by_local[local_num] = { ascent_id: ascent_id, descent_id: descent_id, missing: missing }
+            if missing.any?
+              new_def = append_totals_to_definition(record_header, architecture, global_message_number, fields, developer_fields, missing)
+              modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: new_def }
+            end
           else
             altitude_mode[local_num] = nil
+            totals_spec_by_local[local_num] = nil
           end
         else
           local_num = record_header & 0x0F
@@ -395,11 +415,89 @@ class RubyFit::FitFileParser
             if patched
               modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: patched }
             end
+          elsif definition[:global_message_number] == 18 || definition[:global_message_number] == 19
+            is_session = definition[:global_message_number] == 18
+            totals = is_session ? session_totals[session_index] : lap_totals[lap_index]
+            if is_session
+              session_index += 1
+            else
+              lap_index += 1
+            end
+
+            spec = totals_spec_by_local[local_num]
+            # In append mode every message of this local type MUST emit the appended
+            # bytes (even when totals is nil -> invalid sentinel) to keep the layout
+            # consistent with the rewritten definition.
+            if spec && (spec[:missing].any? || totals)
+              big_endian = architecture_by_local[local_num] == 1
+              patched = patch_record_totals(record_header, values, developer_values, definition, big_endian, spec, totals && totals[0], totals && totals[1])
+              if patched
+                modified_messages << { start: record_start, length: buffer_io.pos - record_start, new_data: patched }
+              end
+            end
           end
         end
       end
 
       yield edit_fit_file_raw(raw, [], modified_messages, [])
+    end
+
+    # Set total_ascent/total_descent (meters, uint16 scale 1) on a session/lap
+    # data message. Fields already in the definition are overwritten in place;
+    # fields in spec[:missing] (appended to the definition by
+    # append_totals_to_definition) are appended here, in the same order, so the
+    # data layout matches. A nil value writes the FIT invalid sentinel for an
+    # appended field, and is left unchanged for an in-place field. Returns new
+    # bytes, or nil when nothing changed.
+    def patch_record_totals(record_header, values, developer_values, definition, big_endian, spec, ascent_m, descent_m)
+      pack = big_endian ? 'n' : 'v'
+      meters_by_id = { spec[:ascent_id] => ascent_m, spec[:descent_id] => descent_m }
+
+      replacements = {}
+      appended = []
+      meters_by_id.each do |id, meters|
+        if spec[:missing].include?(id)
+          raw = meters ? meters.round.clamp(0, 0xFFFE) : 0xFFFF
+          appended << [raw].pack(pack)
+        elsif meters && values[id]
+          replacements[id] = [meters.round.clamp(0, 0xFFFE)].pack(pack)
+        end
+      end
+
+      return nil if replacements.empty? && appended.empty?
+
+      out = String.new(encoding: 'ASCII-8BIT')
+      out << [record_header].pack('C')
+      definition[:fields].each { |field| out << (replacements[field[:id]] || values[field[:id]]) }
+      appended.each { |bytes| out << bytes }
+      (definition[:developer_fields] || []).each { |field| out << developer_values[field[:id]] }
+      out
+    end
+
+    # Rewrite a session/lap definition message to append uint16 (type 0x84)
+    # descriptors for the given missing field ids (total_ascent/total_descent),
+    # mirroring append_altitude_to_definition. 3 bytes per descriptor; each data
+    # message of this local type then grows by 2 bytes per appended field.
+    def append_totals_to_definition(record_header, architecture, global_message_number, fields, developer_fields, missing_ids)
+      big_endian = architecture == 1
+      new_fields = fields + missing_ids.map { |id| { id: id, size: 2, type: 0x84 } }
+
+      has_dev_fields = developer_fields && !developer_fields.empty?
+      header = 0x40 | (record_header & 0x0F)
+      header |= 0x20 if has_dev_fields
+
+      out = String.new(encoding: 'ASCII-8BIT')
+      out << [header].pack('C')
+      out << [0x00].pack('C')
+      out << [architecture].pack('C')
+      out << [global_message_number].pack(big_endian ? 'n' : 'v')
+      out << [new_fields.size].pack('C')
+      new_fields.each { |f| out << [f[:id], f[:size], f[:type]].pack('CCC') }
+      if has_dev_fields
+        out << [developer_fields.size].pack('C')
+        developer_fields.each { |f| out << [f[:id], f[:size], f[:type]].pack('CCC') }
+      end
+      out
     end
 
     def parse(raw)

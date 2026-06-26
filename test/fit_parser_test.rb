@@ -441,43 +441,64 @@ class FitParserTest < Minitest::Test
     new_fit_file_path = 'test/fixtures/added-elevation-data.fit'
     raw = IO.read(fit_file_path)
 
-    # Baseline: parse the original file and grab its records.
+    # Baseline: parse the original file and grab its records, sessions, laps.
     original = nil
     RubyFit::FitFileParser.new.parse(raw) { |data| original = data }
-    records = original[:records]
+    records  = original[:records]
+    sessions = Array(original[:sessions])
+    laps     = Array(original[:laps])
     refute_empty records, "fixture should contain GPS records"
 
-    # Assign a known, distinct altitude (meters) to every record.
-    altitudes = records.each_index.map { |i| 100.0 + i }
+    # Assign known, distinct values: altitude per record, and [ascent, descent]
+    # (meters) per session and per lap.
+    altitudes      = records.each_index.map  { |i| 100.0 + i }
+    session_totals = sessions.each_index.map { |i| [1000 + i, 2000 + i] }
+    lap_totals     = laps.each_index.map     { |i| [10 + i, 20 + i] }
 
-    # Patch the altitudes in place.
+    # Patch altitude + session/lap totals in one pass.
     patched_raw = nil
-    RubyFit::FitFileParser.new.patch_altitudes(raw, altitudes) { |data| patched_raw = data }
+    RubyFit::FitFileParser.new.patch_altitudes(
+      raw, altitudes, session_totals: session_totals, lap_totals: lap_totals
+    ) { |data| patched_raw = data }
     refute_nil patched_raw
 
     File.open(new_fit_file_path, 'wb') { |file| file.write(patched_raw) }
 
     # The fixture's records have no altitude field, so patching appends one to the
-    # record definition (+3 bytes) and 2 bytes per record. The file must therefore
-    # grow by exactly 2 bytes per record (definition growth and the recomputed CRC
-    # net out separately, so assert the per-record portion at minimum).
+    # record definition (+3 bytes) and 2 bytes per record; laps likewise gain
+    # appended total fields. The file must grow by at least the per-record portion.
     assert_operator patched_raw.bytesize, :>=, raw.bytesize + 2 * records.size
 
-    # Re-parse the patched file and verify the new altitudes round-trip. FIT
-    # altitude has scale 5 (0.2 m resolution), so allow a small delta.
+    # Re-parse the patched file and verify everything round-trips.
     reparsed = nil
     RubyFit::FitFileParser.new.parse(patched_raw) { |data| reparsed = data }
-    new_records = reparsed[:records]
-    puts("new records: #{new_records.inspect}")
+    new_records  = reparsed[:records]
+    new_sessions = Array(reparsed[:sessions])
+    new_laps     = Array(reparsed[:laps])
 
+    # Altitude — FIT scale 5 (0.2 m resolution), so allow a small delta.
     assert_equal records.size, new_records.size
     new_records.each_with_index do |record, i|
       assert_in_delta altitudes[i], record[:alt_m], 0.2, "record #{i} altitude was not patched"
     end
 
+    # Session totals — uint16 scale 1, exact round-trip.
+    assert_equal sessions.size, new_sessions.size
+    new_sessions.each_with_index do |session, i|
+      assert_equal session_totals[i][0], session[:tot_ascent_m],  "session #{i} ascent not patched"
+      assert_equal session_totals[i][1], session[:tot_descent_m], "session #{i} descent not patched"
+    end
+
+    # Lap totals — appended fields, exact round-trip.
+    assert_equal laps.size, new_laps.size
+    new_laps.each_with_index do |lap, i|
+      assert_equal lap_totals[i][0], lap[:tot_ascent_m],  "lap #{i} ascent not patched"
+      assert_equal lap_totals[i][1], lap[:tot_descent_m], "lap #{i} descent not patched"
+    end
+
     # Non-altitude fields must be preserved untouched.
-    assert_equal records.first[:lat_deg], new_records.first[:lat_deg]
-    assert_equal records.last[:lon_deg],  new_records.last[:lon_deg]
+    assert_equal records.first[:lat_deg],   new_records.first[:lat_deg]
+    assert_equal records.last[:lon_deg],    new_records.last[:lon_deg]
     assert_equal records.first[:timestamp], new_records.first[:timestamp]
   end
 end
