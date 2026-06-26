@@ -1,0 +1,42 @@
+{
+  "id": 49877007,
+  "url": "https://ridewithgps.com/api/v1/routes/49877007.json",
+  "name": "Test",
+  "visibility": "private",
+  "description": "",
+  "locality": "Cobb County",
+  "administrative_area": "GA",
+  "country_code": "US",
+  "distance": 536,
+  "elevation_gain": 12,
+  "elevation_loss": 0,
+  "first_lat": 34.03497,
+  "first_lng": -84.59215,
+  "last_lat": 34.03852,
+  "last_lng": -84.6307,
+  "sw_lat": 34.03497,
+  "sw_lng": -84.59529,
+  "ne_lat": 34.03864,
+  "ne_lng": -84.59196,
+  "track_type": "point_to_point",
+  "terrain": "climbing",
+  "difficulty": "casual",
+  "unpaved_pct": 0,
+  "surface": "paved",
+  "activity_types": ["cycling"],
+  "created_at": "2025-03-05T14:42:55Z",
+  "updated_at": "2025-03-05T14:42:55Z",
+  "track_points": [
+    {"lon_deg": -84.59215, "lat_deg": 34.03497, "alt_m": 321.7, "dist_m": 0.0, "S": 0, "R": 6, "timestamp": 1111065857},
+    {"lon_deg": -84.59196, "lat_deg": 34.03507, "alt_m": 322.7, "dist_m": 20.7, "S": 1, "R": 4, "timestamp": 1111065857},
+    {"lon_deg": -84.5925, "lat_deg": 34.03574, "alt_m": 324.4, "dist_m": 110.4, "S": 1, "R": 4, "timestamp": 1111065857}
+  ],
+  "points_of_interest": [],
+  "ascent": 12,
+  "sport_code": 2,
+  "file_id": {
+    "manufacturer_code": 15,
+    "product": 9001,
+    "manufacturer": "Garmin"
+  }
+}

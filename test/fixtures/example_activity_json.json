@@ -1,0 +1,258 @@
+{
+  "name": "Morning Run",
+  "manufacturer": 2,
+  "tot_dist_m": 5875.6,
+  "total_moving_time": 2310,
+  "total_elapsed_time": 2321,
+  "tot_timer_time_sec": 2309,
+  "total_ascent": 46.0,
+  "type": "running",
+  "sport": "generic",
+  "sub_sport": "generic",
+  "workout_type": null,
+  "id": 13912150324,
+  "start_time": 1111065857,
+  "timestamp": 1111065857,
+  "local_timestamp": 1111065857,
+  "start_time_local": "2025-03-16T08:24:17Z",
+  "timezone": "(GMT-06:00) America/Chicago",
+  "utc_offset": -18000.0,
+  "first_lng": -94.68175,
+  "first_lat": 38.998181,
+  "last_lat": 38.998181,
+  "last_lng": -94.68175,
+  "average_speed": 2.544,
+  "max_speed": 3.5,
+  "avg_cadence": 81.2,
+  "avg_power": 154.1,
+  "max_power": 212,
+  "normalized_power": 154,
+  "device_watts": true,
+  "kilojoules": 355.9,
+  "has_heartrate": false,
+  "heartrate_opt_out": false,
+  "display_hide_heartrate_option": false,
+  "elev_high": 330.0,
+  "elev_low": 305.0,
+  "upload_id": 14849573752,
+  "upload_id_str": "14849573752",
+  "external_id": "stripped_467683584539394059.fit",
+  "from_accepted_tag": false,
+  "pr_count": 0,
+  "total_photo_count": 0,
+  "has_kudoed": false,
+  "description": "",
+  "total_calories": 275.0,
+  "perceived_exertion": null,
+  "prefer_perceived_exertion": null,
+  "laps": [
+    {
+      "id": 49308517261,
+      "timestamp": 1111065857,
+      "name": "Lap 1",
+      "tot_elapsed_time_sec": 645,
+      "total_moving_time": 645,
+      "tot_timer_time_sec": 645,
+      "start_time": 1111065857,
+      "start_date_local": 1111065857,
+      "tot_dist_m": 1609,
+      "tot_cal": 275,
+      "avg_speed": 2.5,
+      "max_speed": 3.4,
+      "lap_index": 1,
+      "split": 1,
+      "start_index": 0,
+      "end_index": 207,
+      "tot_ascent_m": 23,
+      "avg_cadence": 81,
+      "device_watts": true,
+      "avg_power": 156,
+      "pace_zone": 0,
+      "sport": "generic",
+      "sub_sport": "generic",
+      "event": "lap",
+      "event_type": "stop",
+      "lap_trigger": "manual"
+    },
+    {
+      "id": 49308517263,
+      "timestamp": 1111066857,
+      "resource_state": 2,
+      "name": "Lap 2",
+      "tot_elapsed_time_sec": 650,
+      "total_moving_time": 650,
+      "tot_timer_time_sec": 650,
+      "start_time": 1111066857,
+      "start_time_local": 1111065857,
+      "tot_dist_m": 1609.3,
+      "tot_cal": 275,
+      "avg_spd_mps": 2.48,
+      "max_spd_mps": 3.2,
+      "lap_index": 2,
+      "split": 2,
+      "start_index": 208,
+      "end_index": 857,
+      "tot_ascent_m": 7,
+      "avg_cadence": 79,
+      "device_watts": true,
+      "avg_power": 146,
+      "pace_zone": 0,
+      "sport": "generic",
+      "sub_sport": "generic",
+      "event": "lap",
+      "event_type": "stop",
+      "lap_trigger": "manual",
+      "time_in_hr_zone_sec": [
+        202.88,
+        46.528,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_in_pwr_zone_sec": [
+        205.307,
+        2.88,
+        35.999,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "device_infos": [
+    {
+      "timestamp": 1111065857,
+      "manufacturer_code": 265,
+      "device_name": "COROS APEX",
+      "serial_number": 1234,
+      "manufacturer": 2,
+      "product": 0,
+      "software_version": 0,
+      "hardware_version": 0,
+      "battery_voltage": 0,
+      "device_index": 0,
+      "product_name": "Product Name"
+    }
+  ],
+  "sessions": [
+    {
+      "timestamp": 1111065857,
+      "start_time": 1111065857,
+      "tot_dist_m": 5875,
+      "total_moving_time": 2310,
+      "total_elapsed_time": 2321,
+      "tot_timer_time_sec": 2309,
+      "tot_ascent_m": 46,
+      "start_time_local": "2025-03-16T08:24:17Z",
+      "timezone": "(GMT-06:00) America/Chicago",
+      "utc_offset": -18000.0,
+      "first_lng": -94.68175,
+      "first_lat": 38.998181,
+      "last_lat": 38.998181,
+      "last_lng": -94.68175,
+      "average_speed": 2.544,
+      "max_speed": 3.5,
+      "avg_cad_rpm": 81,
+      "avg_pwr_watts": 154,
+      "max_pwr_watts": 212,
+      "norm_pwr_watts": 154,
+      "tot_cal": 275,
+      "event": "session",
+      "event_type": "stop",
+      "sport": "generic",
+      "sub_sport": "generic",
+      "time_in_hr_zone_sec": [
+        202.88,
+        46.528,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_in_pwr_zone_sec": [
+        205.307,
+        2.88,
+        35.999,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "records": [
+    {
+      "timestamp": 1111065857,
+      "lat_deg": 38.998180,
+      "lon_deg": -94.681747,
+      "dist_m": 0,
+      "alt_m": 309,
+      "hr_bpm": 0,
+      "cad_rpm": 0,
+      "pwr_watts": 0,
+      "cal": 0,
+      "enhanced_spd_mps": 0,
+      "batt_soc_perc": 0,
+      "grade_perc": 0
+    },
+    {
+      "timestamp": 1111065857,
+      "lat_deg": 38.998180,
+      "lon_deg": -94.681747,
+      "dist_m": 20,
+      "alt_m": 309,
+      "hr_bpm": 120,
+      "cad_rpm": 81,
+      "pwr_watts": 185,
+      "cal": 100,
+      "enhanced_spd_mps": 20,
+      "batt_soc_perc": 30,
+      "grade_perc": 5
+    }
+  ],
+  "hr_zones": [
+    {
+      "high_hr_bpm": 118,
+      "name": "Zone 0"
+    },
+    {
+      "high_hr_bpm": 147,
+      "name": "Zone 1"
+    }
+  ],
+  "power_zones": [
+    {
+      "high_pwr_watts": 68,
+      "name": "Zone 0"
+    },
+    {
+      "high_pwr_watts": 87,
+      "name": "Zone 1"
+    }
+  ],
+
+  "wahoo_id": {
+    "app_token": "WAHOOAPPIOS62BB",
+    "workout_num": 3,
+    "workout_type": 12
+  },
+
+  "wahoo_custom_nums": [
+    {
+      "value": 124,
+      "sub_type_code": 1,
+      "type_code": 0
+    }
+  ],
+
+  "wahoo_clms": [
+    {
+      "timestamp": 1104849057,
+      "device_index": 255,
+      "data_len": 26,
+      "data": [53,0,5,52,50,57,52,57,54,55,50,57,53,0,0,14,0,255,255,255,255,0,255,255,255,255]
+    }
+  ]
+}

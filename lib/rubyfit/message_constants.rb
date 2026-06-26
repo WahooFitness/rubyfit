@@ -26,7 +26,10 @@ module RubyFit::MessageConstants
     sharp_right: 22,
     u_turn: 23,
     segment_start: 24,
-    segment_end: 25
+    segment_end: 25,
+    checkpoint: 35,
+    toilet: 39,
+    info: 53
   }.freeze
 
   EVENT_TYPE = {
@@ -79,5 +82,468 @@ module RubyFit::MessageConstants
     elev_high_alert: 45, # Group 0.  Start / stop when in alert condition.
     elev_low_alert: 46, # Group 0.  Start / stop when in alert condition.
     comm_timeout: 47, # marker
+  }.freeze
+
+  SPORT = {
+    generic: 0,
+    running: 1,
+    cycling: 2,
+    transition: 3,
+    fitness_equipment: 4,
+    swimming: 5,
+    basketball: 6,
+    soccer: 7,
+    tennis: 8,
+    american_football: 9,
+    training: 10,
+    walking: 11,
+    cross_country_skiing: 12,
+    alpine_skiing: 13,
+    snowboarding: 14,
+    rowing: 15,
+    mountaineering: 16,
+    hiking: 17,
+    multisport: 18,
+    paddling: 19,
+    flying: 20,
+    e_biking: 21,
+    motorcycling: 22,
+    boating: 23,
+    driving: 24,
+    golf: 25,
+    hang_gliding: 26,
+    horseback_riding: 27,
+    hunting: 28,
+    fishing: 29,
+    inline_skating: 30,
+    rock_climbing: 31,
+    sailing: 32,
+    ice_skating: 33,
+    sky_diving: 34,
+    snowshoeing: 35,
+    snowmobiling: 36,
+    stand_up_paddleboarding: 37,
+    surfing: 38,
+    wakeboarding: 39,
+    water_skiing: 40,
+    kayaking: 41,
+    rafting: 42,
+    windsurfing: 43,
+    kitesurfing: 44,
+    tactical: 45,
+    jumpmaster: 46,
+    boxing: 47,
+    floor_climbing: 48,
+    baseball: 49,
+    diving: 53,
+    hiit: 62,
+    racket: 64,
+    wheelchair_push_walk: 65,
+    wheelchair_push_run: 66,
+    meditation: 67,
+    disc_golf: 69,
+    cricket: 71,
+    rugby: 72,
+    hockey: 73,
+    lacrosse: 74,
+    volleyball: 75,
+    water_tubing: 76,
+    wakesurfing: 77,
+    mixed_martial_arts: 80,
+    snorkeling: 82,
+    dance: 83,
+    jump_rope: 84,
+    all: 254
+  }.freeze
+
+  SUBSPORT = {
+    generic: 0,
+    treadmill: 1,
+    street: 2,
+    trail: 3,
+    track: 4,
+    spin: 5,
+    indoor_cycling: 6,
+    road: 7,
+    mountain: 8,
+    downhill: 9,
+    recumbent: 10,
+    cyclocross: 11,
+    hand_cycling: 12,
+    track_cycling: 13,
+    indoor_rowing: 14,
+    elliptical: 15,
+    stair_climbing: 16,
+    lap_swimming: 17,
+    open_water: 18,
+    flexibility_training: 19,
+    strength_training: 20,
+    warm_up: 21,
+    match: 22,
+    exercise: 23,
+    challenge: 24,
+    indoor_skiing: 25,
+    cardio_training: 26,
+    indoor_walking: 27,
+    e_bike_fitness: 28,
+    bmx: 29,
+    casual_walking: 30,
+    speed_walking: 31,
+    bike_to_run_transition: 32,
+    run_to_bike_transition: 33,
+    swim_to_bike_transition: 34,
+    atv: 35,
+    motocross: 36,
+    backcountry: 37,
+    resort: 38,
+    rc_drone: 39,
+    wingsuit: 40,
+    whitewater: 41,
+    skate_skiing: 42,
+    yoga: 43,
+    pilates: 44,
+    indoor_running: 45,
+    gravel_cycling: 46,
+    e_bike_mountain: 47,
+    communting: 48,
+    mixed_surface: 49,
+    navigate: 50,
+    track_me: 51,
+    map: 52,
+    single_gas_diving: 53,
+    multi_gas_diving: 54,
+    gauge_diving: 55,
+    apnea_diving: 56,
+    apnea_hunting: 57,
+    virtual_activity: 58,
+    obstacle: 59,
+    breathing: 62,
+    sail_race: 65,
+    ultra: 67,
+    indoor_climbing: 68,
+    bouldering: 69,
+    all: 254
+  }.freeze
+
+  DISPLAY_MEASURE = {
+    metric: 0,
+    stature: 1,
+    nautical: 2
+  }.freeze
+
+  DURATION_TYPE = {
+    time: 0,
+    distance: 1,
+    hr_less_than: 2,
+    hr_greater_than: 3,
+    calories: 4,
+    open: 5,
+    repeat_until_steps_cmplt: 6,
+    repeat_until_time: 7,
+    repeat_until_distance: 8,
+    repeat_until_calories: 9,
+    repeat_until_hr_less_than: 10,
+    repeat_until_hr_greater_than: 11,
+    repeat_until_power_less_than: 12,
+    repeat_until_power_greater_than: 13,
+    power_less_than: 14,
+    power_greater_than: 15,
+    training_peaks_tss: 16,
+    repeat_until_power_last_lap_less_than: 17,
+    repeat_until_max_power_last_lap_less_than: 18,
+    power_3s_less_than: 19,
+    power_10s_less_than: 20,
+    power_30s_less_than: 21,
+    power_3s_greater_than: 22,
+    power_10s_greater_than: 23,
+    power_30s_greater_than: 24,
+    power_lap_less_than: 25,
+    power_lap_greater_than: 26,
+    repeat_until_training_peaks_tss: 27,
+    repetition_time: 28,
+    reps: 29,
+    time_only: 31
+  }.freeze
+
+  TARGET_TYPE = {
+    speed: 0,
+    heart_rate: 1,
+    open: 2,
+    cadence: 3,
+    power: 4,
+    grade: 5,
+    resistance: 6,
+    power_3s: 7,
+    power_10s: 8,
+    power_30s: 9,
+    power_lap: 10,
+    swim_stroke: 11,
+    speed_lap: 12,
+    heart_rate_lap: 13
+  }.freeze
+
+  INTENSITY = {
+    active: 0,
+    rest: 1,
+    warmup: 2,
+    cooldown: 3,
+    recovery: 4,
+    interval: 5,
+    other: 6
+  }.freeze
+
+  WORKOUT_EQUIPMENT = {
+    none: 0,
+    swim_fins: 1,
+    swim_kickboard: 2,
+    swim_paddles: 3,
+    swim_pull_buoy: 4,
+    swim_snorkel: 5
+  }.freeze
+
+  ACTIVITY_TYPE = {
+    generic: 0,
+    running: 1,
+    cycling: 2,
+    transition: 3,
+    fitness_equipment: 4,
+    swimming: 5,
+    walking: 6,
+    sedentary: 8,
+    all: 254
+  }.freeze
+
+  LENGTH_TYPE = {
+    idle: 0,
+    active: 1
+  }.freeze
+
+  SWIM_STROKE = {
+    freestyle: 0,
+    backstroke: 1,
+    breaststroke: 2,
+    butterfly: 3,
+    drill: 4,
+    mixed: 5,
+    im: 6
+  }.freeze
+
+  LAP_TRIGGER = {
+    manual: 0,
+    time: 1,
+    distance: 2,
+    position_start: 3,
+    position_lap: 4,
+    position_waypoint: 5,
+    position_marked: 6,
+    session_end: 7,
+    fitness_equipment: 8
+  }.freeze
+
+  FIT_BASE_TYPE = {
+    enum: 0,
+    sint8: 1,
+    uint8: 2,
+    sint16: 131,
+    uint16: 132,
+    sint32: 133,
+    uint32: 134,
+    string: 7,
+    float32: 136,
+    float64: 137,
+    uint8z: 10,
+    uint16z: 139,
+    uint32z: 140,
+    byte: 13,
+    sint64: 142,
+    uint64: 143,
+    uint64z: 144
+  }.freeze
+
+
+  MESSAGE_TYPE = {
+    file_id: 0,
+    event: 21,
+    record: 20,
+    lap: 19,
+    course: 31,
+    course_point: 32,
+    session: 18,
+    workout: 26,
+    hr_zone: 8,
+    pwr_zone: 9,
+    activity: 34,
+    device_info: 23,
+    sport: 12,
+    workout_step: 27,
+    segment_lap: 142,
+    wahoo_custom_num: 65284,
+    wahoo_clm: 65285,
+    wahoo_id: 65281,
+    developer_data_id: 207,
+    field_description: 206
+  }.freeze
+
+  BATTERY_STATUS = {
+    new: 1,
+    good: 2,
+    ok: 3,
+    low: 4,
+    critical: 5,
+    charging: 6,
+    unknown: 7
+  }.freeze
+
+  SOURCE_TYPE = {
+    ant: 0,
+    antplus: 1,
+    bluetooth: 2,
+    bluetooth_low_energy: 3,
+    wifi: 4,
+    local: 5
+  }.freeze
+
+  WAYPOINT_TYPE = {
+    other: 0,
+    slight_right: 1,
+    right: 2,
+    sharp_right: 3,
+    u_turn: 4,
+    slight_left: 5,
+    left: 6,
+    sharp_left: 7,
+    depart: 9,
+    arrive: 10,
+    roundabout: 11,
+    way_point: 12,
+    warning: 13, # warning, caution
+    summit: 14, # summit, peak, mountain top
+    valley: 15, # valley, low point
+    water: 16, # water fountain, water tap
+    food: 17, # food, restaurant, cafe
+    first_aid: 18, # first aid, medical assistance
+    climb_4th_cat: 19, # climb 4th category
+    climb_3rd_cat: 20, # climb 3rd category
+    climb_2nd_cat: 21, # climb 2nd category
+    climb_1st_cat: 22, # climb 1st category
+    climb_hors_cat: 23, # climb hors category
+    sprint: 24, # sprint point
+    roundabout_right: 25,
+    roundabout_left: 26,
+    atm: 27, # ATM
+    art: 28, # Art installation
+    attraction: 29, # Attraction
+    bar: 30, # Bar
+    swimming: 31, # Swimming area
+    bike_parking: 32, # Bike parking
+    bike_share: 33, # Bike share station
+    bike_shop: 34, # Bike shop
+    campsite: 35, # Camping area
+    chairlift: 36, # Chair lift
+    checkpoint: 37,
+    coffee: 38,
+    distance_marker: 39, # Distance marker
+    dog_park: 40, # Dog park
+    e_bike_charging: 41, # E-bike charging station
+    ferry: 42, # Ferry
+    gas_station: 43, # Gas station
+    geocache: 44,
+    groceries: 45, # Grocery store
+    hospital: 46, # Hospital
+    info: 47, # Information point
+    internet: 48, # Internet access point
+    for_kids: 49, # For kids
+    library: 50, # Library
+    lodging: 51, # Lodging
+    meeting_spot: 52, # Meeting point
+    monument: 53,
+    park: 54,
+    parking: 55, # Parking area
+    pharmacy: 56, # Pharmacy
+    rest_area: 57, # Rest area
+    shopping: 58, # Shopping area
+    toilet: 59, # Toilet
+    shower: 60, # Shower
+    trailhead: 61, # Trailhead
+    transition: 62,
+    transit: 63, # Transit stop
+    viewpoint: 64, # Viewpoint
+    winery: 65,
+    segment_start: 66,
+    segment_end: 67,
+    unknown: 255, # Unknown waypoint type
+  }.freeze
+
+  DEVELOPER_FIELDS = {
+    # TO DO: Change these to match the actual developer data IDs and field definitions
+    course_point_type: 16,
+    course_point_description: 17
+  }.freeze
+
+
+  SPORT_SUBSPORT_TO_WORKOUT_ID = {
+    [2, 0] => 0,    # Cycling, Generic
+    [1, 0] => 1,    # Running, Generic
+    [4, 0] => 2,    # Fitness Equip, Generic
+    [1, 4] => 3,    # Running, Track
+    [1, 3] => 4,    # Running, Trail
+    [1, 1] => 5,    # Running, Treadmill
+    [11, 0] => 6,   # Walking, Generic
+    [11, 31] => 7,  # Walking, Speed Walking
+    [11, 30] => 8,  # Walking, Nordic Walking
+    [17, 0] => 9,   # Hiking, Generic
+    [16, 0] => 10,  # Mountaineering, Generic
+    [2, 11] => 11,  # Cycling, Cyclocross
+    [2, 6] => 12,   # Cycling, Indoor Cycling
+    [2, 8] => 13,   # Cycling, Mountain
+    [2, 10] => 14,  # Cycling, Recumbent
+    [2, 7] => 15,   # Cycling, Road
+    [2, 13] => 16,  # Cycling, Track Cycling
+    [22, 0] => 17,  # Motorcycling, Generic
+    [4, 0] => 18,   # Fitness Equip, Generic
+    [4, 15] => 20,  # Fitness Equip, Elliptical
+    [2, 6] => 21,   # Cycling, Indoor Cycling
+    [4, 14] => 22,  # Fitness Equip, Indoor Rowing
+    [4, 16] => 23,  # Fitness Equip, Stair Climbing
+    [5, 0] => 24,   # Swimming, Generic
+    [5, 17] => 25,  # Swimming, Lap Swimming
+    [5, 18] => 26,  # Swimming, Open Water
+    [14, 0] => 27,  # Snowboarding, Generic
+    [13, 0] => 28,  # Alpine Skiing, Generic
+    [13, 9] => 29,  # Alpine Skiing, Downhill
+    [12, 0] => 30,  # Cross Country Skiing, Generic
+    [31, 0] => 31,  # Skating, Generic
+    [33, 0] => 32,  # Ice Skating, Generic
+    [30, 0] => 33,  # Inline Skating, Generic
+    [31, 0] => 34,  # Skating, Long Boarding
+    [32, 0] => 35,  # Sailing, Generic
+    [43, 0] => 36,  # Windsurfing, Generic
+    [19, 0] => 37,  # Paddling, Canoeing
+    [41, 0] => 38,  # Kayaking, Generic
+    [15, 0] => 39,  # Rowing, Generic
+    [44, 0] => 40,  # Kitesurfing, Generic
+    [37, 0] => 41,  # Stand Up Paddleboarding, Generic
+    [10, 20] => 42, # Training, Strength Training
+    [10, 26] => 43, # Training, Cardio Training
+    [4, 16] => 44,  # Fitness Equip, Stair Climbing
+    [65, 0] => 45,  # Wheelchair Push Walk, Generic
+    [25, 0] => 46,  # Golf, Generic
+    [0, 0] => 47,   # Generic, Generic
+    [2, 5] => 49,   # Cycling, Spin
+    [11, 1] => 56,  # Walking, Treadmill
+    [2, 6] => 61,   # Cycling, Indoor Trainer
+    [18, 0] => 62,  # Multisport, Generic
+    [3, 0] => 63,   # Transition, Generic
+    [21, 0] => 64,  # E Biking, Generic
+    [0, 23] => 65,  # Generic, Excercise
+    [10, 43] => 66, # Training, Yoga
+    [1, 0] => 67,   # Running, Race Running
+    [2, 58] => 68,  # Cycling, Virtual Activity
+    [69, 0] => 69,  # Mental Strength Training, Generic
+    [2, 12] => 70,  # Cycling, Handcycling
+    [1, 58] => 71,  # Running, Virtual Activity
+    [10, 0] => 72,  # Training, Generic
+    [0, 0] => 73,   # Generic, Generic
+    [255, 0] => 255 # Unknown
   }.freeze
 end
